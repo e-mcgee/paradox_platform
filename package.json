@@ -8,7 +8,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/example/homebridge.git"
+    "url": "https://github.com/e-mcgee/paradox_platform/tree/master"
   },
   "bugs": {
     "url": "http://github.com/example/homebridge/issues"
