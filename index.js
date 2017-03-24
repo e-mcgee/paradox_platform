@@ -36,86 +36,86 @@ for (i=0; i<32; i++) {
 //   status: is either Armed Away, Armed Perimeter, Armed Sleep, or Disarmed
 //   accessory : store the accessory so that it can be accessed when a change occurs
 var alarmstate = {
-	status: "Disarmed",
-	accessory: null
-	}
+    status: "Disarmed",
+    accessory: null
+}
 
 
 function _parsestatus() {
 
-	if (receivebuffer[16] == 0x52) {
-		if (receivebuffer[19] == 0x01) {
-			// Alarm status
-			if (receivebuffer[33] > 0x10) {
-				alarmstatus = "In Alarm";
-			}
-			else {
-				switch(receivebuffer[33]) {
-					case 0x00:
-					   alarmstatus = "Disarmed";
-					   break;
-					case 0x01:
-					   alarmstatus = "Armed Away";
-					   break;
-					case 0x02:
-					   alarmstatus = "Armed Sleep";
-					   break;
-					case 0x03:
-					   alarmstatus = "Armed Sleep";                           
-					   break;
-					case 0x06: 
-					   alarmstatus = "Armed Sleep";
-					   break;
-					case 0x04:
-					   alarmstatus = "Armed Perimeter";                           
-					   break;
-					case 0x05:
-					   alarmstatus = "Armed Perimeter";
-					   break;
-					case 0x08:
-					   alarmstatus = "Instant Armed";                            
-					   break;
-					case 0x09:
-					   alarmstatus = "Instant Armed";
-					   break;
-					default:
-					   alarmstatus = "Unknown";
-				} 
-			}
-		}
-		if (receivebuffer[19] == 0x00) {
-			// Zone status
-			for (i=0;i<4;i++) {
-				for (j=0;j<8;j++) {
-					if (receivebuffer[i+35] & 0x01<<j) {
-						zonestatus[j+i*8] = 1;
-					}
-					else {
-						zonestatus[j+i*8] = 0;
-					}
-				}
-			}
-		}
-	}
+    if (receivebuffer[16] == 0x52) {
+        if (receivebuffer[19] == 0x01) {
+                // Alarm status
+                if (receivebuffer[33] > 0x10) {
+                        alarmstatus = "In Alarm";
+                }
+                else {
+                        switch(receivebuffer[33]) {
+                                case 0x00:
+                                   alarmstatus = "Disarmed";
+                                   break;
+                                case 0x01:
+                                   alarmstatus = "Armed Away";
+                                   break;
+                                case 0x02:
+                                   alarmstatus = "Armed Sleep";
+                                   break;
+                                case 0x03:
+                                   alarmstatus = "Armed Sleep";                           
+                                   break;
+                                case 0x06: 
+                                   alarmstatus = "Armed Sleep";
+                                   break;
+                                case 0x04:
+                                   alarmstatus = "Armed Perimeter";                           
+                                   break;
+                                case 0x05:
+                                   alarmstatus = "Armed Perimeter";
+                                   break;
+                                case 0x08:
+                                   alarmstatus = "Instant Armed";                            
+                                   break;
+                                case 0x09:
+                                   alarmstatus = "Instant Armed";
+                                   break;
+                                default:
+                                   alarmstatus = "Unknown";
+                        } 
+                }
+        }
+        if (receivebuffer[19] == 0x00) {
+                // Zone status
+                for (i=0;i<4;i++) {
+                        for (j=0;j<8;j++) {
+                                if (receivebuffer[i+35] & 0x01<<j) {
+                                        zonestatus[j+i*8] = 1;
+                                }
+                                else {
+                                        zonestatus[j+i*8] = 0;
+                                }
+                        }
+                }
+        }
+    }
 }
 
 
 function format37ByteMessage(message) {
 
-	var checksum = 0;
-	if (message.length % 37 !=0) {
-		for (i=0;i<message.length;i++)
-			checksum += message.charCodeAt(i);
-		while (checksum > 255) 
-			checksum = checksum - (checksum/256)*256;
-		buf2 = Buffer.from([checksum]);
-                buf1 = Buffer.from(message);
-		buf3 = Buffer.concat([buf1, buf2], buf1.length+buf2.length);
-                buf4 = Buffer.alloc((Math.round(buf3.length/16)+1)*16,0xEE);
-                buf3.copy(buf4);
-                message = buf4.toString('hex');
-	}
-	return message;
+    var checksum = 0;
+    if (message.length % 37 !=0) {
+            for (i=0;i<message.length;i++)
+                    checksum += message.charCodeAt(i);
+            while (checksum > 255) 
+                    checksum = checksum - (checksum/256)*256;
+            buf2 = Buffer.from([checksum]);
+            buf1 = Buffer.from(message);
+            buf3 = Buffer.concat([buf1, buf2], buf1.length+buf2.length);
+            buf4 = Buffer.alloc((Math.round(buf3.length/16)+1)*16,0xEE);
+            buf3.copy(buf4);
+            message = buf4.toString('hex');
+    }
+    return message;
 }
 
 
@@ -411,25 +411,25 @@ function controlPGM (state, pgm, acc, cl) {
 // Convert status to Homebridge values
 function GetHomebridgeStatus(msg) {
 
-	var status= 10;
-	switch (msg) {
-		case "Armed Perimeter":
-			status = Characteristic.SecuritySystemCurrentState.STAY_ARM;
-			break;
-		case "Armed Sleep":
-			status = Characteristic.SecuritySystemCurrentState.NIGHT_ARM;
-			break;
-		case "Armed Away":
-			status = Characteristic.SecuritySystemCurrentState.AWAY_ARM;
-			break;
-		case "Disarmed":
-			status = Characteristic.SecuritySystemCurrentState.DISARMED;
-			break;
-		case "In Alarm":
-			status = Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED;
-			break;						
-	};	
-	return status;
+    var status= 10;
+    switch (msg) {
+        case "Armed Perimeter":
+                status = Characteristic.SecuritySystemCurrentState.STAY_ARM;
+                break;
+        case "Armed Sleep":
+                status = Characteristic.SecuritySystemCurrentState.NIGHT_ARM;
+                break;
+        case "Armed Away":
+                status = Characteristic.SecuritySystemCurrentState.AWAY_ARM;
+                break;
+        case "Disarmed":
+                status = Characteristic.SecuritySystemCurrentState.DISARMED;
+                break;
+        case "In Alarm":
+                status = Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED;
+                break;						
+    };	
+    return status;
 }
 
 
@@ -443,23 +443,23 @@ module.exports = function(homebridge) {
 
 function paradoxPlatform(log, config) {
 
-	var self = this;
+    var self = this;
 
-	this.log = log;
-	this.config = config;
-        
-	alarm_ip_address = this.config.ip;
-	alarm_port = this.config.port;
-	alarm_password = this.config.password;
-                		
-	setInterval(function () {
-		alarmstate.accessory.log('Mute : [%s]', muteStatus);
-		if (!muteStatus) {
+    this.log = log;
+    this.config = config;
+
+    alarm_ip_address = this.config.ip;
+    alarm_port = this.config.port;
+    alarm_password = this.config.password;
+
+    setInterval(function () {
+        alarmstate.accessory.log('Mute : [%s]', muteStatus);
+        if (!muteStatus) {
             getAlarmStatus(self);
             var state;
-                    
+
             alarmstate.accessory.log('Got status');
-		    alarmstate.accessory.log('Results:');
+            alarmstate.accessory.log('Results:');
             for (i = 0; i < 32; i++) {
                 var st;
                 if (zonestatus[i] == 0) {
@@ -468,121 +468,121 @@ function paradoxPlatform(log, config) {
                 else if (zonestatus[i] == 1) {
                     st='on';
                 }
-				if ( zonestatus[i] == 1 || zonestatus[i] == 0 ) {
+                if ( zonestatus[i] == 1 || zonestatus[i] == 0 ) {
                     if (zones[i].accessory != null && zones[i].status != st) {
-						alarmstate.accessory.log('Accessory was :'+zones[i].status);
-						alarmstate.accessory.log('New atate is :'+st);
-						alarmstate.accessory.log(zonestatus[i]);
-						switch(zones[i].type) {
+                        alarmstate.accessory.log('Accessory was :'+zones[i].status);
+                        alarmstate.accessory.log('New atate is :'+st);
+                        alarmstate.accessory.log(zonestatus[i]);
+                        switch(zones[i].type) {
                             case 'Garage Door':
-								if (st=='off') {
+                                if (st=='off') {
                                     state = Characteristic.TargetDoorState.CLOSED;
-								}
-								else {
+                                }
+                                else {
                                     state = Characteristic.TargetDoorState.OPEN;
-								}
-								if (zones[i].accessory.garagedooropenerService.readstate != state) {
-									zones[i].accessory.garagedooropenerService.readstate = state;
-									zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).setValue(state);								
-									zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(state);								
-								}
-								break;
+                                }
+                                if (zones[i].accessory.garagedooropenerService.readstate != state) {
+                                        zones[i].accessory.garagedooropenerService.readstate = state;
+                                        zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).setValue(state);								
+                                        zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(state);								
+                                }
+                                break;
                             case 'Alarm': 
-								break;
+                                break;
                             case 'Contact Sensor':
-								if (st=='off') {
-									state =Characteristic.ContactSensorState.CONTACT_DETECTED;
-								}
-								else {
-									state = Characteristic.ContactSensorState.CONTACT_NOT_DETECTED;
-								}
-								zones[i].accessory.contactsensorService.getCharacteristic(Characteristic.ContactSensorState).setValue(state);
-								break;
+                                if (st=='off') {
+                                    state =Characteristic.ContactSensorState.CONTACT_DETECTED;
+                                }
+                                else {
+                                    state = Characteristic.ContactSensorState.CONTACT_NOT_DETECTED;
+                                }
+                                zones[i].accessory.contactsensorService.getCharacteristic(Characteristic.ContactSensorState).setValue(state);
+                                break;
                             case 'Motion Sensor':
-								if (st=='off') {
-									state = false;
-								}
-								else {
-									state = true;
-								}
-								zones[i].accessory.motionsensorService.getCharacteristic(Characteristic.MotionDetected).setValue(state);
-								break;
+                                if (st=='off') {
+                                    state = false;
+                                }
+                                else {
+                                    state = true;
+                                }
+                                zones[i].accessory.motionsensorService.getCharacteristic(Characteristic.MotionDetected).setValue(state);
+                                break;
                             default:
-								alarmstate.accessory.log('Not Supported: %s [%s]', accessoryName, accConfig.type);
-						}							
+                                alarmstate.accessory.log('Not Supported: %s [%s]', accessoryName, accConfig.type);
+                        }							
                     }
                     zones[i].status = st;
                     if (zones[i].accessory != null) {
-						zones[i].accessory.log('Zone ' + i.toString() + ' ' + zones[i].status + ' (' + zones[i].accessory.name + ')');
+                        zones[i].accessory.log('Zone ' + i.toString() + ' ' + zones[i].status + ' (' + zones[i].accessory.name + ')');
                     }
-				}
+                }
             }
-		  
+
             if (alarmstate.status != alarmstatus) {
                 if (alarmstatus == 'In Alarm' || alarmstatus == 'Armed Perimeter' || alarmstatus == 'Armed Sleep' || alarmstatus == 'Armed Away' ||  alarmstatus == 'Disarmed') {
-					alarmstate.status = alarmstatus;
-					var stat = GetHomebridgeStatus(alarmstatus);
-					alarmstate.accessory.securitysystemService.setCharacteristic(Characteristic.SecuritySystemCurrentState, stat);
-					alarmstate.accessory.securitysystemService.setCharacteristic(Characteristic.SecuritySystemTargetState, stat);
-				}
-			}
+                    alarmstate.status = alarmstatus;
+                    var stat = GetHomebridgeStatus(alarmstatus);
+                    alarmstate.accessory.securitysystemService.setCharacteristic(Characteristic.SecuritySystemCurrentState, stat);
+                    alarmstate.accessory.securitysystemService.setCharacteristic(Characteristic.SecuritySystemTargetState, stat);
+                }
+            }
             alarmstate.accessory.log('Alarmstatus :' + alarmstate.status);
-		}
-		else {
-			alarmstate.accessory.log('Busy with alarm - not getting status now.');
-		}
-	}, 10000);
+        }
+        else {
+                alarmstate.accessory.log('Busy with alarm - not getting status now.');
+        }
+    }, 10000);
 }
 
 
 paradoxPlatform.prototype.accessories = function(callback) {
 
-	var self = this;
+    var self = this;
 
-	var acc = [];
-	
- 	if (this.config.accessories) {
-		var accessories = this.config.accessories;
-		this.log('Looking for accessories in config file');
-		accessories.forEach(function(accessoryConfig) {
-			var accessoryName = accessoryConfig.name;
-			self.log('Accessory');
-			self.log(accessoryName);
-			var accConfig = accessoryConfig.config;
+    var acc = [];
 
-			if (!accessoryName || !accessoryConfig) {
-				self.log('Missing parameters.');
-				return;
-			}
+    if (this.config.accessories) {
+        var accessories = this.config.accessories;
+        this.log('Looking for accessories in config file');
+        accessories.forEach(function(accessoryConfig) {
+            var accessoryName = accessoryConfig.name;
+            self.log('Accessory');
+            self.log(accessoryName);
+            var accConfig = accessoryConfig.config;
 
-			self.log('Found: %s [%s]', accessoryName, accConfig.type);
-			
-			var a = new ParadoxAccessory(self.log, accConfig, accessoryName);
-			
-			if (accConfig.type == 'Garage Door' || accConfig.type == 'Contact Sensor' ||  accConfig.type == 'Motion Sensor') {
-				zones[accConfig.zone].accessory = a;
-				zones[accConfig.zone].type = accConfig.type;
-			}
-			if (accConfig.type == 'Alarm') {
-				alarmstate.accessory = a;
-			}
-			acc.push(a);
-		});
-	}
-	else {
-		this.log('No config for platform');
-	}	
-	callback(acc);
+            if (!accessoryName || !accessoryConfig) {
+                self.log('Missing parameters.');
+                return;
+            }
+
+            self.log('Found: %s [%s]', accessoryName, accConfig.type);
+
+            var a = new ParadoxAccessory(self.log, accConfig, accessoryName);
+
+            if (accConfig.type == 'Garage Door' || accConfig.type == 'Contact Sensor' ||  accConfig.type == 'Motion Sensor') {
+                zones[accConfig.zone].accessory = a;
+                zones[accConfig.zone].type = accConfig.type;
+            }
+            if (accConfig.type == 'Alarm') {
+                alarmstate.accessory = a;
+            }
+            acc.push(a);
+        });
+    }
+    else {
+            this.log('No config for platform');
+    }	
+    callback(acc);
 }
 
 
 function ParadoxAccessory(log, config, name) {
 	
-	this.log = log;
-	this.config = config;
-	this.name = name;
-	
-	this.reachability = true;	
+    this.log = log;
+    this.config = config;
+    this.name = name;
+
+    this.reachability = true;	
 }
 
 
@@ -595,54 +595,54 @@ ParadoxAccessory.prototype.identify = function (callback) {
 
 ParadoxAccessory.prototype.getServices = function () {
 
-  this.informationService = new Service.AccessoryInformation();
+    this.informationService = new Service.AccessoryInformation();
 
-  this.informationService
+    this.informationService
 	.setCharacteristic(Characteristic.Manufacturer, 'Paradox')
 	.setCharacteristic(Characteristic.SerialNumber, 'Platform')
 	.setCharacteristic(Characteristic.FirmwareRevision, 'v1.0');
 
-	switch(this.config.type) {
-		case 'Alarm':
-			this.securitysystemService = new Service.SecuritySystem(this.name);
-			this.informationService
-				.setCharacteristic(Characteristic.Model, 'Alarm');
-			this.securitysystemService
-				.getCharacteristic(Characteristic.SecuritySystemCurrentState)
-					 .on('get', this.getAlarmState.bind(this));
-			this.securitysystemService
-				.getCharacteristic(Characteristic.SecuritySystemTargetState)
-					.on('set', this.setAlarmState.bind(this));
-			return [this.informationService, this.securitysystemService];
-			break;
-		case 'Garage Door':
-			this.garagedooropenerService = new Service.GarageDoorOpener(this.name);
-			this.informationService
-				.setCharacteristic(Characteristic.Model, 'Garage Door');
-			this.garagedooropenerService
-				.getCharacteristic(Characteristic.CurrentDoorState)
-					.on('get', this.getDoorState.bind(this));
-			this.garagedooropenerService
-				.getCharacteristic(Characteristic.TargetDoorState)
-					.on('set', this.setDoorState.bind(this));
-			this.garagedooropenerService
-				.getCharacteristic(Characteristic.ObstructionDetected)
-					.on('get', this.getObstructed.bind(this));
-			return [this.informationService, this.garagedooropenerService];
-			break;
-		case 'Contact Sensor':
-			this.contactsensorService = new Service.ContactSensor(this.name);
-			this.informationService
-				.setCharacteristic(Characteristic.Model, 'Contact Sensor');
-			return [this.informationService, this.contactsensorService];
-			break;
-		case 'Motion Sensor':
-			this.motionsensorService = new Service.MotionSensor(this.name);
-			this.informationService
-				.setCharacteristic(Characteristic.Model, 'Motion Sensor');
-			return [this.informationService, this.motionsensorService];
-			break;
-	}
+    switch(this.config.type) {
+        case 'Alarm':
+            this.securitysystemService = new Service.SecuritySystem(this.name);
+            this.informationService
+                    .setCharacteristic(Characteristic.Model, 'Alarm');
+            this.securitysystemService
+                    .getCharacteristic(Characteristic.SecuritySystemCurrentState)
+                             .on('get', this.getAlarmState.bind(this));
+            this.securitysystemService
+                    .getCharacteristic(Characteristic.SecuritySystemTargetState)
+                            .on('set', this.setAlarmState.bind(this));
+            return [this.informationService, this.securitysystemService];
+            break;
+        case 'Garage Door':
+            this.garagedooropenerService = new Service.GarageDoorOpener(this.name);
+            this.informationService
+                    .setCharacteristic(Characteristic.Model, 'Garage Door');
+            this.garagedooropenerService
+                    .getCharacteristic(Characteristic.CurrentDoorState)
+                            .on('get', this.getDoorState.bind(this));
+            this.garagedooropenerService
+                    .getCharacteristic(Characteristic.TargetDoorState)
+                            .on('set', this.setDoorState.bind(this));
+            this.garagedooropenerService
+                    .getCharacteristic(Characteristic.ObstructionDetected)
+                            .on('get', this.getObstructed.bind(this));
+            return [this.informationService, this.garagedooropenerService];
+            break;
+        case 'Contact Sensor':
+            this.contactsensorService = new Service.ContactSensor(this.name);
+            this.informationService
+                    .setCharacteristic(Characteristic.Model, 'Contact Sensor');
+            return [this.informationService, this.contactsensorService];
+            break;
+        case 'Motion Sensor':
+            this.motionsensorService = new Service.MotionSensor(this.name);
+            this.informationService
+                    .setCharacteristic(Characteristic.Model, 'Motion Sensor');
+            return [this.informationService, this.motionsensorService];
+            break;
+    }
 }
 
 
@@ -651,22 +651,22 @@ ParadoxAccessory.prototype.getServices = function () {
 // Garage Door Opener handler functions
 
 ParadoxAccessory.prototype.getDoorState = function(callback) {
-	var msg = null;
-	var state = 10;
-	var self = this;
-	var acc = this.garagedooropenerService;
-	var config = this.config;
+    var msg = null;
+    var state = 10;
+    var self = this;
+    var acc = this.garagedooropenerService;
+    var config = this.config;
 
-	if (zones[config.zone].status=='off') {
-		acc.readstate = Characteristic.TargetDoorState.CLOSED;
-	}
-	else {
-		acc.readstate = Characteristic.TargetDoorState.OPEN;
-	}
-	
-	this.reachability = true;
+    if (zones[config.zone].status=='off') {
+        acc.readstate = Characteristic.TargetDoorState.CLOSED;
+    }
+    else {
+        acc.readstate = Characteristic.TargetDoorState.OPEN;
+    }
 
-	callback(null,acc.readstate);
+    this.reachability = true;
+
+    callback(null,acc.readstate);
 }
 
 
@@ -687,9 +687,9 @@ ParadoxAccessory.prototype.setDoorState = function(state, callback) {
     this.log(config.pgm);
 
     var options = {
-            mode: 'text',
-            encoding: 'utf8',
-            args: [config.pgm]
+        mode: 'text',
+        encoding: 'utf8',
+        args: [config.pgm]
     };
 
     if (acc.readstate != state) {
@@ -708,17 +708,17 @@ ParadoxAccessory.prototype.setDoorState = function(state, callback) {
                loggedin = false;
             });
 
-			client.on('timeout', () => {
-			   acc.log('No response from alarm - Disconnected from alarm');
-			   loggedin = false;
-			   client.end();
-			});
+            client.on('timeout', () => {
+               acc.log('No response from alarm - Disconnected from alarm');
+               loggedin = false;
+               client.end();
+            });
 
-			client.on('error', () => {
-			   acc.log('Error communicating with alarm - Disconnected from alarm');
-			   loggedin = false;
-			   client.end();
-			});
+            client.on('error', () => {
+               acc.log('Error communicating with alarm - Disconnected from alarm');
+               loggedin = false;
+               client.end();
+            });
 
             client.on('data', (data) => {
                 if (data.length < 1024) {
@@ -752,8 +752,8 @@ ParadoxAccessory.prototype.setDoorState = function(state, callback) {
 
 ParadoxAccessory.prototype.getObstructed = function(callback) {
 
-	this.log('Not Obstructed');
-	callback();
+    this.log('Not Obstructed');
+    callback();
 }
 
 
@@ -763,22 +763,22 @@ ParadoxAccessory.prototype.getObstructed = function(callback) {
 //
 ParadoxAccessory.prototype.getAlarmState = function(callback) {
 
-	var acc = this.securitysystemService;
-	var state;
-	var self = this;
-	var err = null;
-	
-	state = GetHomebridgeStatus(alarmstate.status);
-	if (state == 10) {
-	   self.log('Alarmstate unknown');
-	   err='Error';
-	}
-	self.log('Alarmstate:');
-	self.log(state);
-// 	this.securitysystemService.setCharacteristic(Characteristic.SecuritySystemCurrentState, state);
-	this.reachability = true;
+    var acc = this.securitysystemService;
+    var state;
+    var self = this;
+    var err = null;
 
-	callback(err, state);
+    state = GetHomebridgeStatus(alarmstate.status);
+    if (state == 10) {
+       self.log('Alarmstate unknown');
+       err='Error';
+    }
+    self.log('Alarmstate:');
+    self.log(state);
+// 	this.securitysystemService.setCharacteristic(Characteristic.SecuritySystemCurrentState, state);
+    this.reachability = true;
+
+    callback(err, state);
 }
 
 
@@ -814,23 +814,23 @@ ParadoxAccessory.prototype.setAlarmState = function(state, callback) {
                loggedin = false;
             });
 
-			client.on('timeout', () => {
-			   acc.log('No response from alarm - Disconnected from alarm');
-			   loggedin = false;
-			   client.end();
-			});
+            client.on('timeout', () => {
+               acc.log('No response from alarm - Disconnected from alarm');
+               loggedin = false;
+               client.end();
+            });
 
-			client.on('error', () => {
-			   acc.log('Error communicating with alarm - Disconnected from alarm');
-			   loggedin = false;
-			   client.end();
-			});
+            client.on('error', () => {
+               acc.log('Error communicating with alarm - Disconnected from alarm');
+               loggedin = false;
+               client.end();
+            });
 
             client.on('data', (data) => {
                 if (data.length < 1024) {
                     receivebuffer = Buffer.from(data);
                 }
-				_parsestatus();
+                _parsestatus();
             });
 
             sleep(500);
@@ -847,20 +847,20 @@ ParadoxAccessory.prototype.setAlarmState = function(state, callback) {
         //
         if (GetHomebridgeStatus(alarmstatus) != targetstate) {
             switch (targetstate) {
-                    case Characteristic.SecuritySystemTargetState.STAY_ARM:
-                            controlAlarm("STAY", 0, self, client);
-                            break;				
-                    case Characteristic.SecuritySystemTargetState.NIGHT_ARM:
-                            controlAlarm("SLEEP", 0, self, client);
-                            break;				
-                    case Characteristic.SecuritySystemTargetState.AWAY_ARM :
-                            controlAlarm("ARM", 0, self, client);
-                            break;				
-                    case Characteristic.SecuritySystemTargetState.DISARM:
-                            controlAlarm("DISARM", 0, self, client);
-                            break;
-                    default :
-                            self.log('Unknown state');
+                case Characteristic.SecuritySystemTargetState.STAY_ARM:
+                    controlAlarm("STAY", 0, self, client);
+                    break;				
+                case Characteristic.SecuritySystemTargetState.NIGHT_ARM:
+                    controlAlarm("SLEEP", 0, self, client);
+                    break;				
+                case Characteristic.SecuritySystemTargetState.AWAY_ARM :
+                    controlAlarm("ARM", 0, self, client);
+                    break;				
+                case Characteristic.SecuritySystemTargetState.DISARM:
+                    controlAlarm("DISARM", 0, self, client);
+                    break;
+                default :
+                    self.log('Unknown state');
             };
             self.securitysystemService.setCharacteristic(Characteristic.SecuritySystemCurrentState, state);
         }
