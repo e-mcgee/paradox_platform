@@ -40,6 +40,66 @@ var alarmstate = {
 	accessory: null
 	}
 
+
+function _parsestatus() {
+
+	if (receivebuffer[16] == 0x52) {
+		if (receivebuffer[19] == 0x01) {
+			// Alarm status
+			if (receivebuffer[33] > 0x10) {
+				alarmstatus = "In Alarm";
+			}
+			else {
+				switch(receivebuffer[33]) {
+					case 0x00:
+					   alarmstatus = "Disarmed";
+					   break;
+					case 0x01:
+					   alarmstatus = "Armed Away";
+					   break;
+					case 0x02:
+					   alarmstatus = "Armed Sleep";
+					   break;
+					case 0x03:
+					   alarmstatus = "Armed Sleep";                           
+					   break;
+					case 0x06: 
+					   alarmstatus = "Armed Sleep";
+					   break;
+					case 0x04:
+					   alarmstatus = "Armed Perimeter";                           
+					   break;
+					case 0x05:
+					   alarmstatus = "Armed Perimeter";
+					   break;
+					case 0x08:
+					   alarmstatus = "Instant Armed";                            
+					   break;
+					case 0x09:
+					   alarmstatus = "Instant Armed";
+					   break;
+					default:
+					   alarmstatus = "Unknown";
+				} 
+			}
+		}
+		if (receivebuffer[19] == 0x00) {
+			// Zone status
+			for (i=0;i<4;i++) {
+				for (j=0;j<8;j++) {
+					if (receivebuffer[i+35] & 0x01<<j) {
+						zonestatus[j+i*8] = 1;
+					}
+					else {
+						zonestatus[j+i*8] = 0;
+					}
+				}
+			}
+		}
+	}
+}
+
+
 function format37ByteMessage(message) {
 
 	var checksum = 0;
@@ -54,7 +114,6 @@ function format37ByteMessage(message) {
                 buf4 = Buffer.alloc((Math.round(buf3.length/16)+1)*16,0xEE);
                 buf3.copy(buf4);
                 message = buf4.toString('hex');
-
 	}
 	return message;
 }
@@ -69,14 +128,12 @@ function _login(password, cl, acc) {
     var totalLength = byte1.length + byte2.length + byte3.length;
     var buf = Buffer.concat([byte1, byte2, byte3], totalLength);
 
-
     loginresult = 1;
     acc.log('Logging in');
 
     cl.write(buf);
     sleep(600);
     if (receivebuffer[4] == 0x38) {
-
         acc.log('Log in successfull');
         buf = Buffer.from([0xAA,0x08,0x00,0x03,0x08,0xF0,0x00,0x0A,0xEE,0xEE,0xEE,0xEE,0xEE,0xEE,0xEE,0xEE]);
         buf[1] = 0x00;
@@ -181,6 +238,7 @@ function _login(password, cl, acc) {
     }    
 }
 
+
 function _getalarmstatus(cl,acc) {
     if (loggedin) {
 
@@ -200,7 +258,6 @@ function _getalarmstatus(cl,acc) {
 }
 
 
-
 function getAlarmStatus(acc) {
 
     if (controlPGMstate || controlAlarmstate ) {
@@ -211,79 +268,31 @@ function getAlarmStatus(acc) {
     gettingstatus = true;
 
     var client = net.createConnection({port: alarm_port, host: alarm_ip_address}, () => {
-                acc.log('Getting Status - Connected to Alarm!');
-
+                acc.log('Getting Status - Connected to alarm!');
     });
 
     client.on('end', () => {
-       acc.log('Finished Getting Status - Disconnected from  Alarm');
+       acc.log('Finished Getting Status - Disconnected from  alarm');
        loggedin = false;
     });
 
+    client.on('timeout', () => {
+       acc.log('No response from alarm - Disconnected from alarm');
+       loggedin = false;
+       client.end();
+    });
+
+    client.on('error', () => {
+       acc.log('Error communicating with alarm - Disconnected from alarm');
+       loggedin = false;
+       client.end();
+    });
 
     client.on('data', (data) => {
         if (data.length < 1024) {
             receivebuffer = Buffer.from(data);
         }
-        if (gettingstatus) {
-            if (receivebuffer[16] == 0x52) {
-                if (receivebuffer[19] == 0x01) {
-                    // Alarm status
-                    if (receivebuffer[33] > 0x10) {
-                        alarmstatus = "In Alarm";
-                    }
-                    else {
-                        switch(receivebuffer[33]) {
-                            case 0x00:
-                               alarmstatus = "Disarmed";
-                               break;
-                            case 0x01:
-                               alarmstatus = "Armed Away";
-                               break;
-                            case 0x02:
-                               alarmstatus = "Armed Sleep";
-                               break;
-                            case 0x03:
-                               alarmstatus = "Armed Sleep";                           
-                               break;
-                            case 0x06: 
-                               alarmstatus = "Armed Sleep";
-                               break;
-                            case 0x04:
-                               alarmstatus = "Armed Perimeter";                           
-                               break;
-                            case 0x05:
-                               alarmstatus = "Armed Perimeter";
-                               break;
-                            case 0x08:
-                               alarmstatus = "Instant Armed";                            
-                               break;
-                            case 0x09:
-                               alarmstatus = "Instant Armed";
-                               break;
-                            default:
-                               alarmstatus = "Unknown";
-                        } 
-                    }
-                }
-                if (receivebuffer[19] == 0x00) {
-                    if (loginresult == 0) {
-                        // Zone status
-                        for (i=0;i<4;i++) {
-                            for (j=0;j<8;j++) {
-                                if (receivebuffer[i+35] & 0x01<<j) {
-                                    zonestatus[j+i*8] = 1;
-                                }
-                                else {
-                                    zonestatus[j+i*8] = 0;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
+		_parsestatus();
     });
 
     sleep(500);
@@ -291,12 +300,11 @@ function getAlarmStatus(acc) {
     _getalarmstatus(client,acc);
     client.end();
     gettingstatus = false;
-
 }
 
+
 function controlAlarm (state, partition, acc, cl) {
-        
-    
+            
     if (loggedin) {
         var message1 = '';
 
@@ -344,12 +352,10 @@ function controlAlarm (state, partition, acc, cl) {
     else {
         acc.log('Cannot set Alarm - not logged in');
     }
-    
-    
 }
 
-function getHex(dec)
-{
+
+function getHex(dec) {
     var hexArray = new Array( "\x00", "\x01", "\x02", "\x03", 
                               "\x04", "\x05", "\x06", "\x07",
                               "\x08", "\x09", "\x0a", "\x0b", 
@@ -365,8 +371,7 @@ function getHex(dec)
 
 
 function controlPGM (state, pgm, acc, cl) {
-    
-       
+           
     if (loggedin) {
         var message1 = '';
 
@@ -376,8 +381,12 @@ function controlPGM (state, pgm, acc, cl) {
         if (state == "ON") {
             message1 = '\x40\x00\x30';
         }
-        if (state == "OFF") {
+        else if (state == "OFF") {
             message1 = '\x40\x00\x31';
+        }
+        else {
+        	acc.log('Invalid PGM state - ignoring.');
+        	return;
         }
         msg = getHex(pgm);
         acc.log(msg);
@@ -394,8 +403,7 @@ function controlPGM (state, pgm, acc, cl) {
     }
     else {
         acc.log('Cannot set PGM - not logged in');
-    }
-    
+    }    
 }
 
 
@@ -419,10 +427,8 @@ function GetHomebridgeStatus(msg) {
 			break;
 		case "In Alarm":
 			status = Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED;
-			break;			
-			
-	};
-	
+			break;						
+	};	
 	return status;
 }
 
@@ -442,89 +448,85 @@ function paradoxPlatform(log, config) {
 	this.log = log;
 	this.config = config;
         
-        alarm_ip_address = this.config.ip;
-        alarm_port = this.config.port;
-        alarm_password = this.config.password;
-        
-        
-		
+	alarm_ip_address = this.config.ip;
+	alarm_port = this.config.port;
+	alarm_password = this.config.password;
+                		
 	setInterval(function () {
 		alarmstate.accessory.log('Mute : [%s]', muteStatus);
 		if (!muteStatus) {
-                    getAlarmStatus(self);
- //                   sleep(500);
-                    var state;
+            getAlarmStatus(self);
+            var state;
                     
-                    alarmstate.accessory.log('Got status');
+            alarmstate.accessory.log('Got status');
 		    alarmstate.accessory.log('Results:');
-                    for (i = 0; i < 32; i++) {
-                        var st;
-                        if (zonestatus[i] == 0) {
-                            st='off';
-                        }
-                        else if (zonestatus[i] == 1) {
-                            st='on';
-                        }
-			if ( zonestatus[i] == 1 || zonestatus[i] == 0 ) {
-                            if (zones[i].accessory != null && zones[i].status != st) {
-                                alarmstate.accessory.log('Accessory was :'+zones[i].status);
-                                alarmstate.accessory.log('New atate is :'+st);
-                                alarmstate.accessory.log(zonestatus[i]);
-				switch(zones[i].type) {
-                                    case 'Garage Door':
-					if (st=='off') {
-                                            state = Characteristic.TargetDoorState.CLOSED;
-					}
-					else {
-                                            state = Characteristic.TargetDoorState.OPEN;
-					}
-					if (zones[i].accessory.garagedooropenerService.readstate != state) {
-                                            zones[i].accessory.garagedooropenerService.readstate = state;
-                                            zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).setValue(state);								
-                                            zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(state);								
-					}
-					break;
-                                    case 'Alarm': 
-					break;
-                                    case 'Contact Sensor':
-					if (st=='off') {
-                                            state =Characteristic.ContactSensorState.CONTACT_DETECTED;
-					}
-					else {
-                                            state = Characteristic.ContactSensorState.CONTACT_NOT_DETECTED;
-					}
-					zones[i].accessory.contactsensorService.getCharacteristic(Characteristic.ContactSensorState).setValue(state);
-					break;
-                                    case 'Motion Sensor':
-					if (st=='off') {
-                                            state = false;
-					}
-					else {
-                                            state = true;
-					}
-					zones[i].accessory.motionsensorService.getCharacteristic(Characteristic.MotionDetected).setValue(state);
-					break;
-                                    default:
-					alarmstate.accessory.log('Not Supported: %s [%s]', accessoryName, accConfig.type);
-				}							
-                            }
-                            zones[i].status = st;
-                            if (zones[i].accessory != null) {
-				zones[i].accessory.log('Zone ' + i.toString() + ' ' + zones[i].status + ' (' + zones[i].accessory.name + ')');
-                            }
-			}
+            for (i = 0; i < 32; i++) {
+                var st;
+                if (zonestatus[i] == 0) {
+                    st='off';
+                }
+                else if (zonestatus[i] == 1) {
+                    st='on';
+                }
+				if ( zonestatus[i] == 1 || zonestatus[i] == 0 ) {
+                    if (zones[i].accessory != null && zones[i].status != st) {
+						alarmstate.accessory.log('Accessory was :'+zones[i].status);
+						alarmstate.accessory.log('New atate is :'+st);
+						alarmstate.accessory.log(zonestatus[i]);
+						switch(zones[i].type) {
+                            case 'Garage Door':
+								if (st=='off') {
+                                    state = Characteristic.TargetDoorState.CLOSED;
+								}
+								else {
+                                    state = Characteristic.TargetDoorState.OPEN;
+								}
+								if (zones[i].accessory.garagedooropenerService.readstate != state) {
+									zones[i].accessory.garagedooropenerService.readstate = state;
+									zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).setValue(state);								
+									zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(state);								
+								}
+								break;
+                            case 'Alarm': 
+								break;
+                            case 'Contact Sensor':
+								if (st=='off') {
+									state =Characteristic.ContactSensorState.CONTACT_DETECTED;
+								}
+								else {
+									state = Characteristic.ContactSensorState.CONTACT_NOT_DETECTED;
+								}
+								zones[i].accessory.contactsensorService.getCharacteristic(Characteristic.ContactSensorState).setValue(state);
+								break;
+                            case 'Motion Sensor':
+								if (st=='off') {
+									state = false;
+								}
+								else {
+									state = true;
+								}
+								zones[i].accessory.motionsensorService.getCharacteristic(Characteristic.MotionDetected).setValue(state);
+								break;
+                            default:
+								alarmstate.accessory.log('Not Supported: %s [%s]', accessoryName, accConfig.type);
+						}							
                     }
+                    zones[i].status = st;
+                    if (zones[i].accessory != null) {
+						zones[i].accessory.log('Zone ' + i.toString() + ' ' + zones[i].status + ' (' + zones[i].accessory.name + ')');
+                    }
+				}
+            }
 		  
-                    if (alarmstate.status != alarmstatus) {
-                        if (alarmstatus == 'In Alarm' || alarmstatus == 'Armed Perimeter' || alarmstatus == 'Armed Sleep' || alarmstatus == 'Armed Away' ||  alarmstatus == 'Disarmed') {
-                            alarmstate.status = alarmstatus;
-                            var stat = GetHomebridgeStatus(alarmstatus);
-                            alarmstate.accessory.securitysystemService.setCharacteristic(Characteristic.SecuritySystemCurrentState, stat);
-                            alarmstate.accessory.securitysystemService.setCharacteristic(Characteristic.SecuritySystemTargetState, stat);
-                        }
-                    }
-                    alarmstate.accessory.log('Alarmstatus :' + alarmstate.status);
-
+            if (alarmstate.status != alarmstatus) {
+                if (alarmstatus == 'In Alarm' || alarmstatus == 'Armed Perimeter' || alarmstatus == 'Armed Sleep' || alarmstatus == 'Armed Away' ||  alarmstatus == 'Disarmed') {
+					alarmstate.status = alarmstatus;
+					var stat = GetHomebridgeStatus(alarmstatus);
+					alarmstate.accessory.securitysystemService.setCharacteristic(Characteristic.SecuritySystemCurrentState, stat);
+					alarmstate.accessory.securitysystemService.setCharacteristic(Characteristic.SecuritySystemTargetState, stat);
+				}
+			}
+            alarmstate.accessory.log('Alarmstatus :' + alarmstate.status);
 		}
 		else {
 			alarmstate.accessory.log('Busy with alarm - not getting status now.');
@@ -533,8 +535,8 @@ function paradoxPlatform(log, config) {
 }
 
 
-
 paradoxPlatform.prototype.accessories = function(callback) {
+
 	var self = this;
 
 	var acc = [];
@@ -569,8 +571,7 @@ paradoxPlatform.prototype.accessories = function(callback) {
 	}
 	else {
 		this.log('No config for platform');
-	}
-	
+	}	
 	callback(acc);
 }
 
@@ -581,9 +582,7 @@ function ParadoxAccessory(log, config, name) {
 	this.config = config;
 	this.name = name;
 	
-	this.reachability = true;
-	
-
+	this.reachability = true;	
 }
 
 
@@ -591,7 +590,6 @@ ParadoxAccessory.prototype.identify = function (callback) {
 
   this.log('[' + this.name + '] Identify requested!');
   callback(null); // success
-
 }
 
 
@@ -669,7 +667,6 @@ ParadoxAccessory.prototype.getDoorState = function(callback) {
 	this.reachability = true;
 
 	callback(null,acc.readstate);
-	
 }
 
 
@@ -679,10 +676,8 @@ ParadoxAccessory.prototype.setDoorState = function(state, callback) {
     var config = this.config;
     var self = this;
 
-
     controlPGMstate = true;
     muteStatus = true;
-
 
     this.log('Setting state:');
     this.log(state);
@@ -713,64 +708,23 @@ ParadoxAccessory.prototype.setDoorState = function(state, callback) {
                loggedin = false;
             });
 
+			client.on('timeout', () => {
+			   acc.log('No response from alarm - Disconnected from alarm');
+			   loggedin = false;
+			   client.end();
+			});
+
+			client.on('error', () => {
+			   acc.log('Error communicating with alarm - Disconnected from alarm');
+			   loggedin = false;
+			   client.end();
+			});
+
             client.on('data', (data) => {
                 if (data.length < 1024) {
                     receivebuffer = Buffer.from(data);
                 }
-                if (receivebuffer[16] == 0x52) {
-                    if (receivebuffer[19] == 0x01) {
-                        // Alarm status
-                        if (receivebuffer[33] > 0x10) {
-                            alarmstatus = "In Alarm";
-                        }
-                        else {
-                            switch(receivebuffer[33]) {
-                                case 0x00:
-                                   alarmstatus = "Disarmed";
-                                   break;
-                                case 0x01:
-                                   alarmstatus = "Armed Away";
-                                   break;
-                                case 0x02:
-                                   alarmstatus = "Armed Sleep";
-                                   break;
-                                case 0x03:
-                                   alarmstatus = "Armed Sleep";                           
-                                   break;
-                                case 0x06: 
-                                   alarmstatus = "Armed Sleep";
-                                   break;
-                                case 0x04:
-                                   alarmstatus = "Armed Perimeter";                           
-                                   break;
-                                case 0x05:
-                                   alarmstatus = "Armed Perimeter";
-                                   break;
-                                case 0x08:
-                                   alarmstatus = "Instant Armed";                            
-                                   break;
-                                case 0x09:
-                                   alarmstatus = "Instant Armed";
-                                   break;
-                                default:
-                                   alarmstatus = "Unknown";
-                            } 
-                        }
-                    }
-                    if (receivebuffer[19] == 0x00) {
-                        // Zone status
-                        for (i=0;i<4;i++) {
-                            for (j=0;j<8;j++) {
-                                if (receivebuffer[i+35] & 0x01<<j) {
-                                    zonestatus[j+i*8] = 1;
-                                }
-                                else {
-                                    zonestatus[j+i*8] = 0;
-                                }
-                            }
-                        }
-                    }
-                }
+				_parsestatus();
             });
 
             sleep(500);
@@ -793,7 +747,6 @@ ParadoxAccessory.prototype.setDoorState = function(state, callback) {
     
     this.reachability = true;
     callback(null, state);
-
 }
 
 
@@ -802,6 +755,7 @@ ParadoxAccessory.prototype.getObstructed = function(callback) {
 	this.log('Not Obstructed');
 	callback();
 }
+
 
 //
 //
@@ -825,7 +779,6 @@ ParadoxAccessory.prototype.getAlarmState = function(callback) {
 	this.reachability = true;
 
 	callback(err, state);
-
 }
 
 
@@ -840,11 +793,8 @@ ParadoxAccessory.prototype.setAlarmState = function(state, callback) {
 
         self.log('Setting alarm state to %s', targetstate);
 
-
-        // Need to suspend status update timer while running the Python script and then
+        // Need to suspend status update timer while changing alarm state and then
         // reinstate the timer afterwards to avoid contention on alarm while setting state
-
-
         muteStatus = true;
 
         controlAlarmstate = true;
@@ -864,64 +814,23 @@ ParadoxAccessory.prototype.setAlarmState = function(state, callback) {
                loggedin = false;
             });
 
+			client.on('timeout', () => {
+			   acc.log('No response from alarm - Disconnected from alarm');
+			   loggedin = false;
+			   client.end();
+			});
+
+			client.on('error', () => {
+			   acc.log('Error communicating with alarm - Disconnected from alarm');
+			   loggedin = false;
+			   client.end();
+			});
+
             client.on('data', (data) => {
                 if (data.length < 1024) {
                     receivebuffer = Buffer.from(data);
                 }
-                if (receivebuffer[16] == 0x52) {
-                    if (receivebuffer[19] == 0x01) {
-                        // Alarm status
-                        if (receivebuffer[33] > 0x10) {
-                            alarmstatus = "In Alarm";
-                        }
-                        else {
-                            switch(receivebuffer[33]) {
-                                case 0x00:
-                                   alarmstatus = "Disarmed";
-                                   break;
-                                case 0x01:
-                                   alarmstatus = "Armed Away";
-                                   break;
-                                case 0x02:
-                                   alarmstatus = "Armed Sleep";
-                                   break;
-                                case 0x03:
-                                   alarmstatus = "Armed Sleep";                           
-                                   break;
-                                case 0x06: 
-                                   alarmstatus = "Armed Sleep";
-                                   break;
-                                case 0x04:
-                                   alarmstatus = "Armed Perimeter";                           
-                                   break;
-                                case 0x05:
-                                   alarmstatus = "Armed Perimeter";
-                                   break;
-                                case 0x08:
-                                   alarmstatus = "Instant Armed";                            
-                                   break;
-                                case 0x09:
-                                   alarmstatus = "Instant Armed";
-                                   break;
-                                default:
-                                   alarmstatus = "Unknown";
-                            } 
-                        }
-                    }
-                    if (receivebuffer[19] == 0x00) {
-                        // Zone status
-                        for (i=0;i<4;i++) {
-                            for (j=0;j<8;j++) {
-                                if (receivebuffer[i+35] & 0x01<<j) {
-                                    zonestatus[j+i*8] = 1;
-                                }
-                                else {
-                                    zonestatus[j+i*8] = 0;
-                                }
-                            }
-                        }
-                    }
-                }
+				_parsestatus();
             });
 
             sleep(500);
@@ -933,8 +842,8 @@ ParadoxAccessory.prototype.setAlarmState = function(state, callback) {
         _getalarmstatus(client, self);
         
         sleep(500);
-                //
-        // Based on target state set the correct Python script name
+        //
+        // Based on target state call control alarm function with corresponding state
         //
         if (GetHomebridgeStatus(alarmstatus) != targetstate) {
             switch (targetstate) {
