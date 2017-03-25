@@ -84,12 +84,14 @@ function _parsestatus() {
         }
         if (receivebuffer[19] == 0x00) {
             // Zone status
-            for (i = 0; i < 4; i++) {
-                for (j = 0; j < 8; j++) {
-                    if (receivebuffer[i + 35] & 0x01 << j) {
-                        zonestatus[j + i * 8] = 1;
-                    } else {
-                        zonestatus[j + i * 8] = 0;
+            if (loginresult == 0) {           
+                for (i = 0; i < 4; i++) {
+                    for (j = 0; j < 8; j++) {
+                        if (receivebuffer[i + 35] & 0x01 << j) {
+                            zonestatus[j + i * 8] = 1;
+                        } else {
+                            zonestatus[j + i * 8] = 0;
+                        }
                     }
                 }
             }
