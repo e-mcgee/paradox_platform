@@ -1,36 +1,24 @@
+// Requires
 var net = require('net');
 var sleep = require('system-sleep');
-var loggedin = false;
-var alarmstatus = 'Unknown';
-var receivebuffer = Buffer.alloc(1024, 0x00);
-var zonestatus = Buffer.alloc(32, 0x00);
-var gettingstatus = false;
-var controlAlarmstate = false;
-var controlPGMstate = false;
-var loginresult = 0;
 
-
-"use strict";
-
-var Characteristic, Service;
-
-// Mute flag to allow sending commands to Paradox.  This flag mutes the Zone and Alarm status polling.
-var muteStatus = false;
+// Global variables
+var loggedin = false;                           // indcates if logged in successful
+var alarmstatus = 'Unknown';                    // Current Alarm state
+var receivebuffer = Buffer.alloc(1024, 0x00);   // Data received from alarm is stored here
+var zonestatus = Buffer.alloc(32, 0x00);        // Current 32 zone status is stored here
+var gettingstatus = false;                      // Indicates if status get is in progress
+var controlAlarmstate = false;                  // Indicates if conreolling of alarm is in progress
+var controlPGMstate = false;                    // Indicates if controlling of PGMs are in progress
+var loginresult = 0;                            // Flag used to ignre login messages causing zone status messages
+var muteStatus = false;                         // Mute flag to allow sending commands to Paradox.  This flag mutes the Zone and Alarm status polling.
 
 // Global Zones status array
-var zones = new Array();
-var alarm_ip_address = "192.168.1.0";
-var alarm_port = 10000;
-var alarm_password = "password";
-
-// Initialise zones
 // Each Zone stores :
 //   status : either on or off
 //   accessory : store the accessory so that it can be accessed when a change occurs
 //   Type : either GarageDoorOpener, MotionSensor, or ContactSensor
-for (i = 0; i < 32; i++) {
-    zones.push({status: "off", accessory: null, type: null});
-}
+var zones = new Array();
 
 // Global alarmstate
 //   status: is either Armed Away, Armed Perimeter, Armed Sleep, or Disarmed
@@ -40,7 +28,47 @@ var alarmstate = {
     accessory: null
 }
 
+var alarm_ip_address = "192.168.1.0";           // Alarm IP address on local LAN
+var alarm_port = 10000;                         // Alarm Port used
+var alarm_password = "password";                // Store alarm password in here
 
+
+// Global constants
+const LOGIN_MSG1 = '\x72\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+const LOGIN_MSG2 = '\x50\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+const LOGIN_MSG3 = '\x5f\x20\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+const LOGIN_MSG4 = '\x50\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+const LOGIN_MSG5 = '\x50\x00\x0e\x52\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+
+const STATUS_MSG1 = [0xAA, 0x25, 0x00, 0x04, 0x08, 0x00, 0x00, 0x14, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0x50, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xd0, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE];
+const STATUS_MSG2 = [0xAA, 0x25, 0x00, 0x04, 0x08, 0x00, 0x00, 0x14, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0x50, 0x00, 0x80, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xd1, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE];
+
+const CONTROLALARM_MSG1 = [0xAA, 0x25, 0x00, 0x04, 0x08, 0x00, 0x00, 0x14, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE];
+const CONTROLALARM_ARM_P0_MSG    = '\x40\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+const CONTROLALARM_DISARM_P0_MSG = '\x40\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+const CONTROLALARM_SLEEP_P0_MSG  = '\x40\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+const CONTROLALARM_STAY_P0_MSG   = '\x40\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+const CONTROLALARM_ARM_P1_MSG    = '\x40\x00\x04\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+const CONTROLALARM_DISARM_P1_MSG = '\x40\x00\x05\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+const CONTROLALARM_SLEEP_P1_MSG  = '\x40\x00\x03\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+const CONTROLALARM_STAY_P1_MSG   = '\x40\x00\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+
+const CONTROLPGM_MSG1 = [0xAA, 0x25, 0x00, 0x04, 0x08, 0x00, 0x00, 0x14, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE];
+const CONTROLPGM_MSG2 = '\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+
+"use strict";
+
+var Characteristic, Service;
+
+
+// Initialise zones
+for (i = 0; i < 32; i++) {
+    zones.push({status: "off", accessory: null, type: null});
+}
+
+//
+// Function to retrieve alram status and zone status from buffer data received from alarm.
+//  This is used in periodic status pole as well as in alarm control and pgm control functions
 function _parsestatus() {
 
     if (receivebuffer[16] == 0x52) {
@@ -84,7 +112,7 @@ function _parsestatus() {
         }
         if (receivebuffer[19] == 0x00) {
             // Zone status
-            if (loginresult == 0) {           
+            if (loginresult == 0) {             // only get zone status if this message is not as a result of a login message sent to alarm          
                 for (i = 0; i < 4; i++) {
                     for (j = 0; j < 8; j++) {
                         if (receivebuffer[i + 35] & 0x01 << j) {
@@ -99,7 +127,8 @@ function _parsestatus() {
     }
 }
 
-
+//
+// This function formats the message sent to the alarm by ensuring it is 36 bytes in length and then adding a checksum byte to the end that results in a 37 byte message
 function format37ByteMessage(message) {
 
     var checksum = 0;
@@ -118,7 +147,8 @@ function format37ByteMessage(message) {
     return message;
 }
 
-
+//
+// This is the login function to the alarm.  It takes the alarm password, the socket handle, and the accessory in order to be able to log message for the ccessory
 function _login(password, cl, acc) {
 
     var byte1 = Buffer.from([0xAA, 0x08, 0x00, 0x03, 0x08, 0xF0, 0x00, 0x0A, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE]);
@@ -148,7 +178,7 @@ function _login(password, cl, acc) {
         buf[1] = 0x25;
         buf[3] = 0x04;
         buf[5] = 0x00;
-        var message = '\x72\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+        var message = LOGIN_MSG1;
         message = format37ByteMessage(message);
         buf2 = Buffer.from(message, 'hex');
         totalLength = buf.length + buf2.length;
@@ -159,7 +189,7 @@ function _login(password, cl, acc) {
         buf[1] = 0x26;
         buf[3] = 0x03;
         buf[5] = 0xF8;
-        message = '\x50\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+        message = LOGIN_MSG2;
         message = format37ByteMessage(message);
         buf2 = Buffer.from(message, 'hex');
         buf2[2] = 0x80;     // Weird bug that adds c2 whenever there is 0x80 in string so fix it manually
@@ -171,7 +201,7 @@ function _login(password, cl, acc) {
         buf[1] = 0x25;
         buf[3] = 0x04;
         buf[5] = 0x00;
-        message = '\x5f\x20\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+        message = LOGIN_MSG3;
         message = format37ByteMessage(message);
         buf2 = Buffer.from(message, 'hex');
         totalLength = buf.length + buf2.length;
@@ -210,7 +240,7 @@ function _login(password, cl, acc) {
         buf[3] = 0x04;
         buf[5] = 0x00;
         buf[7] = 0x14;
-        message = '\x50\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+        message = LOGIN_MSG4;
         message = format37ByteMessage(message);
         buf2 = Buffer.from(message, 'hex');
         totalLength = buf.length + buf2.length;
@@ -222,7 +252,7 @@ function _login(password, cl, acc) {
         buf[3] = 0x04;
         buf[5] = 0x00;
         buf[7] = 0x14;
-        message = '\x50\x00\x0e\x52\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+        message = LOGIN_MSG5;
         message = format37ByteMessage(message);
         buf2 = Buffer.from(message, 'hex');
         totalLength = buf.length + buf2.length;
@@ -238,15 +268,18 @@ function _login(password, cl, acc) {
 }
 
 
+//
+// This is an internal function that sends the status request messages to the alarm in order to retrieve the alarm and zone status
+//  It takes the socket handle to communicate the message to the alrm and accessory handle in order to og messages for the accessory
 function _getalarmstatus(cl, acc) {
     if (loggedin) {
 
         acc.log('Geting Status...');
         loginresult = 0;
-        buf = Buffer.from([0xAA, 0x25, 0x00, 0x04, 0x08, 0x00, 0x00, 0x14, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0x50, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xd0, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE]);
+        buf = Buffer.from(STATUS_MSG1);
         cl.write(buf);
         sleep(250);
-        buf = Buffer.from([0xAA, 0x25, 0x00, 0x04, 0x08, 0x00, 0x00, 0x14, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0x50, 0x00, 0x80, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xd1, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE]);
+        buf = Buffer.from(STATUS_MSG2);
         cl.write(buf);
         sleep(250);
         acc.log(alarmstatus);
@@ -256,6 +289,9 @@ function _getalarmstatus(cl, acc) {
 }
 
 
+//
+// Function that handles the full status get cycle. It logs in, sends status requets message and retrieves status info form data received from alarm
+//  It takes accessory as input in order to be able to log messages for it
 function getAlarmStatus(acc) {
 
     if (controlPGMstate || controlAlarmstate) {
@@ -301,42 +337,45 @@ function getAlarmStatus(acc) {
 }
 
 
+//
+// Function to control alarm
+//   It takes input as the state the alarm must be set to, the partition in which the zone is, the accessory in order to log messages and the socket handle to be able to talk to alarm 
 function controlAlarm(state, partition, acc, cl) {
 
     if (loggedin) {
         var message1 = '';
 
         acc.log('Controlling Alarm State...');
-        buf = Buffer.from([0xAA, 0x25, 0x00, 0x04, 0x08, 0x00, 0x00, 0x14, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE]);
+        buf = Buffer.from(CONTROLALARM_MSG1);
         if (partition == 0) {
             switch (state) {
                 case "ARM" :
-                    message1 = '\x40\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+                    message1 = CONTROLALARM_ARM__P0_MSG;
                     break;
                 case "DISARM" :
-                    message1 = '\x40\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+                    message1 = CONTROLALARM_DISARM_P0_MSG;
                     break;
                 case "SLEEP" :
-                    message1 = '\x40\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+                    message1 = CONTROLALARM_SLEEP_P0_MSG;
                     break;
                 case "STAY" :
-                    message1 = '\x40\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+                    message1 = CONTROLALARM_STAY_P0_MSG;
                     break;
             }
         }
         if (partition == 1) {
             switch (state) {
                 case "ARM" :
-                    message1 = '\x40\x00\x04\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+                    message1 = CONTROLALARM_ARM_P1_MSG;
                     break;
                 case "DISARM" :
-                    message1 = '\x40\x00\x05\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+                    message1 = CONTROLALARM_DISARM_P1_MSG;
                     break;
                 case "SLEEP" :
-                    message1 = '\x40\x00\x03\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+                    message1 = CONTROLALARM_SLEEP_P1_MSG;
                     break;
                 case "STAY" :
-                    message1 = '\x40\x00\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+                    message1 = CONTROLALARM_STAY_P1_MSG;
                     break;
             }
         }
@@ -352,6 +391,8 @@ function controlAlarm(state, partition, acc, cl) {
 }
 
 
+//
+// Function to covert a decimal number into a hex string representative
 function getHex(dec) {
     var hexArray = new Array("\x00", "\x01", "\x02", "\x03",
             "\x04", "\x05", "\x06", "\x07",
@@ -367,6 +408,9 @@ function getHex(dec) {
 }
 
 
+//
+// Function to control pgms
+//   It takes input as the state the pgm must be set to, the accessory in order to log messages and the socket handle to be able to talk to alarm 
 function controlPGM(state, pgm, acc, cl) {
 
     if (loggedin) {
@@ -374,7 +418,7 @@ function controlPGM(state, pgm, acc, cl) {
 
         acc.log('Controlling PGM State...');
 
-        buf = Buffer.from([0xAA, 0x25, 0x00, 0x04, 0x08, 0x00, 0x00, 0x14, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE]);
+        buf = Buffer.from(CONTROLPGM_MSG1);
         if (state == "ON") {
             message1 = '\x40\x00\x30';
         } else if (state == "OFF") {
@@ -386,7 +430,7 @@ function controlPGM(state, pgm, acc, cl) {
         msg = getHex(pgm);
         acc.log(msg);
         message2 = message1.concat(msg);
-        str2 = '\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+        str2 = CONTROLPGM_MSG2;
         message3 = message2.concat(str2);
         message4 = format37ByteMessage(message3);
         var buf2 = Buffer.from(message4, 'hex');
@@ -402,7 +446,7 @@ function controlPGM(state, pgm, acc, cl) {
 
 
 //
-// Convert status to Homebridge values
+// Funtion to convert status to Homebridge values
 function GetHomebridgeStatus(msg) {
 
     var status = 10;
@@ -435,7 +479,8 @@ module.exports = function (homebridge) {
     homebridge.registerPlatform("homebridge-paradox", "Paradox", paradoxPlatform);
 };
 
-
+//
+// Define Homebridge Paradox Platform
 function paradoxPlatform(log, config) {
 
     var self = this;
@@ -443,10 +488,17 @@ function paradoxPlatform(log, config) {
     this.log = log;
     this.config = config;
 
+    // Retrieve Alarm IP address, Port and password form config.json file
     alarm_ip_address = this.config.ip;
     alarm_port = this.config.port;
     alarm_password = this.config.password;
 
+    // Status poll loop
+    //  This loop sends the status request message to the alarm and then retrives the values form the buffer.
+    //  It then parses the values corretcly to reflect the correct Homekit status, depending on what tye of accessory the status belongs to.
+    //  It handles garage door, contact zones and motion detection homekit accessories.
+    //  The zone accessory type is mapped in the config.json file.
+    //  Each accsory can also have a pgm mapped to it.  this is also mapped in the config.json file.
     setInterval(function () {
         alarmstate.accessory.log('Mute : [%s]', muteStatus);
         if (!muteStatus) {
@@ -525,6 +577,10 @@ function paradoxPlatform(log, config) {
 }
 
 
+//
+// This is the function used by homebridge to create the accessories by parsing through the config.json file.
+//  It retrieves the name, accessory type.
+//  It then maps the name and type to the zone in the global zone status array.
 paradoxPlatform.prototype.accessories = function (callback) {
 
     var self = this;
@@ -575,6 +631,8 @@ function ParadoxAccessory(log, config, name) {
 }
 
 
+//
+// Called when the accessory needs to be identified. This can be done in the Home app for example
 ParadoxAccessory.prototype.identify = function (callback) {
 
     this.log('[' + this.name + '] Identify requested!');
@@ -582,6 +640,7 @@ ParadoxAccessory.prototype.identify = function (callback) {
 }
 
 
+//  This is called to retrieve the accessory service types and handles all the modelled types, i.e. Alarm, Garage Door, Contact Sensor and Motion sensor.
 ParadoxAccessory.prototype.getServices = function () {
 
     this.informationService = new Service.AccessoryInformation();
