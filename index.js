@@ -154,7 +154,7 @@ function format37ByteMessage(message) {
 // This is the login function to the alarm.  It takes the alarm password, the socket handle, and the accessory in order to be able to log message for the ccessory
 function _login(password, cl, acc) {
 
-    var byte1 = Buffer.from([LOGIN_MSG1);
+    var byte1 = Buffer.from(LOGIN_MSG1);
     var byte2 = Buffer.alloc(16,0xEE);  // Please not : currently only cater for passwords shorter than 16 characters
     var byte2 = byte2.copy(password,0);
 
@@ -220,7 +220,7 @@ function _login(password, cl, acc) {
         buftemp[12] = 0x19;
         buftemp[13] = 0x00;
         buftemp[14] = 0x00;
-        buf2 = Buffer.from([LOGIN_MSG6);
+        buf2 = Buffer.from(LOGIN_MSG6);
         totalLength = buftemp.length + buf2.length;
         buf3 = Buffer.concat([buftemp, buf2], totalLength);
         var checksum = 0;
