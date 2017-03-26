@@ -34,11 +34,14 @@ var alarm_password = "password";                // Store alarm password in here
 
 
 // Global constants
-const LOGIN_MSG1 = '\x72\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
-const LOGIN_MSG2 = '\x50\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
-const LOGIN_MSG3 = '\x5f\x20\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+const LOGIN_MSG1 = [0xAA, 0x08, 0x00, 0x03, 0x08, 0xF0, 0x00, 0x0A, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE];
+const LOGIN_MSG2 = [0xAA, 0x08, 0x00, 0x03, 0x08, 0xF0, 0x00, 0x0A, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE];
+const LOGIN_MSG3 = '\x72\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
 const LOGIN_MSG4 = '\x50\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
-const LOGIN_MSG5 = '\x50\x00\x0e\x52\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+const LOGIN_MSG5 = '\x5f\x20\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+const LOGIN_MSG6 = [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00];
+const LOGIN_MSG7 = '\x50\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+const LOGIN_MSG8 = '\x50\x00\x0e\x52\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
 
 const STATUS_MSG1 = [0xAA, 0x25, 0x00, 0x04, 0x08, 0x00, 0x00, 0x14, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0x50, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xd0, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE];
 const STATUS_MSG2 = [0xAA, 0x25, 0x00, 0x04, 0x08, 0x00, 0x00, 0x14, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0x50, 0x00, 0x80, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xd1, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE];
@@ -151,12 +154,12 @@ function format37ByteMessage(message) {
 // This is the login function to the alarm.  It takes the alarm password, the socket handle, and the accessory in order to be able to log message for the ccessory
 function _login(password, cl, acc) {
 
-    var byte1 = Buffer.from([0xAA, 0x08, 0x00, 0x03, 0x08, 0xF0, 0x00, 0x0A, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE]);
-    var byte2 = Buffer.from(password);
-    var byte3 = Buffer.from([0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE]);
+    var byte1 = Buffer.from([LOGIN_MSG1);
+    var byte2 = Buffer.alloc(16,0xEE);  // Please not : currently only cater for passwords shorter than 16 characters
+    var byte2 = byte2.copy(password,0);
 
-    var totalLength = byte1.length + byte2.length + byte3.length;
-    var buf = Buffer.concat([byte1, byte2, byte3], totalLength);
+    var totalLength = byte1.length + byte2.length;
+    var buf = Buffer.concat([byte1, byte2], totalLength);
 
     loginresult = 1;
     acc.log('Logging in');
@@ -165,7 +168,7 @@ function _login(password, cl, acc) {
     sleep(600);
     if (receivebuffer[4] == 0x38) {
         acc.log('Log in successfull');
-        buf = Buffer.from([0xAA, 0x08, 0x00, 0x03, 0x08, 0xF0, 0x00, 0x0A, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE]);
+        buf = Buffer.from(LOGIN_MSG2);
         buf[1] = 0x00;
         buf[5] = 0xF2;
         cl.write(buf);
@@ -178,7 +181,7 @@ function _login(password, cl, acc) {
         buf[1] = 0x25;
         buf[3] = 0x04;
         buf[5] = 0x00;
-        var message = LOGIN_MSG1;
+        var message = LOGIN_MSG3;
         message = format37ByteMessage(message);
         buf2 = Buffer.from(message, 'hex');
         totalLength = buf.length + buf2.length;
@@ -189,7 +192,7 @@ function _login(password, cl, acc) {
         buf[1] = 0x26;
         buf[3] = 0x03;
         buf[5] = 0xF8;
-        message = LOGIN_MSG2;
+        message = LOGIN_MSG4;
         message = format37ByteMessage(message);
         buf2 = Buffer.from(message, 'hex');
         buf2[2] = 0x80;     // Weird bug that adds c2 whenever there is 0x80 in string so fix it manually
@@ -201,7 +204,7 @@ function _login(password, cl, acc) {
         buf[1] = 0x25;
         buf[3] = 0x04;
         buf[5] = 0x00;
-        message = LOGIN_MSG3;
+        message = LOGIN_MSG5;
         message = format37ByteMessage(message);
         buf2 = Buffer.from(message, 'hex');
         totalLength = buf.length + buf2.length;
@@ -217,7 +220,7 @@ function _login(password, cl, acc) {
         buftemp[12] = 0x19;
         buftemp[13] = 0x00;
         buftemp[14] = 0x00;
-        buf2 = Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00]);
+        buf2 = Buffer.from([LOGIN_MSG6);
         totalLength = buftemp.length + buf2.length;
         buf3 = Buffer.concat([buftemp, buf2], totalLength);
         var checksum = 0;
@@ -240,7 +243,7 @@ function _login(password, cl, acc) {
         buf[3] = 0x04;
         buf[5] = 0x00;
         buf[7] = 0x14;
-        message = LOGIN_MSG4;
+        message = LOGIN_MSG7;
         message = format37ByteMessage(message);
         buf2 = Buffer.from(message, 'hex');
         totalLength = buf.length + buf2.length;
@@ -252,7 +255,7 @@ function _login(password, cl, acc) {
         buf[3] = 0x04;
         buf[5] = 0x00;
         buf[7] = 0x14;
-        message = LOGIN_MSG5;
+        message = LOGIN_MSG8;
         message = format37ByteMessage(message);
         buf2 = Buffer.from(message, 'hex');
         totalLength = buf.length + buf2.length;
