@@ -157,7 +157,7 @@ function _login(password, cl, acc) {
     var byte1 = Buffer.from(LOGIN_MSG1);
     var byte2 = Buffer.alloc(16,0xEE);  // Please not : currently only cater for passwords shorter than 16 characters
     var byte3 = Buffer.from(password);
-    var byte2 = byte2.copy(byte3,0);
+    byte3.copy(byte2,0);
 
     var totalLength = byte1.length + byte2.length;
     var buf = Buffer.concat([byte1, byte2], totalLength);
