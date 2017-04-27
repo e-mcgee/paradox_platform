@@ -354,7 +354,7 @@ function controlAlarm(state, partition, acc, cl) {
         if (partition == 0) {
             switch (state) {
                 case "ARM" :
-                    message1 = CONTROLALARM_ARM__P0_MSG;
+                    message1 = CONTROLALARM_ARM_P0_MSG;
                     break;
                 case "DISARM" :
                     message1 = CONTROLALARM_DISARM_P0_MSG;
