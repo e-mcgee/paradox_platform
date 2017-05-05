@@ -807,7 +807,7 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
                 if (data.length < 1024) {
                     receivebuffer = Buffer.from(data);
                 }
-                _parsestatus();
+                _parsestatus(acc);
             });
 
             sleep(500);
@@ -913,7 +913,7 @@ ParadoxAccessory.prototype.setAlarmState = function (state, callback) {
                 if (data.length < 1024) {
                     receivebuffer = Buffer.from(data);
                 }
-                _parsestatus();
+                _parsestatus(acc);
             });
 
             sleep(500);
