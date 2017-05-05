@@ -85,58 +85,57 @@ function _checksum() {
 //  This is used in periodic status pole as well as in alarm control and pgm control functions
 function _parsestatus(acc) {
     
-    if (_checksum())
+    if (_checksum()) {
         acc.log('Checksum OK');
-    else acc.log('Checksum NOT OK');
-
-    if (receivebuffer[16] == 0x52) {
-        if (receivebuffer[19] == 0x01) {
-            // Alarm status
-            if (receivebuffer[33] > 0x10) {
-                alarmstatus = "In Alarm";
-            } else {
-                switch (receivebuffer[33]) {
-                    case 0x00:
-                        alarmstatus = "Disarmed";
-                        break;
-                    case 0x01:
-                        alarmstatus = "Armed Away";
-                        break;
-                    case 0x02:
-                        alarmstatus = "Armed Sleep";
-                        break;
-                    case 0x03:
-                        alarmstatus = "Armed Sleep";
-                        break;
-                    case 0x06:
-                        alarmstatus = "Armed Sleep";
-                        break;
-                    case 0x04:
-                        alarmstatus = "Armed Perimeter";
-                        break;
-                    case 0x05:
-                        alarmstatus = "Armed Perimeter";
-                        break;
-                    case 0x08:
-                        alarmstatus = "Instant Armed";
-                        break;
-                    case 0x09:
-                        alarmstatus = "Instant Armed";
-                        break;
-                    default:
-                        alarmstatus = "Unknown";
+        if (receivebuffer[16] == 0x52) {
+            if (receivebuffer[19] == 0x01) {
+                // Alarm status
+                if (receivebuffer[33] > 0x10) {
+                    alarmstatus = "In Alarm";
+                } else {
+                    switch (receivebuffer[33]) {
+                        case 0x00:
+                            alarmstatus = "Disarmed";
+                            break;
+                        case 0x01:
+                            alarmstatus = "Armed Away";
+                            break;
+                        case 0x02:
+                            alarmstatus = "Armed Sleep";
+                            break;
+                        case 0x03:
+                            alarmstatus = "Armed Sleep";
+                            break;
+                        case 0x06:
+                            alarmstatus = "Armed Sleep";
+                            break;
+                        case 0x04:
+                            alarmstatus = "Armed Perimeter";
+                            break;
+                        case 0x05:
+                            alarmstatus = "Armed Perimeter";
+                            break;
+                        case 0x08:
+                            alarmstatus = "Instant Armed";
+                            break;
+                        case 0x09:
+                            alarmstatus = "Instant Armed";
+                            break;
+                        default:
+                            alarmstatus = "Unknown";
+                    }
                 }
             }
-        }
-        if (receivebuffer[19] == 0x00) {
-            // Zone status
-            if (loginresult == 0) {             // only get zone status if this message is not as a result of a login message sent to alarm          
-                for (i = 0; i < 4; i++) {
-                    for (j = 0; j < 8; j++) {
-                        if (receivebuffer[i + 35] & 0x01 << j) {
-                            zonestatus[j + i * 8] = 1;
-                        } else {
-                            zonestatus[j + i * 8] = 0;
+            if (receivebuffer[19] == 0x00) {
+                // Zone status
+                if (loginresult == 0) {             // only get zone status if this message is not as a result of a login message sent to alarm          
+                    for (i = 0; i < 4; i++) {
+                        for (j = 0; j < 8; j++) {
+                            if (receivebuffer[i + 35] & 0x01 << j) {
+                                zonestatus[j + i * 8] = 1;
+                            } else {
+                                zonestatus[j + i * 8] = 0;
+                            }
                         }
                     }
                 }
