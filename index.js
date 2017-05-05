@@ -85,7 +85,7 @@ function _checksum() {
 //  This is used in periodic status pole as well as in alarm control and pgm control functions
 function _parsestatus(acc) {
     
-    if (_checksum)
+    if (_checksum())
         acc.log('Checksum OK');
     else acc.log('Checksum NOT OK');
 
@@ -807,7 +807,7 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
                 if (data.length < 1024) {
                     receivebuffer = Buffer.from(data);
                 }
-                _parsestatus(acc);
+                _parsestatus(self);
             });
 
             sleep(500);
@@ -913,7 +913,7 @@ ParadoxAccessory.prototype.setAlarmState = function (state, callback) {
                 if (data.length < 1024) {
                     receivebuffer = Buffer.from(data);
                 }
-                _parsestatus(acc);
+                _parsestatus(self);
             });
 
             sleep(500);
