@@ -76,18 +76,18 @@ function _checksum() {
             checksum += receivebuffer[i];
         while (checksum > 255)
             checksum = checksum - (checksum / 256) * 256;
-    if (checksum==receivebuffer[36])
+    if (checksum == receivebuffer[36])
         return true;
     else return false;
 }
 //
 // Function to retrieve alram status and zone status from buffer data received from alarm.
 //  This is used in periodic status pole as well as in alarm control and pgm control functions
-function _parsestatus() {
+function _parsestatus(acc) {
     
     if (_checksum)
-        self.log('Checksum OK');
-    else self.log('Checksum NOT OK');
+        acc.log('Checksum OK');
+    else acc.log('Checksum NOT OK');
 
     if (receivebuffer[16] == 0x52) {
         if (receivebuffer[19] == 0x01) {
@@ -345,7 +345,7 @@ function getAlarmStatus(acc) {
         if (data.length < 1024) {
             receivebuffer = Buffer.from(data);
         }
-        _parsestatus();
+        _parsestatus(acc);
     });
 
     sleep(500);
