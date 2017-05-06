@@ -133,7 +133,7 @@ function _parsestatus(acc) {
                     }
                 }
             }
-            if (checok && receivebuffer[19] == 0x00) {
+            if (checkok && receivebuffer[19] == 0x00) {
                 // Zone status
                 if (loginresult == 0) {             // only get zone status if this message is not as a result of a login message sent to alarm          
                     acc.log('Zone State received');
