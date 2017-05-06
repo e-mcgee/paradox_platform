@@ -94,7 +94,7 @@ function _parsestatus(acc) {
     else checkok = false;
     
         if (checkok && receivebuffer[16] == 0x52) {
-            if (receivebuffer[19] == 0x01) {
+ //           if (receivebuffer[19] == 0x01) {
                 // Alarm status
                 acc.log('Alarm State received');
                 if (receivebuffer[33] > 0x10) {
@@ -132,8 +132,8 @@ function _parsestatus(acc) {
                             alarmstatus = "Unknown";
                     }
                 }
-            }
-            if (receivebuffer[19] == 0x00) {
+//            }
+//            if (receivebuffer[19] == 0x00) {
                 // Zone status
                 if (loginresult == 0) {             // only get zone status if this message is not as a result of a login message sent to alarm          
                     acc.log('Zone State received');
@@ -147,7 +147,7 @@ function _parsestatus(acc) {
                         }
                     }
                 }
-            }
+ //           }
         }
  //   }
 }
