@@ -343,10 +343,10 @@ function getAlarmStatus(acc) {
     });
 
     client.on('data', (data) => {
-        if (data.length < 1024) {
+        if (data.length > 37) {
             receivebuffer = Buffer.from(data);
+            _parsestatus(acc);
         }
-        _parsestatus(acc);
     });
 
     sleep(500);
