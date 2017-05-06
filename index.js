@@ -88,7 +88,7 @@ function _parsestatus(acc) {
     if (_checksum()) {
         acc.log('Checksum OK');
     
-//    }
+    }
         if (receivebuffer[16] == 0x52) {
             if (receivebuffer[19] == 0x01) {
                 // Alarm status
@@ -145,7 +145,7 @@ function _parsestatus(acc) {
                 }
             }
         }
-    }
+ //   }
 }
 
 //
@@ -300,10 +300,10 @@ function _getalarmstatus(cl, acc) {
         loginresult = 0;
         buf = Buffer.from(STATUS_MSG1);
         cl.write(buf);
-        sleep(500);
+        sleep(250);
         buf = Buffer.from(STATUS_MSG2);
         cl.write(buf);
-        sleep(500);
+        sleep(250);
         acc.log(alarmstatus);
     } else {
         acc.log('Cannot get status - not logged in');
