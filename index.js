@@ -292,7 +292,7 @@ function _login(password, cl, acc) {
 
 //
 // This is an internal function that sends the status request messages to the alarm in order to retrieve the alarm and zone status
-//  It takes the socket handle to communicate the message to the alrm and accessory handle in order to og messages for the accessory
+//  It takes the socket handle to communicate the message to the alarm and accessory handle in order to log messages for the accessory
 function _getalarmstatus(cl, acc) {
     if (loggedin) {
 
@@ -300,10 +300,10 @@ function _getalarmstatus(cl, acc) {
         loginresult = 0;
         buf = Buffer.from(STATUS_MSG1);
         cl.write(buf);
-        sleep(250);
+        sleep(500);
         buf = Buffer.from(STATUS_MSG2);
         cl.write(buf);
-        sleep(250);
+        sleep(500);
         acc.log(alarmstatus);
     } else {
         acc.log('Cannot get status - not logged in');
