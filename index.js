@@ -88,7 +88,7 @@ function _parsestatus(acc) {
     if (_checksum()) {
         acc.log('Checksum OK');
     
-    ]
+    }
         if (receivebuffer[16] == 0x52) {
             if (receivebuffer[19] == 0x01) {
                 // Alarm status
