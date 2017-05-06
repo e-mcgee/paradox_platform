@@ -85,11 +85,15 @@ function _checksum() {
 //  This is used in periodic status pole as well as in alarm control and pgm control functions
 function _parsestatus(acc) {
     
+    var checkok = false;
+    
     if (_checksum()) {
         acc.log('Checksum OK');
-    
+        checkok = true;    
     }
-        if (receivebuffer[16] == 0x52) {
+    else checkok = false;
+    
+        if (checkok && receivebuffer[16] == 0x52) {
             if (receivebuffer[19] == 0x01) {
                 // Alarm status
                 acc.log('Alarm State received');
