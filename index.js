@@ -805,10 +805,10 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
             });
 
             client.on('data', (data) => {
-                if (data.length < 1024) {
+                if (data.length > 37) {
                     receivebuffer = Buffer.from(data);
-                }
-                _parsestatus(self);
+                    _parsestatus(self);
+               }
             });
 
             sleep(500);
@@ -911,10 +911,10 @@ ParadoxAccessory.prototype.setAlarmState = function (state, callback) {
             });
 
             client.on('data', (data) => {
-                if (data.length < 1024) {
+                if (data.length > 37) {
                     receivebuffer = Buffer.from(data);
+                    _parsestatus(self);
                 }
-                _parsestatus(self);
             });
 
             sleep(500);
