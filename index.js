@@ -350,7 +350,9 @@ function getAlarmStatus(acc) {
 
     client.on('data', (data) => {
         if (data.length > 37) {
-            acc.log("Message received")
+            acc.log("Message received");
+            acc.log("message length = ");
+            acc.log(data.length);
             receivebuffer = Buffer.from(data);
             _parsestatus(acc);
         }
