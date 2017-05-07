@@ -610,9 +610,10 @@ function paradoxPlatform(log, config) {
                             }
                         }
                     }
-                    alarmstate.accessory.securitysystemService.setCharacteristic(Characteristic.SecuritySystemAlarmType, alarmtype);                    
-                    alarmstate.accessory.securitysystemService.setCharacteristic(Characteristic.SecuritySystemCurrentState, stat);
-                    alarmstate.accessory.securitysystemService.setCharacteristic(Characteristic.SecuritySystemTargetState, stat);
+                    alarmstate.accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemAlarmType).setValue(alarmtype);                    
+                    alarmstate.accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemCurrentState).setValue(stat);
+                    alarmstate.accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemTargetState).setValue(stat);
+//                    alarmstate.accessory.securitysystemService.setCharacteristic(Characteristic.SecuritySystemTargetState, stat);
                 }
             }
             alarmstate.accessory.log('Alarmstatus :' + alarmstate.status);
