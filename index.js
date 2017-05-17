@@ -147,7 +147,8 @@ function _parsestatus(acc, cl) {
                     }
                 }
             }
-            loginresult = 11;
+            cl.end();
+            gettingstatus = false;
             return;
         }
     }
@@ -161,7 +162,7 @@ function _parsestatus(acc, cl) {
         loginresult = 2;
         return;
     }
-    else {
+    if (loginresult == 1 && receivebuffer[4] != 0x38) {
         acc.log('Error logging in');
         cl.end();
         loggedin = false;
@@ -170,6 +171,7 @@ function _parsestatus(acc, cl) {
     }
     
     if (loginresult == 2) {
+        acc.log('Loggging in 2');
         buf = Buffer.from(LOGIN_MSG2);
         buf[1] = 0x00;
         buf[5] = 0xF3;
@@ -179,6 +181,7 @@ function _parsestatus(acc, cl) {
     }
 
     if (loginresult == 3) {
+        acc.log('Loggging in 3');
         buf = Buffer.from(LOGIN_MSG2);
         buf[1] = 0x25;
         buf[3] = 0x04;
@@ -194,6 +197,7 @@ function _parsestatus(acc, cl) {
     }
 
     if (loginresult = 4) {
+        acc.log('Loggging in 4');
         buf = Buffer.from(LOGIN_MSG2);
         buf[1] = 0x26;
         buf[3] = 0x03;
@@ -210,6 +214,7 @@ function _parsestatus(acc, cl) {
     }
 
     if (loginresult == 5) {
+        acc.log('Loggging in 5');
         buf = Buffer.from(LOGIN_MSG2);
         buf[1] = 0x25;
         buf[3] = 0x04;
@@ -225,6 +230,7 @@ function _parsestatus(acc, cl) {
     }
 
     if (loginresult == 6) {
+        acc.log('Loggging in 6');
         buf = Buffer.from(LOGIN_MSG2);
         buf[1] = 0x25;
         buf[3] = 0x04;
@@ -259,6 +265,7 @@ function _parsestatus(acc, cl) {
     }
 
     if (loginresult == 7) {
+        acc.log('Loggging in 7');
         buf = Buffer.from(LOGIN_MSG2);
         buf[1] = 0x25;
         buf[3] = 0x04;
@@ -275,6 +282,7 @@ function _parsestatus(acc, cl) {
     }
 
     if (loginresult == 8) {
+        acc.log('Loggging in 8');
         buf = Buffer.from(LOGIN_MSG2);
         buf[1] = 0x25;
         buf[3] = 0x04;
@@ -527,9 +535,9 @@ function getAlarmStatus(acc) {
 //    sleep(500);
     _login(alarm_password, client, acc);
 //    _getalarmstatus(client, acc);
-    while (loginresult != 10);
-    client.end();
-    gettingstatus = false;
+//    while (loginresult != 10);
+//    client.end();
+//    gettingstatus = false;
 }
 
 
