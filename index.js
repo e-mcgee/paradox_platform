@@ -83,7 +83,7 @@ function _checksum() {
 //
 // Function to retrieve alram status and zone status from buffer data received from alarm.
 //  This is used in periodic status pole as well as in alarm control and pgm control functions
-function _parsestatus(acc) {
+function _parsestatus(acc, cl) {
     
     var checkok = false;
     
@@ -492,7 +492,7 @@ function getAlarmStatus(acc) {
             acc.log("message length = ");
             acc.log(data.length);
             receivebuffer = Buffer.from(data);
-            _parsestatus(acc);
+            _parsestatus(acc, client);
         }
     });
 
