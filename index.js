@@ -93,7 +93,7 @@ function _parsestatus(acc, cl) {
     }
     else checkok = false;
     
-    if (loginresult == 0 && receivebuffer[16] == 0x52) {
+    if (loginresult == 10 && receivebuffer[16] == 0x52) {
         if (receivebuffer[19] == 0x01) {
             // Alarm status
             acc.log('Alarm State received');
@@ -147,6 +147,8 @@ function _parsestatus(acc, cl) {
                     }
                 }
             }
+            loginresult = 11;
+            return;
         }
     }
     
@@ -288,6 +290,32 @@ function _parsestatus(acc, cl) {
         loggedin = true;
         return;
     }
+
+    if (loginresult == 8 && loggedin) {
+
+        acc.log('Geting Status...');
+ //       loginresult = 0;
+        buf = Buffer.from(STATUS_MSG1);
+        cl.write(buf);
+        loginresult = 9;
+        return;
+    }
+    
+    if (loginresult == 9) {
+//        sleep(250);
+        buf = Buffer.from(STATUS_MSG2);
+        cl.write(buf);
+//        sleep(250);
+        acc.log(alarmstatus);
+        loginresult = 10;
+        return;
+    }
+    
+    if (loginresult == 8 & !loggedin) {
+        acc.log('Cannot get status - not logged in');
+    }
+
+
 }
 
 //
@@ -498,7 +526,8 @@ function getAlarmStatus(acc) {
 
 //    sleep(500);
     _login(alarm_password, client, acc);
-    _getalarmstatus(client, acc);
+//    _getalarmstatus(client, acc);
+    while (loginresult != 11) acc.log("Getting status...");
     client.end();
     gettingstatus = false;
 }
