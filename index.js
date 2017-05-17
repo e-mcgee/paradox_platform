@@ -527,7 +527,7 @@ function getAlarmStatus(acc) {
 //    sleep(500);
     _login(alarm_password, client, acc);
 //    _getalarmstatus(client, acc);
-    while (loginresult != 10) acc.log("Getting status...");
+    while (loginresult != 10);
     client.end();
     gettingstatus = false;
 }
