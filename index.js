@@ -93,63 +93,201 @@ function _parsestatus(acc) {
     }
     else checkok = false;
     
-        if (receivebuffer[16] == 0x52) {
-            if (receivebuffer[19] == 0x01) {
-                // Alarm status
-                acc.log('Alarm State received');
-                if (receivebuffer[33] > 0x10) {
-                    alarmstatus = "In Alarm";
-                } else {
-                    switch (receivebuffer[33]) {
-                        case 0x00:
-                            alarmstatus = "Disarmed";
-                            break;
-                        case 0x01:
-                            alarmstatus = "Armed Away";
-                            break;
-                        case 0x02:
-                            alarmstatus = "Armed Sleep";
-                            break;
-                        case 0x03:
-                            alarmstatus = "Armed Sleep";
-                            break;
-                        case 0x06:
-                            alarmstatus = "Armed Sleep";
-                            break;
-                        case 0x04:
-                            alarmstatus = "Armed Perimeter";
-                            break;
-                        case 0x05:
-                            alarmstatus = "Armed Perimeter";
-                            break;
-                        case 0x08:
-                            alarmstatus = "Instant Armed";
-                            break;
-                        case 0x09:
-                            alarmstatus = "Instant Armed";
-                            break;
-                        default:
-                            alarmstatus = "Unknown";
-                    }
+    if (loginresult == 0 && receivebuffer[16] == 0x52) {
+        if (receivebuffer[19] == 0x01) {
+            // Alarm status
+            acc.log('Alarm State received');
+            if (receivebuffer[33] > 0x10) {
+                alarmstatus = "In Alarm";
+            } else {
+                switch (receivebuffer[33]) {
+                    case 0x00:
+                        alarmstatus = "Disarmed";
+                        break;
+                    case 0x01:
+                        alarmstatus = "Armed Away";
+                        break;
+                    case 0x02:
+                        alarmstatus = "Armed Sleep";
+                        break;
+                    case 0x03:
+                        alarmstatus = "Armed Sleep";
+                        break;
+                    case 0x06:
+                        alarmstatus = "Armed Sleep";
+                        break;
+                    case 0x04:
+                        alarmstatus = "Armed Perimeter";
+                        break;
+                    case 0x05:
+                        alarmstatus = "Armed Perimeter";
+                        break;
+                    case 0x08:
+                        alarmstatus = "Instant Armed";
+                        break;
+                    case 0x09:
+                        alarmstatus = "Instant Armed";
+                        break;
+                    default:
+                        alarmstatus = "Unknown";
                 }
             }
-            if (checkok==true && receivebuffer[19] == 0x00) {
-                // Zone status
-                if (loginresult == 0) {             // only get zone status if this message is not as a result of a login message sent to alarm          
-                    acc.log('Zone State received');
-                    for (i = 0; i < 4; i++) {
-                        for (j = 0; j < 8; j++) {
-                            if (receivebuffer[i + 35] & 0x01 << j) {
-                                zonestatus[j + i * 8] = 1;
-                            } else {
-                                zonestatus[j + i * 8] = 0;
-                            }
+        }
+        if (checkok==true && receivebuffer[19] == 0x00) {
+            // Zone status
+            if (loginresult == 0) {             // only get zone status if this message is not as a result of a login message sent to alarm          
+                acc.log('Zone State received');
+                for (i = 0; i < 4; i++) {
+                    for (j = 0; j < 8; j++) {
+                        if (receivebuffer[i + 35] & 0x01 << j) {
+                            zonestatus[j + i * 8] = 1;
+                        } else {
+                            zonestatus[j + i * 8] = 0;
                         }
                     }
                 }
             }
         }
- //   }
+    }
+    
+    if (loginresult == 1 && receivebuffer[4] == 0x38) {
+        acc.log('Log in successfull');
+        buf = Buffer.from(LOGIN_MSG2);
+        buf[1] = 0x00;
+        buf[5] = 0xF2;
+        cl.write(buf);
+        loginresult = 2;
+        return;
+    }
+    else {
+        acc.log('Error logging in');
+        cl.end();
+        loggedin = false;
+        loginresult = 0;
+        return;
+    }
+    
+    if (loginresult == 2) {
+        buf = Buffer.from(LOGIN_MSG2);
+        buf[1] = 0x00;
+        buf[5] = 0xF3;
+        cl.write(buf);
+        loginresult = 3;
+        return;
+    }
+
+    if (loginresult == 3) {
+        buf = Buffer.from(LOGIN_MSG2);
+        buf[1] = 0x25;
+        buf[3] = 0x04;
+        buf[5] = 0x00;
+        var message = LOGIN_MSG3;
+        message = format37ByteMessage(message);
+        buf2 = Buffer.from(message, 'hex');
+        totalLength = buf.length + buf2.length;
+        var buf3 = Buffer.concat([buf, buf2], totalLength);
+        cl.write(buf3);
+        loginresult = 4;
+        return;
+    }
+
+    if (loginresult = 4) {
+        buf = Buffer.from(LOGIN_MSG2);
+        buf[1] = 0x26;
+        buf[3] = 0x03;
+        buf[5] = 0xF8;
+        message = LOGIN_MSG4;
+        message = format37ByteMessage(message);
+        buf2 = Buffer.from(message, 'hex');
+        buf2[2] = 0x80;     // Weird bug that adds c2 whenever there is 0x80 in string so fix it manually
+        totalLength = buf.length + buf2.length;
+        buf3 = Buffer.concat([buf, buf2], totalLength);
+        cl.write(buf3);
+        loginresult = 5;
+        return;
+    }
+
+    if (loginresult == 5) {
+        buf = Buffer.from(LOGIN_MSG2);
+        buf[1] = 0x25;
+        buf[3] = 0x04;
+        buf[5] = 0x00;
+        message = LOGIN_MSG5;
+        message = format37ByteMessage(message);
+        buf2 = Buffer.from(message, 'hex');
+        totalLength = buf.length + buf2.length;
+        buf3 = Buffer.concat([buf, buf2], totalLength);
+        cl.write(buf3);
+        loginresult = 6;
+        return;
+    }
+
+    if (loginresult == 6) {
+        buf = Buffer.from(LOGIN_MSG2);
+        buf[1] = 0x25;
+        buf[3] = 0x04;
+        buf[5] = 0x00;
+        buf[7] = 0x14;
+        buftemp = Buffer.alloc(23, 0x00);
+        receivebuffer.copy(buftemp, 0, 16, 26);
+        receivebuffer.copy(buftemp, 10, 24, 26);
+        receivebuffer.copy(buftemp, 15, 31, 39);
+        buftemp[12] = 0x19;
+        buftemp[13] = 0x00;
+        buftemp[14] = 0x00;
+        buf2 = Buffer.from(LOGIN_MSG6);
+        totalLength = buftemp.length + buf2.length;
+        buf3 = Buffer.concat([buftemp, buf2], totalLength);
+        var checksum = 0;
+        for (i = 0; i < buf3.length; i++) {
+            checksum += buf3[i];
+        }
+        while (checksum > 255) {
+            checksum = checksum - Math.trunc(checksum / 256) * 256;
+        }
+        buf4 = Buffer.from([checksum]);
+        buf5 = Buffer.concat([buf3, buf4], buf3.length + buf4.length);
+        buf6 = Buffer.alloc((Math.round(buf5.length / 16) + 1) * 16, 0xEE);
+        buf5.copy(buf6);
+        totalLength = buf.length + buf6.length;
+        buf7 = Buffer.concat([buf, buf6], totalLength);
+        cl.write(buf7);
+        loginresult = 7;
+        return;
+    }
+
+    if (loginresult == 7) {
+        buf = Buffer.from(LOGIN_MSG2);
+        buf[1] = 0x25;
+        buf[3] = 0x04;
+        buf[5] = 0x00;
+        buf[7] = 0x14;
+        message = LOGIN_MSG7;
+        message = format37ByteMessage(message);
+        buf2 = Buffer.from(message, 'hex');
+        totalLength = buf.length + buf2.length;
+        buf3 = Buffer.concat([buf, buf2], totalLength);
+        cl.write(buf3);
+        loginresult = 8;
+        return;
+    }
+
+    if (loginresult == 8) {
+        buf = Buffer.from(LOGIN_MSG2);
+        buf[1] = 0x25;
+        buf[3] = 0x04;
+        buf[5] = 0x00;
+        buf[7] = 0x14;
+        message = LOGIN_MSG8;
+        message = format37ByteMessage(message);
+        buf2 = Buffer.from(message, 'hex');
+        totalLength = buf.length + buf2.length;
+        buf3 = Buffer.concat([buf, buf2], totalLength);
+        cl.write(buf3);
+//        sleep(250);
+        loggedin = true;
+        return;
+    }
 }
 
 //
@@ -188,109 +326,109 @@ function _login(password, cl, acc) {
     acc.log('Logging in');
 
     cl.write(buf);
-    sleep(600);
-    if (receivebuffer[4] == 0x38) {
-        acc.log('Log in successfull');
-        buf = Buffer.from(LOGIN_MSG2);
-        buf[1] = 0x00;
-        buf[5] = 0xF2;
-        cl.write(buf);
-        sleep(250);
-
-        buf[5] = 0xF3;
-        cl.write(buf);
-        sleep(250);
-
-        buf[1] = 0x25;
-        buf[3] = 0x04;
-        buf[5] = 0x00;
-        var message = LOGIN_MSG3;
-        message = format37ByteMessage(message);
-        buf2 = Buffer.from(message, 'hex');
-        totalLength = buf.length + buf2.length;
-        var buf3 = Buffer.concat([buf, buf2], totalLength);
-        cl.write(buf3);
-        sleep(250);
-
-        buf[1] = 0x26;
-        buf[3] = 0x03;
-        buf[5] = 0xF8;
-        message = LOGIN_MSG4;
-        message = format37ByteMessage(message);
-        buf2 = Buffer.from(message, 'hex');
-        buf2[2] = 0x80;     // Weird bug that adds c2 whenever there is 0x80 in string so fix it manually
-        totalLength = buf.length + buf2.length;
-        buf3 = Buffer.concat([buf, buf2], totalLength);
-        cl.write(buf3);
-        sleep(250);
-
-        buf[1] = 0x25;
-        buf[3] = 0x04;
-        buf[5] = 0x00;
-        message = LOGIN_MSG5;
-        message = format37ByteMessage(message);
-        buf2 = Buffer.from(message, 'hex');
-        totalLength = buf.length + buf2.length;
-        buf3 = Buffer.concat([buf, buf2], totalLength);
-        cl.write(buf3);
-        sleep(250);
-
-        buf[7] = 0x14;
-        buftemp = Buffer.alloc(23, 0x00);
-        receivebuffer.copy(buftemp, 0, 16, 26);
-        receivebuffer.copy(buftemp, 10, 24, 26);
-        receivebuffer.copy(buftemp, 15, 31, 39);
-        buftemp[12] = 0x19;
-        buftemp[13] = 0x00;
-        buftemp[14] = 0x00;
-        buf2 = Buffer.from(LOGIN_MSG6);
-        totalLength = buftemp.length + buf2.length;
-        buf3 = Buffer.concat([buftemp, buf2], totalLength);
-        var checksum = 0;
-        for (i = 0; i < buf3.length; i++) {
-            checksum += buf3[i];
-        }
-        while (checksum > 255) {
-            checksum = checksum - Math.trunc(checksum / 256) * 256;
-        }
-        buf4 = Buffer.from([checksum]);
-        buf5 = Buffer.concat([buf3, buf4], buf3.length + buf4.length);
-        buf6 = Buffer.alloc((Math.round(buf5.length / 16) + 1) * 16, 0xEE);
-        buf5.copy(buf6);
-        totalLength = buf.length + buf6.length;
-        buf7 = Buffer.concat([buf, buf6], totalLength);
-        cl.write(buf7);
-        sleep(250);
-
-        buf[1] = 0x25;
-        buf[3] = 0x04;
-        buf[5] = 0x00;
-        buf[7] = 0x14;
-        message = LOGIN_MSG7;
-        message = format37ByteMessage(message);
-        buf2 = Buffer.from(message, 'hex');
-        totalLength = buf.length + buf2.length;
-        buf3 = Buffer.concat([buf, buf2], totalLength);
-        cl.write(buf3);
-        sleep(250);
-
-        buf[1] = 0x25;
-        buf[3] = 0x04;
-        buf[5] = 0x00;
-        buf[7] = 0x14;
-        message = LOGIN_MSG8;
-        message = format37ByteMessage(message);
-        buf2 = Buffer.from(message, 'hex');
-        totalLength = buf.length + buf2.length;
-        buf3 = Buffer.concat([buf, buf2], totalLength);
-        cl.write(buf3);
-        sleep(250);
-        loggedin = true;
-    } else {
-        acc.log('Error logging in');
-        cl.end();
-        loggedin = false;
-    }
+//    sleep(600);
+//    if (receivebuffer[4] == 0x38) {
+//        acc.log('Log in successfull');
+//        buf = Buffer.from(LOGIN_MSG2);
+//        buf[1] = 0x00;
+//        buf[5] = 0xF2;
+//        cl.write(buf);
+//        sleep(250);
+//
+//        buf[5] = 0xF3;
+//        cl.write(buf);
+//        sleep(250);
+//
+//        buf[1] = 0x25;
+//        buf[3] = 0x04;
+//        buf[5] = 0x00;
+//        var message = LOGIN_MSG3;
+//        message = format37ByteMessage(message);
+//        buf2 = Buffer.from(message, 'hex');
+//        totalLength = buf.length + buf2.length;
+//        var buf3 = Buffer.concat([buf, buf2], totalLength);
+//        cl.write(buf3);
+//        sleep(250);
+//
+//        buf[1] = 0x26;
+//        buf[3] = 0x03;
+//        buf[5] = 0xF8;
+//        message = LOGIN_MSG4;
+//        message = format37ByteMessage(message);
+//        buf2 = Buffer.from(message, 'hex');
+//        buf2[2] = 0x80;     // Weird bug that adds c2 whenever there is 0x80 in string so fix it manually
+//        totalLength = buf.length + buf2.length;
+//        buf3 = Buffer.concat([buf, buf2], totalLength);
+//        cl.write(buf3);
+//        sleep(250);
+//
+//        buf[1] = 0x25;
+//        buf[3] = 0x04;
+//        buf[5] = 0x00;
+//        message = LOGIN_MSG5;
+//        message = format37ByteMessage(message);
+//        buf2 = Buffer.from(message, 'hex');
+//        totalLength = buf.length + buf2.length;
+//        buf3 = Buffer.concat([buf, buf2], totalLength);
+//        cl.write(buf3);
+//        sleep(250);
+//
+//        buf[7] = 0x14;
+//        buftemp = Buffer.alloc(23, 0x00);
+//        receivebuffer.copy(buftemp, 0, 16, 26);
+//        receivebuffer.copy(buftemp, 10, 24, 26);
+//        receivebuffer.copy(buftemp, 15, 31, 39);
+//        buftemp[12] = 0x19;
+//        buftemp[13] = 0x00;
+//        buftemp[14] = 0x00;
+//        buf2 = Buffer.from(LOGIN_MSG6);
+//        totalLength = buftemp.length + buf2.length;
+//        buf3 = Buffer.concat([buftemp, buf2], totalLength);
+//        var checksum = 0;
+//        for (i = 0; i < buf3.length; i++) {
+//            checksum += buf3[i];
+//        }
+//        while (checksum > 255) {
+//            checksum = checksum - Math.trunc(checksum / 256) * 256;
+//        }
+//        buf4 = Buffer.from([checksum]);
+//        buf5 = Buffer.concat([buf3, buf4], buf3.length + buf4.length);
+//        buf6 = Buffer.alloc((Math.round(buf5.length / 16) + 1) * 16, 0xEE);
+//        buf5.copy(buf6);
+//        totalLength = buf.length + buf6.length;
+//        buf7 = Buffer.concat([buf, buf6], totalLength);
+//        cl.write(buf7);
+//        sleep(250);
+//
+//        buf[1] = 0x25;
+//        buf[3] = 0x04;
+//        buf[5] = 0x00;
+//        buf[7] = 0x14;
+//        message = LOGIN_MSG7;
+//        message = format37ByteMessage(message);
+//        buf2 = Buffer.from(message, 'hex');
+//        totalLength = buf.length + buf2.length;
+//        buf3 = Buffer.concat([buf, buf2], totalLength);
+//        cl.write(buf3);
+//        sleep(250);
+//
+//        buf[1] = 0x25;
+//        buf[3] = 0x04;
+//        buf[5] = 0x00;
+//        buf[7] = 0x14;
+//        message = LOGIN_MSG8;
+//        message = format37ByteMessage(message);
+//        buf2 = Buffer.from(message, 'hex');
+//        totalLength = buf.length + buf2.length;
+//        buf3 = Buffer.concat([buf, buf2], totalLength);
+//        cl.write(buf3);
+//        sleep(250);
+//        loggedin = true;
+//    } else {
+//        acc.log('Error logging in');
+//        cl.end();
+//        loggedin = false;
+//    }
 }
 
 
@@ -358,7 +496,7 @@ function getAlarmStatus(acc) {
         }
     });
 
-    sleep(500);
+//    sleep(500);
     _login(alarm_password, client, acc);
     _getalarmstatus(client, acc);
     client.end();
