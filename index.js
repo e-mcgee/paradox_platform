@@ -1,6 +1,6 @@
 // Requires
 var net = require('net');
-var sleep = require('system-sleep');
+//var sleep = require('system-sleep');
 
 // Global variables
 var loggedin = false;                           // indcates if logged in successful
@@ -88,12 +88,11 @@ function _parsestatus(acc, cl) {
     var checkok = false;
     
     if (_checksum()) {
-        acc.log('Checksum OK');
+//        acc.log('Checksum OK');
         checkok = true;    
     }
     else checkok = false;
     
-//    if (loginresult == 10 && receivebuffer[16] == 0x52) {
     if (receivebuffer[16] == 0x52) {
         if (receivebuffer[19] == 0x01) {
             // Alarm status
@@ -134,7 +133,7 @@ function _parsestatus(acc, cl) {
                 }
             }
         }
-        if (checkok==true && receivebuffer[19] == 0x00) {
+        if (receivebuffer[19] == 0x00) {
             // Zone status
             if (loginresult == 0) {             // only get zone status if this message is not as a result of a login message sent to alarm          
                 acc.log('Zone State received');
@@ -148,183 +147,8 @@ function _parsestatus(acc, cl) {
                     }
                 }
             }
-//            cl.end();
-//            gettingstatus = false;
-//            return;
         }
     }
-    
-//    if (loginresult == 1 && receivebuffer[4] == 0x38) {
-//        acc.log('Log in successfull');
-//        buf = Buffer.from(LOGIN_MSG2);
-//        buf[1] = 0x00;
-//        buf[5] = 0xF2;
-//        cl.write(buf);
-//        loginresult = 2;
-//        return;
-//    }
-//    if (loginresult == 1 && receivebuffer[4] != 0x38) {
-//        acc.log('Error logging in');
-//        cl.end();
-//        loggedin = false;
-//        loginresult = 0;
-//        return;
-//    }
-//    
-//    if (loginresult == 2) {
-//        acc.log('Loggging in 2');
-//        buf = Buffer.from(LOGIN_MSG2);
-//        buf[1] = 0x00;
-//        buf[5] = 0xF3;
-//        cl.write(buf);
-//        loginresult = 3;
-//        return;
-//    }
-//
-//    if (loginresult == 3) {
-//        acc.log('Loggging in 3');
-//        buf = Buffer.from(LOGIN_MSG2);
-//        buf[1] = 0x25;
-//        buf[3] = 0x04;
-//        buf[5] = 0x00;
-//        var message = LOGIN_MSG3;
-//        message = format37ByteMessage(message);
-//        buf2 = Buffer.from(message, 'hex');
-//        totalLength = buf.length + buf2.length;
-//        var buf3 = Buffer.concat([buf, buf2], totalLength);
-//        cl.write(buf3);
-//        loginresult = 4;
-//        return;
-//    }
-//
-//    if (loginresult = 4) {
-//        acc.log('Loggging in 4');
-//        buf = Buffer.from(LOGIN_MSG2);
-//        buf[1] = 0x26;
-//        buf[3] = 0x03;
-//        buf[5] = 0xF8;
-//        message = LOGIN_MSG4;
-//        message = format37ByteMessage(message);
-//        buf2 = Buffer.from(message, 'hex');
-//        buf2[2] = 0x80;     // Weird bug that adds c2 whenever there is 0x80 in string so fix it manually
-//        totalLength = buf.length + buf2.length;
-//        buf3 = Buffer.concat([buf, buf2], totalLength);
-//        cl.write(buf3);
-//        loginresult = 5;
-//        return;
-//    }
-//
-//    if (loginresult == 5) {
-//        acc.log('Loggging in 5');
-//        buf = Buffer.from(LOGIN_MSG2);
-//        buf[1] = 0x25;
-//        buf[3] = 0x04;
-//        buf[5] = 0x00;
-//        message = LOGIN_MSG5;
-//        message = format37ByteMessage(message);
-//        buf2 = Buffer.from(message, 'hex');
-//        totalLength = buf.length + buf2.length;
-//        buf3 = Buffer.concat([buf, buf2], totalLength);
-//        cl.write(buf3);
-//        loginresult = 6;
-//        return;
-//    }
-//
-//    if (loginresult == 6) {
-//        acc.log('Loggging in 6');
-//        buf = Buffer.from(LOGIN_MSG2);
-//        buf[1] = 0x25;
-//        buf[3] = 0x04;
-//        buf[5] = 0x00;
-//        buf[7] = 0x14;
-//        buftemp = Buffer.alloc(23, 0x00);
-//        receivebuffer.copy(buftemp, 0, 16, 26);
-//        receivebuffer.copy(buftemp, 10, 24, 26);
-//        receivebuffer.copy(buftemp, 15, 31, 39);
-//        buftemp[12] = 0x19;
-//        buftemp[13] = 0x00;
-//        buftemp[14] = 0x00;
-//        buf2 = Buffer.from(LOGIN_MSG6);
-//        totalLength = buftemp.length + buf2.length;
-//        buf3 = Buffer.concat([buftemp, buf2], totalLength);
-//        var checksum = 0;
-//        for (i = 0; i < buf3.length; i++) {
-//            checksum += buf3[i];
-//        }
-//        while (checksum > 255) {
-//            checksum = checksum - Math.trunc(checksum / 256) * 256;
-//        }
-//        buf4 = Buffer.from([checksum]);
-//        buf5 = Buffer.concat([buf3, buf4], buf3.length + buf4.length);
-//        buf6 = Buffer.alloc((Math.round(buf5.length / 16) + 1) * 16, 0xEE);
-//        buf5.copy(buf6);
-//        totalLength = buf.length + buf6.length;
-//        buf7 = Buffer.concat([buf, buf6], totalLength);
-//        cl.write(buf7);
-//        loginresult = 7;
-//        return;
-//    }
-//
-//    if (loginresult == 7) {
-//        acc.log('Loggging in 7');
-//        buf = Buffer.from(LOGIN_MSG2);
-//        buf[1] = 0x25;
-//        buf[3] = 0x04;
-//        buf[5] = 0x00;
-//        buf[7] = 0x14;
-//        message = LOGIN_MSG7;
-//        message = format37ByteMessage(message);
-//        buf2 = Buffer.from(message, 'hex');
-//        totalLength = buf.length + buf2.length;
-//        buf3 = Buffer.concat([buf, buf2], totalLength);
-//        cl.write(buf3);
-//        loginresult = 8;
-//        return;
-//    }
-//
-//    if (loginresult == 8) {
-//        acc.log('Loggging in 8');
-//        buf = Buffer.from(LOGIN_MSG2);
-//        buf[1] = 0x25;
-//        buf[3] = 0x04;
-//        buf[5] = 0x00;
-//        buf[7] = 0x14;
-//        message = LOGIN_MSG8;
-//        message = format37ByteMessage(message);
-//        buf2 = Buffer.from(message, 'hex');
-//        totalLength = buf.length + buf2.length;
-//        buf3 = Buffer.concat([buf, buf2], totalLength);
-//        cl.write(buf3);
-////        sleep(250);
-//        loggedin = true;
-//        return;
-//    }
-//
-//    if (loginresult == 8 && loggedin) {
-//
-//        acc.log('Geting Status...');
-// //       loginresult = 0;
-//        buf = Buffer.from(STATUS_MSG1);
-//        cl.write(buf);
-//        loginresult = 9;
-//        return;
-//    }
-//    
-//    if (loginresult == 9) {
-////        sleep(250);
-//        buf = Buffer.from(STATUS_MSG2);
-//        cl.write(buf);
-////        sleep(250);
-//        acc.log(alarmstatus);
-//        loginresult = 10;
-//        return;
-//    }
-//    
-//    if (loginresult == 8 & !loggedin) {
-//        acc.log('Cannot get status - not logged in');
-//    }
-
-
 }
 
 //
@@ -363,109 +187,111 @@ function _login(password, cl, acc) {
     acc.log('Logging in');
 
     cl.write(buf);
-    sleep(600);
-    if (receivebuffer[4] == 0x38) {
-        acc.log('Log in successfull');
-        buf = Buffer.from(LOGIN_MSG2);
-        buf[1] = 0x00;
-        buf[5] = 0xF2;
-        cl.write(buf);
-        sleep(250);
-
-        buf[5] = 0xF3;
-        cl.write(buf);
-        sleep(250);
-
-        buf[1] = 0x25;
-        buf[3] = 0x04;
-        buf[5] = 0x00;
-        var message = LOGIN_MSG3;
-        message = format37ByteMessage(message);
-        buf2 = Buffer.from(message, 'hex');
-        totalLength = buf.length + buf2.length;
-        var buf3 = Buffer.concat([buf, buf2], totalLength);
-        cl.write(buf3);
-        sleep(250);
-
-        buf[1] = 0x26;
-        buf[3] = 0x03;
-        buf[5] = 0xF8;
-        message = LOGIN_MSG4;
-        message = format37ByteMessage(message);
-        buf2 = Buffer.from(message, 'hex');
-        buf2[2] = 0x80;     // Weird bug that adds c2 whenever there is 0x80 in string so fix it manually
-        totalLength = buf.length + buf2.length;
-        buf3 = Buffer.concat([buf, buf2], totalLength);
-        cl.write(buf3);
-        sleep(250);
-
-        buf[1] = 0x25;
-        buf[3] = 0x04;
-        buf[5] = 0x00;
-        message = LOGIN_MSG5;
-        message = format37ByteMessage(message);
-        buf2 = Buffer.from(message, 'hex');
-        totalLength = buf.length + buf2.length;
-        buf3 = Buffer.concat([buf, buf2], totalLength);
-        cl.write(buf3);
-        sleep(250);
-
-        buf[7] = 0x14;
-        buftemp = Buffer.alloc(23, 0x00);
-        receivebuffer.copy(buftemp, 0, 16, 26);
-        receivebuffer.copy(buftemp, 10, 24, 26);
-        receivebuffer.copy(buftemp, 15, 31, 39);
-        buftemp[12] = 0x19;
-        buftemp[13] = 0x00;
-        buftemp[14] = 0x00;
-        buf2 = Buffer.from(LOGIN_MSG6);
-        totalLength = buftemp.length + buf2.length;
-        buf3 = Buffer.concat([buftemp, buf2], totalLength);
-        var checksum = 0;
-        for (i = 0; i < buf3.length; i++) {
-            checksum += buf3[i];
+    setTimeout(function () {
+        if (receivebuffer[4] == 0x38) {
+            acc.log('Log in successfull');
+            buf = Buffer.from(LOGIN_MSG2);
+            buf[1] = 0x00;
+            buf[5] = 0xF2;
+            cl.write(buf);
+            setTimeout(function () {
+                buf[5] = 0xF3;
+                cl.write(buf);
+                setTimeout(function () {
+                    buf[1] = 0x25;
+                    buf[3] = 0x04;
+                    buf[5] = 0x00;
+                    var message = LOGIN_MSG3;
+                    message = format37ByteMessage(message);
+                    buf2 = Buffer.from(message, 'hex');
+                    totalLength = buf.length + buf2.length;
+                    var buf3 = Buffer.concat([buf, buf2], totalLength);
+                    cl.write(buf3);
+                    setTimeout(function () {
+                        buf[1] = 0x26;
+                        buf[3] = 0x03;
+                        buf[5] = 0xF8;
+                        message = LOGIN_MSG4;
+                        message = format37ByteMessage(message);
+                        buf2 = Buffer.from(message, 'hex');
+                        buf2[2] = 0x80;     // Weird bug that adds c2 whenever there is 0x80 in string so fix it manually
+                        totalLength = buf.length + buf2.length;
+                        buf3 = Buffer.concat([buf, buf2], totalLength);
+                        cl.write(buf3);
+                        setTimeout(function () {
+                            buf[1] = 0x25;
+                            buf[3] = 0x04;
+                            buf[5] = 0x00;
+                            message = LOGIN_MSG5;
+                            message = format37ByteMessage(message);
+                            buf2 = Buffer.from(message, 'hex');
+                            totalLength = buf.length + buf2.length;
+                            buf3 = Buffer.concat([buf, buf2], totalLength);
+                            cl.write(buf3);
+                            setTimeout(function () {
+                                buf[7] = 0x14;
+                                buftemp = Buffer.alloc(23, 0x00);
+                                receivebuffer.copy(buftemp, 0, 16, 26);
+                                receivebuffer.copy(buftemp, 10, 24, 26);
+                                receivebuffer.copy(buftemp, 15, 31, 39);
+                                buftemp[12] = 0x19;
+                                buftemp[13] = 0x00;
+                                buftemp[14] = 0x00;
+                                buf2 = Buffer.from(LOGIN_MSG6);
+                                totalLength = buftemp.length + buf2.length;
+                                buf3 = Buffer.concat([buftemp, buf2], totalLength);
+                                var checksum = 0;
+                                for (i = 0; i < buf3.length; i++) {
+                                    checksum += buf3[i];
+                                }
+                                while (checksum > 255) {
+                                    checksum = checksum - Math.trunc(checksum / 256) * 256;
+                                }
+                                buf4 = Buffer.from([checksum]);
+                                buf5 = Buffer.concat([buf3, buf4], buf3.length + buf4.length);
+                                buf6 = Buffer.alloc((Math.round(buf5.length / 16) + 1) * 16, 0xEE);
+                                buf5.copy(buf6);
+                                totalLength = buf.length + buf6.length;
+                                buf7 = Buffer.concat([buf, buf6], totalLength);
+                                cl.write(buf7);
+                                setTimeout(function () {
+                                    buf[1] = 0x25;
+                                    buf[3] = 0x04;
+                                    buf[5] = 0x00;
+                                    buf[7] = 0x14;
+                                    message = LOGIN_MSG7;
+                                    message = format37ByteMessage(message);
+                                    buf2 = Buffer.from(message, 'hex');
+                                    totalLength = buf.length + buf2.length;
+                                    buf3 = Buffer.concat([buf, buf2], totalLength);
+                                    cl.write(buf3);
+                                    setTimeout(function () {
+                                        buf[1] = 0x25;
+                                        buf[3] = 0x04;
+                                        buf[5] = 0x00;
+                                        buf[7] = 0x14;
+                                        message = LOGIN_MSG8;
+                                        message = format37ByteMessage(message);
+                                        buf2 = Buffer.from(message, 'hex');
+                                        totalLength = buf.length + buf2.length;
+                                        buf3 = Buffer.concat([buf, buf2], totalLength);
+                                        cl.write(buf3);
+                                        setTimeout(function () {
+                                            loggedin = true;
+                                        }, 250);
+                                    }, 250);
+                                }, 250);
+                            }, 250);
+                        }, 250);
+                    }, 250);
+                }, 250);
+            }, 250);
+        } else {
+            acc.log('Error logging in');
+            cl.end();
+            loggedin = false;
         }
-        while (checksum > 255) {
-            checksum = checksum - Math.trunc(checksum / 256) * 256;
-        }
-        buf4 = Buffer.from([checksum]);
-        buf5 = Buffer.concat([buf3, buf4], buf3.length + buf4.length);
-        buf6 = Buffer.alloc((Math.round(buf5.length / 16) + 1) * 16, 0xEE);
-        buf5.copy(buf6);
-        totalLength = buf.length + buf6.length;
-        buf7 = Buffer.concat([buf, buf6], totalLength);
-        cl.write(buf7);
-        sleep(250);
-
-        buf[1] = 0x25;
-        buf[3] = 0x04;
-        buf[5] = 0x00;
-        buf[7] = 0x14;
-        message = LOGIN_MSG7;
-        message = format37ByteMessage(message);
-        buf2 = Buffer.from(message, 'hex');
-        totalLength = buf.length + buf2.length;
-        buf3 = Buffer.concat([buf, buf2], totalLength);
-        cl.write(buf3);
-        sleep(250);
-
-        buf[1] = 0x25;
-        buf[3] = 0x04;
-        buf[5] = 0x00;
-        buf[7] = 0x14;
-        message = LOGIN_MSG8;
-        message = format37ByteMessage(message);
-        buf2 = Buffer.from(message, 'hex');
-        totalLength = buf.length + buf2.length;
-        buf3 = Buffer.concat([buf, buf2], totalLength);
-        cl.write(buf3);
-        sleep(250);
-        loggedin = true;
-    } else {
-        acc.log('Error logging in');
-        cl.end();
-        loggedin = false;
-    }
+    }, 600);
 }
 
 
@@ -479,11 +305,13 @@ function _getalarmstatus(cl, acc) {
         loginresult = 0;
         buf = Buffer.from(STATUS_MSG1);
         cl.write(buf);
-        sleep(250);
-        buf = Buffer.from(STATUS_MSG2);
-        cl.write(buf);
-        sleep(250);
-        acc.log(alarmstatus);
+        setTimeout(function () {
+            buf = Buffer.from(STATUS_MSG2);
+            cl.write(buf);
+            setTimeout(function () {
+                acc.log(alarmstatus);
+            }, 250);
+        }, 250);
     } else {
         acc.log('Cannot get status - not logged in');
     }
@@ -525,20 +353,24 @@ function getAlarmStatus(acc) {
 
     client.on('data', (data) => {
         if (data.length > 37) {
-            acc.log("Message received");
-            acc.log("message length = ");
-            acc.log(data.length);
+//            acc.log("Message received");
+//            acc.log("message length = ");
+//            acc.log(data.length);
             receivebuffer = Buffer.from(data);
             _parsestatus(acc, client);
         }
     });
 
-    sleep(500);
-    _login(alarm_password, client, acc);
-    _getalarmstatus(client, acc);
-//    while (loginresult != 10);
-    client.end();
-    gettingstatus = false;
+   setTimeout(function () {
+        _login(alarm_password, client, acc);
+        setTimeout(function () {
+            _getalarmstatus(client, acc);
+            setTimeout(function () {
+                client.end();
+                gettingstatus = false;
+            }, 550);
+        }, 3000);
+   }, 500);
 }
 
 
@@ -589,7 +421,6 @@ function controlAlarm(state, partition, acc, cl) {
         var totalLength = buf.length + buf2.length;
         var buf3 = Buffer.concat([buf, buf2], totalLength);
         cl.write(buf3);
-        sleep(250);
     } else {
         acc.log('Cannot set Alarm - not logged in');
     }
@@ -633,17 +464,16 @@ function controlPGM(state, pgm, acc, cl) {
             return;
         }
         msg = getHex(pgm);
-        acc.log(msg);
+//        acc.log(msg);
         message2 = message1.concat(msg);
         str2 = CONTROLPGM_MSG2;
         message3 = message2.concat(str2);
         message4 = format37ByteMessage(message3);
         var buf2 = Buffer.from(message4, 'hex');
-        acc.log(buf2);
+//        acc.log(buf2);
         var totalLength = buf.length + buf2.length;
         var buf3 = Buffer.concat([buf, buf2], totalLength);
         cl.write(buf3);
-        sleep(250);
     } else {
         acc.log('Cannot set PGM - not logged in');
     }
@@ -789,7 +619,6 @@ function paradoxPlatform(log, config) {
                     alarmstate.accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemAlarmType).setValue(alarmtype);                    
                     alarmstate.accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemCurrentState).setValue(stat);
                     alarmstate.accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemTargetState).setValue(stat);
-//                    alarmstate.accessory.securitysystemService.setCharacteristic(Characteristic.SecuritySystemTargetState, stat);
                 }
             }
             alarmstate.accessory.log('Alarmstatus :' + alarmstate.status);
@@ -929,8 +758,10 @@ ParadoxAccessory.prototype.getDoorState = function (callback) {
     var config = this.config;
 
     if (zones[config.zone].status == 'off') {
+        self.log('Closed');
         acc.readstate = Characteristic.TargetDoorState.CLOSED;
     } else {
+        self.log('Open');
         acc.readstate = Characteristic.TargetDoorState.OPEN;
     }
 
@@ -945,30 +776,113 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
     var acc = this.garagedooropenerService;
     var config = this.config;
     var self = this;
+    
+    if (gettingstatus || controlAlarmstate) {
+        self.log('Alarm busy ... waiting 5s');
+        setTimeout (function () {
+            self.log('OK proceeding');
+            controlPGMstate = true;
+            muteStatus = true;
 
-    controlPGMstate = true;
-    muteStatus = true;
+            self.log('Setting state:');
+            self.log(state);
+//            self.log('acc.readstate:');
+//            self.log(acc.readstate);
+            self.log('PGM:');
+            self.log(config.pgm);
 
-    this.log('Setting state:');
-    this.log(state);
-    this.log('acc.readstate:');
-    this.log(acc.readstate);
-    this.log('PGM:');
-    this.log(config.pgm);
+            var options = {
+                mode: 'text',
+                encoding: 'utf8',
+                args: [config.pgm]
+            };
 
-    var options = {
-        mode: 'text',
-        encoding: 'utf8',
-        args: [config.pgm]
-    };
+            if (acc.readstate != state) {
 
-    if (acc.readstate != state) {
+                loggedin = false;
 
-        var tries = 3;
+                var client = net.createConnection({port: alarm_port, host: alarm_ip_address}, () => {
+                    self.log('Connected to Alarm!');
+                });
 
-        loggedin = false;
+                client.on('end', () => {
+                    self.log('Disconnected from  Alarm');
+                    loggedin = false;
+                });
 
-        while (tries > 0 && !loggedin) {
+                client.on('timeout', () => {
+                    acc.log('No response from alarm - Disconnected from alarm');
+                    loggedin = false;
+                    client.end();
+                });
+
+                client.on('error', () => {
+                    acc.log('Error communicating with alarm - Disconnected from alarm');
+                    loggedin = false;
+                    client.end();
+                });
+
+                client.on('data', (data) => {
+                    if (data.length > 37) {
+                        receivebuffer = Buffer.from(data);
+                        _parsestatus(self);
+                   }
+                });
+
+                setTimeout(function () {
+                    _login(alarm_password, client, self);
+                    setTimeout(function () {
+                        controlPGM("ON", config.pgm, self, client);
+                        setTimeout(function () {
+                            controlPGM("OFF", config.pgm, self, client);
+                            setTimeout(function () {
+                                client.end();
+                                self.garagedooropenerService.readstate = state;
+                                self.garagedooropenerService.setCharacteristic(Characteristic.CurrentDoorState, state);
+                                controlPGMstate = false;
+                                muteStatus = false;
+
+                                this.reachability = true;
+                                callback(null, state);
+
+                            }, 250);
+                        }, 250);
+                    }, 3000);
+                }, 500);
+            } else {
+                self.log('Status same - confirming')
+                self.garagedooropenerService.readstate = state;
+                self.garagedooropenerService.setCharacteristic(Characteristic.CurrentDoorState, state);
+                controlPGMstate = false;
+                muteStatus = false;                            
+                self.reachability = true;
+                callback(null, state);
+            }
+        }, 5000);
+        
+    } else {
+        // Wait for status get to finish or Control of Alarm to finish
+        
+        controlPGMstate = true;
+        muteStatus = true;
+
+        self.log('Setting state:');
+        self.log(state);
+ //       self.log('acc.readstate:');
+ //       self.log(acc.readstate);
+        self.log('PGM:');
+        self.log(config.pgm);
+
+        var options = {
+            mode: 'text',
+            encoding: 'utf8',
+            args: [config.pgm]
+        };
+
+        if (acc.readstate != state) {
+
+            loggedin = false;
+
             var client = net.createConnection({port: alarm_port, host: alarm_ip_address}, () => {
                 self.log('Connected to Alarm!');
             });
@@ -997,26 +911,36 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
                }
             });
 
-            sleep(500);
+            setTimeout(function () {
+                _login(alarm_password, client, self);
+                setTimeout(function () {
+                    controlPGM("ON", config.pgm, self, client);
+                    setTimeout(function () {
+                        controlPGM("OFF", config.pgm, self, client);
+                        setTimeout(function () {
+                            client.end();
+                            self.garagedooropenerService.readstate = state;
+                            self.garagedooropenerService.setCharacteristic(Characteristic.CurrentDoorState, state);
+                            controlPGMstate = false;
+                            muteStatus = false;
 
-            _login(alarm_password, client, self);
-            tries = -1;
-        }
+                            this.reachability = true;
+                            callback(null, state);
 
-        controlPGM("ON", config.pgm, self, client);
-        controlPGM("OFF", config.pgm, self, client);
-
-        client.end();
+                        }, 250);
+                    }, 250);
+                }, 3000);
+            }, 500);
+        } else {
+            self.log('Status same - confirming')
+            self.garagedooropenerService.readstate = state;
+            self.garagedooropenerService.setCharacteristic(Characteristic.CurrentDoorState, state);
+            controlPGMstate = false;
+            muteStatus = false;            
+            self.reachability = true;
+            callback(null, state);
+        }   
     }
-
-    self.garagedooropenerService.readstate = state;
-    self.garagedooropenerService.setCharacteristic(Characteristic.CurrentDoorState, state);
-
-    controlPGMstate = false;
-    muteStatus = false;
-
-    this.reachability = true;
-    callback(null, state);
 }
 
 
@@ -1065,15 +989,87 @@ ParadoxAccessory.prototype.setAlarmState = function (state, callback) {
 
         // Need to suspend status update timer while changing alarm state and then
         // reinstate the timer afterwards to avoid contention on alarm while setting state
-        muteStatus = true;
+        
+        if (controlPGMstate || gettingstatus) {
+            self.log('Busy with alarm .... Waiting to complete');
+            setTimeout (function () {
+                
+                muteStatus = true;
+                controlAlarmstate = true;
+                loggedin = false;
+                var client = net.createConnection({port: alarm_port, host: alarm_ip_address}, () => {
+                    self.log('Controlling Alarm - Connected to Alarm!');
+                });
 
-        controlAlarmstate = true;
+                client.on('end', () => {
+                    self.log('Controlling Alarm - Disconnected from  Alarm');
+                    loggedin = false;
+                });
 
-        var tries = 3;
+                client.on('timeout', () => {
+                    self.log('No response from alarm - Disconnected from alarm');
+                    loggedin = false;
+                    client.end();
+                });
 
-        loggedin = false;
+                client.on('error', () => {
+                    self.log('Error communicating with alarm - Disconnected from alarm');
+                    loggedin = false;
+                    client.end();
+                });
 
-        while (tries > 0 && !loggedin) {
+                client.on('data', (data) => {
+                    if (data.length > 37) {
+                        receivebuffer = Buffer.from(data);
+                        _parsestatus(self);
+                    }
+                });
+
+                setTimeout(function () {
+                    _login(alarm_password, client, self);
+                    setTimeout(function () {
+                        _getalarmstatus(client, self);
+                        setTimeout(function () {
+                            if (GetHomebridgeStatus(alarmstatus) != targetstate) {
+                                switch (targetstate) {
+                                    case Characteristic.SecuritySystemTargetState.STAY_ARM:
+                                        controlAlarm("STAY", 0, self, client);
+                                        break;
+                                    case Characteristic.SecuritySystemTargetState.NIGHT_ARM:
+                                        controlAlarm("SLEEP", 0, self, client);
+                                        break;
+                                    case Characteristic.SecuritySystemTargetState.AWAY_ARM :
+                                        controlAlarm("ARM", 0, self, client);
+                                        break;
+                                    case Characteristic.SecuritySystemTargetState.DISARM:
+                                        controlAlarm("DISARM", 0, self, client);
+                                        break;
+                                    default :
+                                        self.log('Unknown state');
+                                }
+                                ;
+                                self.securitysystemService.setCharacteristic(Characteristic.SecuritySystemCurrentState, state);
+                            }
+
+                            client.end();
+                            controlAlarmstate = false;
+                            muteStatus = false;
+                            self.reachability = true;
+                            callback(null, state);                       
+                        }, 500);                
+                    }, 3000);
+                }, 500);
+                
+            }, 5000);    
+
+        // Wait for status get to finish or PGM setting to finish
+        } else {
+            
+            muteStatus = true;
+
+            controlAlarmstate = true;
+
+            loggedin = false;
 
             var client = net.createConnection({port: alarm_port, host: alarm_ip_address}, () => {
                 self.log('Controlling Alarm - Connected to Alarm!');
@@ -1085,13 +1081,13 @@ ParadoxAccessory.prototype.setAlarmState = function (state, callback) {
             });
 
             client.on('timeout', () => {
-                acc.log('No response from alarm - Disconnected from alarm');
+                self.log('No response from alarm - Disconnected from alarm');
                 loggedin = false;
                 client.end();
             });
 
             client.on('error', () => {
-                acc.log('Error communicating with alarm - Disconnected from alarm');
+                self.log('Error communicating with alarm - Disconnected from alarm');
                 loggedin = false;
                 client.end();
             });
@@ -1103,45 +1099,41 @@ ParadoxAccessory.prototype.setAlarmState = function (state, callback) {
                 }
             });
 
-            sleep(500);
+            setTimeout(function () {
+                _login(alarm_password, client, self);
+                setTimeout(function () {
+                    _getalarmstatus(client, self);
+                    setTimeout(function () {
+                        if (GetHomebridgeStatus(alarmstatus) != targetstate) {
+                            switch (targetstate) {
+                                case Characteristic.SecuritySystemTargetState.STAY_ARM:
+                                    controlAlarm("STAY", 0, self, client);
+                                    break;
+                                case Characteristic.SecuritySystemTargetState.NIGHT_ARM:
+                                    controlAlarm("SLEEP", 0, self, client);
+                                    break;
+                                case Characteristic.SecuritySystemTargetState.AWAY_ARM :
+                                    controlAlarm("ARM", 0, self, client);
+                                    break;
+                                case Characteristic.SecuritySystemTargetState.DISARM:
+                                    controlAlarm("DISARM", 0, self, client);
+                                    break;
+                                default :
+                                    self.log('Unknown state');
+                            }
+                            ;
+                            self.securitysystemService.setCharacteristic(Characteristic.SecuritySystemCurrentState, state);
+                        }
 
-            _login(alarm_password, client, self);
-            tries -= 1;
+                        client.end();
+                        controlAlarmstate = false;
+                        muteStatus = false;
+                        self.reachability = true;
+                        callback(null, state);                       
+                    }, 500);                
+                }, 3000);
+            }, 500);
         }
-
-        _getalarmstatus(client, self);
-
-        sleep(500);
-        //
-        // Based on target state call control alarm function with corresponding state
-        //
-        if (GetHomebridgeStatus(alarmstatus) != targetstate) {
-            switch (targetstate) {
-                case Characteristic.SecuritySystemTargetState.STAY_ARM:
-                    controlAlarm("STAY", 0, self, client);
-                    break;
-                case Characteristic.SecuritySystemTargetState.NIGHT_ARM:
-                    controlAlarm("SLEEP", 0, self, client);
-                    break;
-                case Characteristic.SecuritySystemTargetState.AWAY_ARM :
-                    controlAlarm("ARM", 0, self, client);
-                    break;
-                case Characteristic.SecuritySystemTargetState.DISARM:
-                    controlAlarm("DISARM", 0, self, client);
-                    break;
-                default :
-                    self.log('Unknown state');
-            }
-            ;
-            self.securitysystemService.setCharacteristic(Characteristic.SecuritySystemCurrentState, state);
-        }
-
-        client.end();
-        controlAlarmstate = false;
-        muteStatus = false;
-        this.reachability = true;
-
-        callback(null, state);
     } else {
         self.log('Alarm status error - ignoring');
     }
