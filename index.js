@@ -291,7 +291,7 @@ function _login(password, cl, acc) {
             cl.end();
             loggedin = false;
         }
-    }, 250);
+    }, 600);
 }
 
 
@@ -368,9 +368,9 @@ function getAlarmStatus(acc) {
             setTimeout(function () {
                 client.end();
                 gettingstatus = false;
-            }, 500);
-        }, 2500);
-   }, 250);
+            }, 550);
+        }, 3000);
+   }, 500);
 }
 
 
@@ -847,8 +847,8 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
 
                             }, 250);
                         }, 250);
-                    }, 2500);
-                }, 250);
+                    }, 3000);
+                }, 500);
             } else {
                 self.log('Status same - confirming')
                 self.garagedooropenerService.readstate = state;
@@ -858,7 +858,7 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
                 self.reachability = true;
                 callback(null, state);
             }
-        }, 3500);
+        }, 5000);
         
     } else {
         // Wait for status get to finish or Control of Alarm to finish
@@ -929,8 +929,8 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
 
                         }, 250);
                     }, 250);
-                }, 2500);
-            }, 250);
+                }, 3000);
+            }, 500);
         } else {
             self.log('Status same - confirming')
             self.garagedooropenerService.readstate = state;
@@ -1056,11 +1056,11 @@ ParadoxAccessory.prototype.setAlarmState = function (state, callback) {
                             muteStatus = false;
                             self.reachability = true;
                             callback(null, state);                       
-                        }, 250);                
-                    }, 2500);
-                }, 250);
+                        }, 500);                
+                    }, 3000);
+                }, 500);
                 
-            }, 3500);    
+            }, 5000);    
 
         // Wait for status get to finish or PGM setting to finish
         } else {
@@ -1130,9 +1130,9 @@ ParadoxAccessory.prototype.setAlarmState = function (state, callback) {
                         muteStatus = false;
                         self.reachability = true;
                         callback(null, state);                       
-                    }, 250);                
-                }, 2500);
-            }, 250);
+                    }, 500);                
+                }, 3000);
+            }, 500);
         }
     } else {
         self.log('Alarm status error - ignoring');
