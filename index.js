@@ -337,18 +337,18 @@ function getAlarmStatus(acc) {
     });
 
     client.on('end', () => {
-        self.log('Finished Getting Status - Disconnected from  alarm');
+//        self.log('Finished Getting Status - Disconnected from  alarm');
         loggedin = false;
     });
 
     client.on('timeout', () => {
-        self.log('No response from alarm - Disconnected from alarm');
+//        self.log('No response from alarm - Disconnected from alarm');
         loggedin = false;
         client.end();
     });
 
     client.on('error', () => {
-        self.log('Error communicating with alarm - Disconnected from alarm');
+//        self.log('Error communicating with alarm - Disconnected from alarm');
         loggedin = false;
         client.end();
     });
@@ -808,18 +808,18 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
                 });
 
                 client.on('end', () => {
-                    self.log('Disconnected from  Alarm');
+//                    self.log('Disconnected from  Alarm');
                     loggedin = false;
                 });
 
                 client.on('timeout', () => {
-                    self.log('No response from alarm - Disconnected from alarm');
+//                    self.log('No response from alarm - Disconnected from alarm');
                     loggedin = false;
                     client.end();
                 });
 
                 client.on('error', () => {
-                    self.log('Error communicating with alarm - Disconnected from alarm');
+//                    self.log('Error communicating with alarm - Disconnected from alarm');
                     loggedin = false;
                     client.end();
                 });
@@ -890,18 +890,18 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
             });
 
             client.on('end', () => {
-                self.log('Disconnected from  Alarm');
+//                self.log('Disconnected from  Alarm');
                 loggedin = false;
             });
 
             client.on('timeout', () => {
-                self.log('No response from alarm - Disconnected from alarm');
+//                self.log('No response from alarm - Disconnected from alarm');
                 loggedin = false;
                 client.end();
             });
 
             client.on('error', () => {
-                self.log('Error communicating with alarm - Disconnected from alarm');
+//                self.log('Error communicating with alarm - Disconnected from alarm');
                 loggedin = false;
                 client.end();
             });
@@ -1004,18 +1004,18 @@ ParadoxAccessory.prototype.setAlarmState = function (state, callback) {
                 });
 
                 client.on('end', () => {
-                    self.log('Controlling Alarm - Disconnected from  Alarm');
+//                    self.log('Controlling Alarm - Disconnected from  Alarm');
                     loggedin = false;
                 });
 
                 client.on('timeout', () => {
-                    self.log('No response from alarm - Disconnected from alarm');
+//                    self.log('No response from alarm - Disconnected from alarm');
                     loggedin = false;
                     client.end();
                 });
 
                 client.on('error', () => {
-                    self.log('Error communicating with alarm - Disconnected from alarm');
+//                    self.log('Error communicating with alarm - Disconnected from alarm');
                     loggedin = false;
                     client.end();
                 });
@@ -1078,18 +1078,18 @@ ParadoxAccessory.prototype.setAlarmState = function (state, callback) {
             });
 
             client.on('end', () => {
-                self.log('Controlling Alarm - Disconnected from  Alarm');
+//                self.log('Controlling Alarm - Disconnected from  Alarm');
                 loggedin = false;
             });
 
             client.on('timeout', () => {
-                self.log('No response from alarm - Disconnected from alarm');
+//                self.log('No response from alarm - Disconnected from alarm');
                 loggedin = false;
                 client.end();
             });
 
             client.on('error', () => {
-                self.log('Error communicating with alarm - Disconnected from alarm');
+//                self.log('Error communicating with alarm - Disconnected from alarm');
                 loggedin = false;
                 client.end();
             });
