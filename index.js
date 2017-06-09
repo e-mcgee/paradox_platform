@@ -322,6 +322,8 @@ function _getalarmstatus(cl, acc) {
 // Function that handles the full status get cycle. It logs in, sends status requets message and retrieves status info form data received from alarm
 //  It takes accessory as input in order to be able to log messages for it
 function getAlarmStatus(acc) {
+    
+    self = this;
 
     if (controlPGMstate || controlAlarmstate) {
         acc.log('Busy with alarm now - not getting status');
@@ -611,7 +613,7 @@ function paradoxPlatform(log, config) {
                             }
                             if (zonestatus[i] == 1 || zonestatus[i] == 0) {
                                 if (zones[i].accessory != null && zones[i].status != st) {
-                                    alarmtype += zone[i].name + ' ';
+                                    alarmtype += zones[i].name + ' ';
                                 }
                             }
                         }
