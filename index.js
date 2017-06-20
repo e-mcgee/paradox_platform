@@ -561,14 +561,14 @@ function paradoxPlatform(log, config) {
                         switch (zones[i].type) {
                             case 'Garage Door':
                                 if (st == 'off') {
-                                    state = Characteristic.TargetDoorState.CLOSED;
-//                                } else {
-//                                    state = Characteristic.TargetDoorState.OPEN;
-//                                }
+                                    state = Characteristic.CurrentDoorState.CLOSED;
+                                } else {
+                                    state = Characteristic.CurrentDoorState.OPEN;
+                                }
                                     if (zones[i].accessory.garagedooropenerService.readstate != state) {
-                                        zones[i].accessory.garagedooropenerService.readstate = state;
+//                                        zones[i].accessory.garagedooropenerService.readstate = state;
                                         zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).setValue(state);
-                                        zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(state);
+//                                        zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(state);
                                     }
                                 }
                                 break;
