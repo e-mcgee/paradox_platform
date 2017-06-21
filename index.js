@@ -664,9 +664,27 @@ paradoxPlatform.prototype.accessories = function (callback) {
             if (accConfig.type == 'Garage Door' || accConfig.type == 'Contact Sensor' || accConfig.type == 'Motion Sensor') {
                 zones[accConfig.zone].accessory = a;
                 zones[accConfig.zone].type = accConfig.type;
+                switch (accConfig.type) {
+                    case 'Garage Door':
+                        zones[i].accessory.garagedooropenerService.readstate = Characteristic.CurrentDoorState.CLOSED;
+                        zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).setValue(Characteristic.CurrentDoorState.CLOSED);
+                        zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(Characteristic.CurrentDoorState.CLOSED);
+                        break;
+                    case 'Contact Sensor':
+                        zones[i].accessory.contactsensorService.getCharacteristic(Characteristic.ContactSensorState).setValue(Characteristic.ContactSensorState.CONTACT_NOT_DETECTED);
+                        break;
+                    case 'Motion Sensor':
+                        zones[i].accessory.motionsensorService.getCharacteristic(Characteristic.MotionDetected).setValue(false);
+                        break;
+                    default:
+                }
             }
+
             if (accConfig.type == 'Alarm') {
                 alarmstate.accessory = a;
+                var stat = GetHomebridgeStatus('Disarmed');
+                alarmstate.accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemCurrentState).setValue(stat);
+                alarmstate.accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemTargetState).setValue(stat);
             }
             acc.push(a);
         });
