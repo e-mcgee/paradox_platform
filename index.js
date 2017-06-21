@@ -631,26 +631,26 @@ function paradoxPlatform(log, config) {
         }
     }, 10000);
     
-    for (i = 0; i < 32; i++) {
-        switch (zones[i].type) {
-            case 'Garage Door':
-                zones[i].accessory.garagedooropenerService.readstate = Characteristic.CurrentDoorState.CLOSED;
-                zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).setValue(Characteristic.CurrentDoorState.CLOSED);
-                zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(Characteristic.CurrentDoorState.CLOSED);
-                break;
-            case 'Contact Sensor':
-                zones[i].accessory.contactsensorService.getCharacteristic(Characteristic.ContactSensorState).setValue(Characteristic.ContactSensorState.CONTACT_NOT_DETECTED);
-                break;
-            case 'Motion Sensor':
-                zones[i].accessory.motionsensorService.getCharacteristic(Characteristic.MotionDetected).setValue(false);
-                break;
-            default:
-        }
-    }
-    
-    var stat = GetHomebridgeStatus('Disarmed');
-    alarmstate.accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemCurrentState).setValue(stat);
-    alarmstate.accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemTargetState).setValue(stat);    
+//    for (i = 0; i < 32; i++) {
+//        switch (zones[i].type) {
+//            case 'Garage Door':
+//                zones[i].accessory.garagedooropenerService.readstate = Characteristic.CurrentDoorState.CLOSED;
+//                zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).setValue(Characteristic.CurrentDoorState.CLOSED);
+//                zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(Characteristic.CurrentDoorState.CLOSED);
+//                break;
+//            case 'Contact Sensor':
+//                zones[i].accessory.contactsensorService.getCharacteristic(Characteristic.ContactSensorState).setValue(Characteristic.ContactSensorState.CONTACT_NOT_DETECTED);
+//                break;
+//            case 'Motion Sensor':
+//                zones[i].accessory.motionsensorService.getCharacteristic(Characteristic.MotionDetected).setValue(false);
+//                break;
+//            default:
+//        }
+//    }
+//    
+//    var stat = GetHomebridgeStatus('Disarmed');
+//    alarmstate.accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemCurrentState).setValue(stat);
+//    alarmstate.accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemTargetState).setValue(stat);    
 }
 
 
