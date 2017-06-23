@@ -528,6 +528,8 @@ function paradoxPlatform(log, config) {
 
     this.log = log;
     this.config = config;
+    
+    this.log("Platform initialisation");
 
     // Retrieve Alarm IP address, Port and password form config.json file
     alarm_ip_address = this.config.ip;
@@ -687,20 +689,20 @@ paradoxPlatform.prototype.accessories = function (callback) {
             if (accConfig.type == 'Garage Door' || accConfig.type == 'Contact Sensor' || accConfig.type == 'Motion Sensor') {
                 zones[accConfig.zone].accessory = a;
                 zones[accConfig.zone].type = accConfig.type;
-                switch (accConfig.type) {
-                    case 'Garage Door':
-                        zones[accConfig.zone].accessory.garagedooropenerService.readstate = Characteristic.CurrentDoorState.CLOSED;
-                        zones[accConfig.zone].accessory.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).setValue(Characteristic.CurrentDoorState.CLOSED);
-                        zones[accConfig.zone].accessory.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(Characteristic.CurrentDoorState.CLOSED);
-                        break;
-                    case 'Contact Sensor':
-                        zones[accConfig.zone].accessory.contactsensorService.getCharacteristic(Characteristic.ContactSensorState).setValue(Characteristic.ContactSensorState.CONTACT_NOT_DETECTED);
-                        break;
-                    case 'Motion Sensor':
-                        zones[accConfig.zone].accessory.motionsensorService.getCharacteristic(Characteristic.MotionDetected).setValue(false);
-                        break;
-                    default:
-                }
+//                switch (accConfig.type) {
+//                    case 'Garage Door':
+//                        zones[accConfig.zone].accessory.garagedooropenerService.readstate = Characteristic.CurrentDoorState.CLOSED;
+//                        zones[accConfig.zone].accessory.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).setValue(Characteristic.CurrentDoorState.CLOSED);
+//                        zones[accConfig.zone].accessory.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(Characteristic.CurrentDoorState.CLOSED);
+//                        break;
+//                    case 'Contact Sensor':
+//                        zones[accConfig.zone].accessory.contactsensorService.getCharacteristic(Characteristic.ContactSensorState).setValue(Characteristic.ContactSensorState.CONTACT_NOT_DETECTED);
+//                        break;
+//                    case 'Motion Sensor':
+//                        zones[accConfig.zone].accessory.motionsensorService.getCharacteristic(Characteristic.MotionDetected).setValue(false);
+//                        break;
+//                    default:
+//                }
             }
 
             if (accConfig.type == 'Alarm') {
