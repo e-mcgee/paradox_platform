@@ -94,6 +94,8 @@ function _parsestatus(acc, cl) {
         checkok = true;    
     }
     else checkok = false;
+    acc.log("Checksum :");
+    acc.log(_checksum);
     
     if (receivebuffer[16] == 0x52) {
         if (receivebuffer[19] == 0x01) {
