@@ -648,9 +648,9 @@ function paradoxPlatform(log, config) {
         }
     }
     
-    var stat = GetHomebridgeStatus('Disarmed');
-    alarmstate.accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemCurrentState).setValue(stat);
-    alarmstate.accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemTargetState).setValue(stat);    
+//    var stat = GetHomebridgeStatus('Disarmed');
+//    alarmstate.accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemCurrentState).setValue(stat);
+//    alarmstate.accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemTargetState).setValue(stat);    
 }
 
 
