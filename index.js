@@ -582,7 +582,7 @@ function paradoxPlatform(log, config) {
                             case 'Alarm':
                                 break;
                             case 'Contact Sensor':
-                                if (zone[i].status == 'off') {
+                                if (zones[i].status == 'off') {
                                     state = Characteristic.ContactSensorState.CONTACT_DETECTED;
                                 } else {
                                     state = Characteristic.ContactSensorState.CONTACT_NOT_DETECTED;
@@ -590,7 +590,7 @@ function paradoxPlatform(log, config) {
                                 zones[i].accessory.contactsensorService.getCharacteristic(Characteristic.ContactSensorState).setValue(state);
                                 break;
                             case 'Motion Sensor':
-                                if (zone[i].status == 'off') {
+                                if (zones[i].status == 'off') {
                                     state = false;
                                 } else {
                                     state = true;
