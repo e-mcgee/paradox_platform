@@ -144,9 +144,12 @@ function _parsestatus(acc, cl) {
                 for (i = 0; i < 4; i++) {
                     for (j = 0; j < 8; j++) {
                         if (receivebuffer[i + 35] & 0x01 << j) {
-                            zonestatus[j + i * 8] = 1;
+                            zones[j + i * 8].status = "on";
+//                            zonestatus[j + i * 8] = 1;
                         } else {
-                            zonestatus[j + i * 8] = 0;
+//                            zonestatus[j + i * 8] = 0;
+                            zones[j + i * 8].status = "off";
+
                         }
                     }
                 }
@@ -552,19 +555,20 @@ function paradoxPlatform(log, config) {
             alarmstate.accessory.log('Results:');
             for (i = 0; i < 32; i++) {
                 var st;
-                if (zonestatus[i] == 0) {
-                    st = 'off';
-                } else if (zonestatus[i] == 1) {
-                    st = 'on';
-                }
-                if (zonestatus[i] == 1 || zonestatus[i] == 0) {
-                    if (zones[i].accessory != null && zones[i].status != st) {
-                        alarmstate.accessory.log('Accessory was :' + zones[i].status);
-                        alarmstate.accessory.log('New atate is :' + st);
-                        alarmstate.accessory.log(zonestatus[i]);
+//                if (zonestatus[i] == 0) {
+//                    st = 'off';
+//                } else if (zonestatus[i] == 1) {
+//                    st = 'on';
+//                }
+//                if (zonestatus[i] == 1 || zonestatus[i] == 0) {
+                    if (zones[i].accessory != null) {
+                        //&& zones[i].status != st
+//                        alarmstate.accessory.log('Accessory was :' + zones[i].status);
+//                        alarmstate.accessory.log('New atate is :' + st);
+//                        alarmstate.accessory.log(zonestatus[i]);
                         switch (zones[i].type) {
                             case 'Garage Door':
-                                if (st == 'off') {
+                                if (zone[i].status == 'off') {
                                     state = Characteristic.CurrentDoorState.CLOSED;
                                 } else {
                                     state = Characteristic.CurrentDoorState.OPEN;
@@ -578,7 +582,7 @@ function paradoxPlatform(log, config) {
                             case 'Alarm':
                                 break;
                             case 'Contact Sensor':
-                                if (st == 'off') {
+                                if (zone[i].status == 'off') {
                                     state = Characteristic.ContactSensorState.CONTACT_DETECTED;
                                 } else {
                                     state = Characteristic.ContactSensorState.CONTACT_NOT_DETECTED;
@@ -586,7 +590,7 @@ function paradoxPlatform(log, config) {
                                 zones[i].accessory.contactsensorService.getCharacteristic(Characteristic.ContactSensorState).setValue(state);
                                 break;
                             case 'Motion Sensor':
-                                if (st == 'off') {
+                                if (zone[i].status == 'off') {
                                     state = false;
                                 } else {
                                     state = true;
@@ -601,7 +605,7 @@ function paradoxPlatform(log, config) {
                     if (zones[i].accessory != null) {
                         zones[i].accessory.log('Zone ' + i.toString() + ' ' + zones[i].status + ' (' + zones[i].accessory.name + ')');
                     }
-                }
+//                }
             }
 
             if (alarmstate.status != alarmstatus) {
@@ -611,17 +615,18 @@ function paradoxPlatform(log, config) {
                     if (alarmstatus == 'In Alarm') {
                         var alarmtype = 'Zone(s) triggered:';                        
                         for (i = 0; i < 32; i++) {
-                            var st;
-                            if (zonestatus[i] == 0) {
-                                st = 'off';
-                            } else if (zonestatus[i] == 1) {
-                                st = 'on';
-                            }
-                            if (zonestatus[i] == 1 || zonestatus[i] == 0) {
-                                if (zones[i].accessory != null && zones[i].status != st) {
+//                            var st;
+//                            if (zonestatus[i] == 0) {
+//                                st = 'off';
+//                            } else if (zonestatus[i] == 1) {
+//                                st = 'on';
+//                            }
+//                            if (zonestatus[i] == 1 || zonestatus[i] == 0) {
+                                if (zones[i].accessory != null) {
+                                    //&& zones[i].status != st
                                     alarmtype += zones[i].name + ' ';
                                 }
-                            }
+//                            }
                         }
                     }
                     alarmstate.accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemAlarmType).setValue(alarmtype);                    
@@ -806,10 +811,10 @@ ParadoxAccessory.prototype.getDoorState = function (callback) {
 
     if (zones[config.zone].status == 'off') {
         self.log('Closed');
-        acc.readstate = Characteristic.CurrentDoorState.CLOSED;  /// Was TergetDoorState
+        acc.readstate = Characteristic.CurrentDoorState.CLOSED;  /// Was TargetDoorState
     } else {
         self.log('Open');
-        acc.readstate = Characteristic.CurrentDoorState.OPEN;  /// Was TergetDoorState
+        acc.readstate = Characteristic.CurrentDoorState.OPEN;  /// Was TargetDoorState
     }
 
     this.reachability = true;
