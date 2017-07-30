@@ -574,9 +574,9 @@ function paradoxPlatform(log, config) {
                                     state = Characteristic.CurrentDoorState.OPEN;
                                 }
                                     if (zones[i].accessory.garagedooropenerService.readstate != state) {
-                                        zones[i].accessory.garagedooropenerService.readstate = state;
-//                                        zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).setValue(state);
-//                                        zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(state);
+//                                        zones[i].accessory.garagedooropenerService.readstate = state;
+                                        zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).setValue(state);
+                                        zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(state);
                                         zones[1].accessory.log('Zone state being changed')
                                     }
                                 break;
