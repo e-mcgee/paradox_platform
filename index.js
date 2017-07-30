@@ -923,7 +923,7 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
             } else {
                 self.log('Status same - confirming')
                 self.garagedooropenerService.readstate = state;
-                self.garagedooropenerService.setCharacteristic(Characteristic.CurrentDoorState, state);
+//                self.garagedooropenerService.setCharacteristic(Characteristic.CurrentDoorState, state);
                 controlPGMstate = false;
                 muteStatus = false;                            
                 self.reachability = true;
@@ -1023,7 +1023,7 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
         } else {
             self.log('Status same - confirming')
             self.garagedooropenerService.readstate = state;
-            self.garagedooropenerService.setCharacteristic(Characteristic.CurrentDoorState, state);
+//            self.garagedooropenerService.setCharacteristic(Characteristic.CurrentDoorState, state);
             controlPGMstate = false;
             muteStatus = false;            
             self.reachability = true;
