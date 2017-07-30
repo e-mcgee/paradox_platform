@@ -601,7 +601,7 @@ function paradoxPlatform(log, config) {
                                 alarmstate.accessory.log('Not Supported: %s [%s]', accessoryName, accConfig.type);
                         }
                     }
-                    zones[i].status = st;
+//                    zones[i].status = st;
                     if (zones[i].accessory != null) {
                         zones[i].accessory.log('Zone ' + i.toString() + ' ' + zones[i].status + ' (' + zones[i].accessory.name + ')');
                     }
