@@ -574,7 +574,7 @@ function paradoxPlatform(log, config) {
                                     state = Characteristic.CurrentDoorState.OPEN;
                                 }
                                     if (zones[i].accessory.garagedooropenerService.readstate != state) {
-                                        zones[i].accessory.garagedooropenerService.readstate = state;
+//                                        zones[i].accessory.garagedooropenerService.readstate = state;
                                         zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).setValue(state);
                                         zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(state);
                                         zones[1].accessory.log('Zone state being changed')
@@ -891,7 +891,7 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
                             setTimeout(function () {
                                 client.end();
 //                                if ( self.garagedooropenerService.readstate == Characteristic.CurrentDoorState.CLOSED) {
-//                                    self.garagedooropenerService.setCharacteristic(Characteristic.CurrentDoorState, Characteristic.CurrentDoorState.OPENING);
+                                    self.garagedooropenerService.setCharacteristic(Characteristic.CurrentDoorState, state);
 //                                    self.garagedooropenerService.readstate = Characteristic.CurrentDoorState.OPEN;
 //                                    setTimeout(function () {
 //                                        self.garagedooropenerService.setCharacteristic(Characteristic.CurrentDoorState, Characteristic.CurrentDoorState.OPEN);
@@ -994,7 +994,7 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
 //                                self.garagedooropenerService.setCharacteristic(Characteristic.CurrentDoorState, Characteristic.CurrentDoorState.OPENING);
 //                                self.garagedooropenerService.readstate = Characteristic.CurrentDoorState.OPEN;
 //                                setTimeout(function () {
-//                                    self.garagedooropenerService.setCharacteristic(Characteristic.CurrentDoorState, Characteristic.CurrentDoorState.OPEN);
+                                    self.garagedooropenerService.setCharacteristic(Characteristic.CurrentDoorState, state);
 //                                    self.garagedooropenerService.readstate = Characteristic.CurrentDoorState.OPEN;
  //                                   self.garagedooropenerService.setCharacteristic(Characteristic.TargetDoorState, Characteristic.CurrentDoorState.OPEN);
 //                                }, DOOROPENTIME);
