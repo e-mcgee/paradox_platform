@@ -899,7 +899,7 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
 //                                        self.garagedooropenerService.readstate = Characteristic.CurrentDoorState.OPEN;
 //                                        self.garagedooropenerService.setCharacteristic(Characteristic.TargetDoorState, Characteristic.CurrentDoorState.OPEN);
 //                                    }, DOOROPENTIME);
-                               }
+ //                              }
 //                                else {
 //                                    self.garagedooropenerService.setCharacteristic(Characteristic.CurrentDoorState, Characteristic.CurrentDoorState.CLOSING);                                    
 //                                    self.garagedooropenerService.readstate = Characteristic.CurrentDoorState.CLOSING;
