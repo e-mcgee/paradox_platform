@@ -569,9 +569,9 @@ function paradoxPlatform(log, config) {
                         switch (zones[i].type) {
                             case 'Garage Door':
                                 if (zones[i].status == 'off') {
-                                    state = Characteristic.CurrentDoorState.OPEN;
-                                } else {
                                     state = Characteristic.CurrentDoorState.CLOSED;
+                                } else {
+                                    state = Characteristic.CurrentDoorState.OPEN;
                                 }
                                     if (zones[i].accessory.garagedooropenerService.readstate != state) {
                                         zones[i].accessory.garagedooropenerService.readstate = state;
