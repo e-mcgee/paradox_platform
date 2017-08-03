@@ -574,7 +574,7 @@ function paradoxPlatform(log, config) {
                                     state = Characteristic.CurrentDoorState.OPEN;
                                 }
                                     if (zones[i].accessory.garagedooropenerService.readstate != state) {
-                                        zones[i].accessory.garagedooropenerService.readstate = state;
+//                                        zones[i].accessory.garagedooropenerService.readstate = state;
 //                                        zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).getValue();
                                         zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).updateValue(state);
                                         zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).updateValue(state);
@@ -603,7 +603,6 @@ function paradoxPlatform(log, config) {
                                 alarmstate.accessory.log('Not Supported: %s [%s]', accessoryName, accConfig.type);
                         }
                     }
-//                    zones[i].status = st;
                     if (zones[i].accessory != null) {
                         zones[i].accessory.log('Zone ' + i.toString() + ' ' + zones[i].status + ' (' + zones[i].accessory.name + ')');
                     }
@@ -617,23 +616,14 @@ function paradoxPlatform(log, config) {
                     if (alarmstatus == 'In Alarm') {
                         var alarmtype = 'Zone(s) triggered:';                        
                         for (i = 0; i < 32; i++) {
-//                            var st;
-//                            if (zonestatus[i] == 0) {
-//                                st = 'off';
-//                            } else if (zonestatus[i] == 1) {
-//                                st = 'on';
-//                            }
-//                            if (zonestatus[i] == 1 || zonestatus[i] == 0) {
-                                if (zones[i].accessory != null) {
-                                    //&& zones[i].status != st
-                                    alarmtype += zones[i].name + ' ';
-                                }
-//                            }
+                            if (zones[i].accessory != null) {
+                                alarmtype += zones[i].name + ' ';
+                            }
                         }
                     }
-                    alarmstate.accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemAlarmType).setValue(alarmtype);                    
-                    alarmstate.accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemCurrentState).setValue(stat);
-                    alarmstate.accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemTargetState).setValue(stat);
+                    alarmstate.accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemAlarmType).updateValue(alarmtype);                    
+                    alarmstate.accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemCurrentState).updateValue(stat);
+                    alarmstate.accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemTargetState).updateValue(stat);
                 }
             }
             alarmstate.accessory.log('Alarmstatus :' + alarmstate.status);
@@ -642,27 +632,7 @@ function paradoxPlatform(log, config) {
         }
     }, 10000);
     
-//    for (i = 0; i < 32; i++) {
-//        switch (zones[i].type) {
-//            case 'Garage Door':
-//                zones[i].accessory.garagedooropenerService.readstate = Characteristic.CurrentDoorState.CLOSED;
-//                zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).setValue(Characteristic.CurrentDoorState.CLOSED);
-//                zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(Characteristic.CurrentDoorState.CLOSED);
-//                break;
-//            case 'Contact Sensor':
-//                zones[i].accessory.contactsensorService.getCharacteristic(Characteristic.ContactSensorState).setValue(Characteristic.ContactSensorState.CONTACT_NOT_DETECTED);
-//                break;
-//            case 'Motion Sensor':
-//                zones[i].accessory.motionsensorService.getCharacteristic(Characteristic.MotionDetected).setValue(false);
-//                break;
-//            default:
-//        }
-//    }
-    
-//    var stat = GetHomebridgeStatus('Disarmed');
-//    alarmstate.accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemCurrentState).setValue(stat);
-//    alarmstate.accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemTargetState).setValue(stat);    
-}
+/
 
 
 //
