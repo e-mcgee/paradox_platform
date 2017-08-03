@@ -573,13 +573,13 @@ function paradoxPlatform(log, config) {
                                 } else {
                                     state = Characteristic.CurrentDoorState.OPEN;
                                 }
-                                    if (zones[i].accessory.garagedooropenerService.readstate != state) {
+                                if (zones[i].accessory.garagedooropenerService.readstate != state) {
 //                                        zones[i].accessory.garagedooropenerService.readstate = state;
 //                                        zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).getValue();
-                                        zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).updateValue(state);
-                                        zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).updateValue(state);
-                                        zones[1].accessory.log('Zone state being changed')
-                                    }
+                                    zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).updateValue(state);
+                                    zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).updateValue(state);
+                                    zones[1].accessory.log('Zone state being changed');
+                                }
                                 break;
                             case 'Alarm':
                                 break;
@@ -632,7 +632,7 @@ function paradoxPlatform(log, config) {
         }
     }, 10000);
     
-/
+}
 
 
 //
