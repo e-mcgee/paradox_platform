@@ -688,6 +688,7 @@ function ParadoxAccessory(log, config, name) {
     this.name = name;
 
     this.reachability = true;
+    this.initService();
 }
 
 
@@ -701,27 +702,27 @@ ParadoxAccessory.prototype.identify = function (callback) {
 
 
 //  This is called to retrieve the accessory service types and handles all the modelled types, i.e. Alarm, Garage Door, Contact Sensor and Motion sensor.
-//ParadoxAccessory.prototype.getServices = function () {
-//
-//    switch (this.config.type) {
-//        case 'Alarm':
-//            return [this.informationService, this.securitysystemService];
-//            break;
-//        case 'Garage Door':
-//          return [this.informationService, this.garagedooropenerService];
-//            break;
-//        case 'Contact Sensor':
-//           return [this.informationService, this.contactsensorService];
-//            break;
-//        case 'Motion Sensor':
-//            return [this.informationService, this.motionsensorService];
-//            break;
-//    }
-//};
+ParadoxAccessory.prototype.getServices = function () {
+
+    switch (this.config.type) {
+        case 'Alarm':
+            return [this.informationService, this.securitysystemService];
+            break;
+        case 'Garage Door':
+          return [this.informationService, this.garagedooropenerService];
+            break;
+        case 'Contact Sensor':
+           return [this.informationService, this.contactsensorService];
+            break;
+        case 'Motion Sensor':
+            return [this.informationService, this.motionsensorService];
+            break;
+    }
+};
 
 
 //  This is called to retrieve the accessory service types and handles all the modelled types, i.e. Alarm, Garage Door, Contact Sensor and Motion sensor.
-ParadoxAccessory.prototype.getServices = function () {
+ParadoxAccessory.prototype.initService = function () {
 
     this.informationService = new Service.AccessoryInformation();
 
@@ -741,7 +742,7 @@ ParadoxAccessory.prototype.getServices = function () {
             this.securitysystemService
                     .getCharacteristic(Characteristic.SecuritySystemTargetState)
                     .on('set', this.setAlarmState.bind(this));
-            return [this.informationService, this.securitysystemService];
+//            return [this.informationService, this.securitysystemService];
             break;
         case 'Garage Door':
             this.garagedooropenerService = new Service.GarageDoorOpener(this.name);
@@ -767,19 +768,19 @@ ParadoxAccessory.prototype.getServices = function () {
                 this.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).setValue(Characteristic.CurrentDoorState.OPEN);  /// Was TargetDoorState
                 this.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(Characteristic.CurrentDoorState.OPEN);
             }
-            return [this.informationService, this.garagedooropenerService];
+//            return [this.informationService, this.garagedooropenerService];
             break;
         case 'Contact Sensor':
             this.contactsensorService = new Service.ContactSensor(this.name);
             this.informationService
                     .setCharacteristic(Characteristic.Model, 'Contact Sensor');
-            return [this.informationService, this.contactsensorService];
+//            return [this.informationService, this.contactsensorService];
             break;
         case 'Motion Sensor':
             this.motionsensorService = new Service.MotionSensor(this.name);
             this.informationService
                     .setCharacteristic(Characteristic.Model, 'Motion Sensor');
-            return [this.informationService, this.motionsensorService];
+//            return [this.informationService, this.motionsensorService];
         break;
     }
 };
