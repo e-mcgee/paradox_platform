@@ -981,8 +981,8 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
                         controlPGM("OFF", config.pgm, self, client);
                         setTimeout(function () {
                             client.end();
-                                self.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).updateValue(state);
-                                self.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).updateValue(state);
+                                self.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).setValue(state);
+//                                self.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).updateValue(state);
 //                            if ( self.garagedooropenerService.readstate == Characteristic.CurrentDoorState.CLOSED) {
 //                                if ( state == Characteristic.CurrentDoorState.CLOSED) {
 //                            self.garagedooropenerService.setCharacteristic(Characteristic.CurrentDoorState, Characteristic.CurrentDoorState.OPENING);
