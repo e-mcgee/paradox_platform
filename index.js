@@ -26,7 +26,7 @@ var zones = new Array();
 var alarmstate = {
     status: "Disarmed",
     accessory: null
-}
+};
 
 var alarm_ip_address = "192.168.1.0";           // Alarm IP address on local LAN
 var alarm_port = 10000;                         // Alarm Port used
@@ -667,27 +667,10 @@ paradoxPlatform.prototype.accessories = function (callback) {
             if (accConfig.type == 'Garage Door' || accConfig.type == 'Contact Sensor' || accConfig.type == 'Motion Sensor') {
                 zones[accConfig.zone].accessory = a;
                 zones[accConfig.zone].type = accConfig.type;
-//                switch (accConfig.type) {
-//                    case 'Garage Door':
-//                        zones[accConfig.zone].accessory.garagedooropenerService.readstate = Characteristic.CurrentDoorState.CLOSED;
-//                        zones[accConfig.zone].accessory.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).setValue(Characteristic.CurrentDoorState.CLOSED);
-//                        zones[accConfig.zone].accessory.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(Characteristic.CurrentDoorState.CLOSED);
-//                        break;
-//                    case 'Contact Sensor':
-//                        zones[accConfig.zone].accessory.contactsensorService.getCharacteristic(Characteristic.ContactSensorState).setValue(Characteristic.ContactSensorState.CONTACT_NOT_DETECTED);
-//                        break;
-//                    case 'Motion Sensor':
-//                        zones[accConfig.zone].accessory.motionsensorService.getCharacteristic(Characteristic.MotionDetected).setValue(false);
-//                        break;
-//                    default:
-//                }
             }
 
             if (accConfig.type == 'Alarm') {
                 alarmstate.accessory = a;
-//                var stat = GetHomebridgeStatus('Disarmed');
-//                alarmstate.accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemCurrentState).setValue(stat);
-//                alarmstate.accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemTargetState).setValue(stat);
             }
             acc.push(a);
         });
@@ -695,7 +678,7 @@ paradoxPlatform.prototype.accessories = function (callback) {
         this.log('No config for platform');
     }
     callback(acc);
-}
+};
 
 
 function ParadoxAccessory(log, config, name) {
@@ -714,7 +697,7 @@ ParadoxAccessory.prototype.identify = function (callback) {
 
     this.log('[' + this.name + '] Identify requested!');
     callback(null); // success
-}
+};
 
 
 //  This is called to retrieve the accessory service types and handles all the modelled types, i.e. Alarm, Garage Door, Contact Sensor and Motion sensor.
@@ -734,7 +717,7 @@ ParadoxAccessory.prototype.getServices = function () {
             return [this.informationService, this.motionsensorService];
             break;
     }
-}
+};
 
 
 //  This is called to retrieve the accessory service types and handles all the modelled types, i.e. Alarm, Garage Door, Contact Sensor and Motion sensor.
@@ -795,7 +778,7 @@ ParadoxAccessory.prototype.initService = function () {
                     .setCharacteristic(Characteristic.Model, 'Motion Sensor');
             break;
     }
-}
+};
 
 
 //
@@ -820,7 +803,7 @@ ParadoxAccessory.prototype.getDoorState = function (callback) {
     this.reachability = true;
 
     callback(null, acc.readstate);
-}
+};
 
 
 ParadoxAccessory.prototype.setDoorState = function (state, callback) {
@@ -1037,14 +1020,14 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
             callback(null, state);
         }   
     }
-}
+};
 
 
 ParadoxAccessory.prototype.getObstructed = function (callback) {
 
     this.log('Not Obstructed');
     callback();
-}
+};
 
 
 //
@@ -1069,7 +1052,7 @@ ParadoxAccessory.prototype.getAlarmState = function (callback) {
     this.reachability = true;
 
     callback(err, state);
-}
+};
 
 
 ParadoxAccessory.prototype.setAlarmState = function (state, callback) {
@@ -1233,4 +1216,4 @@ ParadoxAccessory.prototype.setAlarmState = function (state, callback) {
     } else {
         self.log('Alarm status error - ignoring');
     }
-}
+};
