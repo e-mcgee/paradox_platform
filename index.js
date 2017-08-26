@@ -762,11 +762,11 @@ ParadoxAccessory.prototype.initService = function () {
             if (zones[this.config.zone].status == 'off') {
                 this.log('Closed');
                 this.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).setValue(Characteristic.CurrentDoorState.CLOSED);  /// Was TargetDoorState
-                this.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(Characteristic.CurrentDoorState.CLOSED);
+                this.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(Characteristic.TargetDoorState.CLOSED);
             } else {
                 this.log('Open');
                 this.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).setValue(Characteristic.CurrentDoorState.OPEN);  /// Was TargetDoorState
-                this.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(Characteristic.CurrentDoorState.OPEN);
+                this.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(Characteristic.TargetDoorState.OPEN);
             }
 //            return [this.informationService, this.garagedooropenerService];
             break;
