@@ -1,6 +1,5 @@
 // Requires
 var net = require('net');
-//var sleep = require('system-sleep');
 
 // Global variables
 var loggedin = false;                           // indcates if logged in successful
@@ -68,7 +67,8 @@ var Characteristic, Service, DoorState;
 
 // Initialise zones
 for (i = 0; i < 32; i++) {
-    zones.push({status: "off", accessory: null, type: null});
+    zones.push({status: "off", accessory: null, type: null, doorOpensInSeconds: null
+});
 }
 
 
@@ -145,9 +145,7 @@ function _parsestatus(acc, cl) {
                     for (j = 0; j < 8; j++) {
                         if (receivebuffer[i + 35] & 0x01 << j) {
                             zones[j + i * 8].status = "on";
-//                            zonestatus[j + i * 8] = 1;
                         } else {
-//                            zonestatus[j + i * 8] = 0;
                             zones[j + i * 8].status = "off";
 
                         }
@@ -551,63 +549,63 @@ function paradoxPlatform(log, config) {
         if (!muteStatus) {
             getAlarmStatus(self);
             var state;
-
             alarmstate.accessory.log('Got status');
             alarmstate.accessory.log('Results:');
             for (i = 0; i < 32; i++) {
                 var st;
-//                if (zonestatus[i] == 0) {
-//                    st = 'off';
-//                } else if (zonestatus[i] == 1) {
-//                    st = 'on';
-//                }
-//                if (zonestatus[i] == 1 || zonestatus[i] == 0) {
-                    if (zones[i].accessory != null) {
-                        //&& zones[i].status != st
-//                        alarmstate.accessory.log('Accessory was :' + zones[i].status);
-//                        alarmstate.accessory.log('New atate is :' + st);
-//                        alarmstate.accessory.log(zonestatus[i]);
-                        switch (zones[i].type) {
-                            case 'Garage Door':
-                                if (zones[i].status == 'off') {
-                                    state = Characteristic.CurrentDoorState.CLOSED;
-                                } else {
-                                    state = Characteristic.CurrentDoorState.OPEN;
-                                }
-                                if (zones[i].accessory.garagedooropenerService.readstate != state) {
-//                                        zones[i].accessory.garagedooropenerService.readstate = state;
-//                                        zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).getValue();
-                                    zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).updateValue(state);
-//                                    zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).updateValue(state);
-                                    zones[1].accessory.log('Zone state being changed');
-                                }
-                                break;
-                            case 'Alarm':
-                                break;
-                            case 'Contact Sensor':
-                                if (zones[i].status == 'off') {
-                                    state = Characteristic.ContactSensorState.CONTACT_DETECTED;
-                                } else {
-                                    state = Characteristic.ContactSensorState.CONTACT_NOT_DETECTED;
-                                }
-                                zones[i].accessory.contactsensorService.getCharacteristic(Characteristic.ContactSensorState).setValue(state);
-                                break;
-                            case 'Motion Sensor':
-                                if (zones[i].status == 'off') {
-                                    state = false;
-                                } else {
-                                    state = true;
-                                }
-                                zones[i].accessory.motionsensorService.getCharacteristic(Characteristic.MotionDetected).setValue(state);
-                                break;
-                            default:
-                                alarmstate.accessory.log('Not Supported: %s [%s]', accessoryName, accConfig.type);
-                        }
+                if (zones[i].accessory != null) {
+                    switch (zones[i].type) {
+                        case 'Garage Door':
+                            var isClosed;
+                            if (zones[i].status == 'off') {
+                                isClosed = true;
+                                state = Characteristic.CurrentDoorState.CLOSED;
+                            } else {
+                                isClosed = false;
+                                state = Characteristic.CurrentDoorState.OPEN;
+                            }
+//                            if (zones[i].accessory.garagedooropenerService.readstate != state) {
+//                                zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).setValue(state);
+//                                zones[i].accessory.log('Zone state being changed');
+//                            }
+                            
+                            var isClosed = this.isClosed();
+                            var isOpen = this.isOpen();
+                            if (isClosed != zones[i].accessory.garagedooropenerService.wasClosed) {
+                              if (!zones[i].accessory.garagedooropenerService.operating) {
+                                zones[i].accessory.log('Door state changed');
+                                zones[i].accessory.garagedooropenerService.wasClosed = isClosed;
+                                zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).setValue(state);
+                                zones[i].accessory.garagedooropenerService.targetState = state;
+                              }
+                            }
+
+                            break;
+                        case 'Alarm':
+                            break;
+                        case 'Contact Sensor':
+                            if (zones[i].status == 'off') {
+                                state = Characteristic.ContactSensorState.CONTACT_DETECTED;
+                            } else {
+                                state = Characteristic.ContactSensorState.CONTACT_NOT_DETECTED;
+                            }
+                            zones[i].accessory.contactsensorService.getCharacteristic(Characteristic.ContactSensorState).setValue(state);
+                            break;
+                        case 'Motion Sensor':
+                            if (zones[i].status == 'off') {
+                                state = false;
+                            } else {
+                                state = true;
+                            }
+                            zones[i].accessory.motionsensorService.getCharacteristic(Characteristic.MotionDetected).setValue(state);
+                            break;
+                        default:
+                            alarmstate.accessory.log('Not Supported: %s [%s]', accessoryName, accConfig.type);
                     }
-                    if (zones[i].accessory != null) {
-                        zones[i].accessory.log('Zone ' + i.toString() + ' ' + zones[i].status + ' (' + zones[i].accessory.name + ')');
-                    }
-//                }
+                }
+                if (zones[i].accessory != null) {
+                    zones[i].accessory.log('Zone ' + i.toString() + ' ' + zones[i].status + ' (' + zones[i].accessory.name + ')');
+                }
             }
 
             if (alarmstate.status != alarmstatus) {
@@ -634,7 +632,6 @@ function paradoxPlatform(log, config) {
     }, 10000);
     
 }
-
 
 //
 // This is the function used by homebridge to create the accessories by parsing through the config.json file.
@@ -668,6 +665,11 @@ paradoxPlatform.prototype.accessories = function (callback) {
                 zones[accConfig.zone].accessory = a;
                 zones[accConfig.zone].type = accConfig.type;
             }
+            if (accConfig.type == 'Garage Door') {
+                zones[accConfig.zone].doorOpensInSeconds = accConfig.doorOpensInSeconds;
+                self.log('Door open in seconds:');
+                self.log(accConfig.doorOpensInSeconds);
+            }
 
             if (accConfig.type == 'Alarm') {
                 alarmstate.accessory = a;
@@ -686,8 +688,9 @@ function ParadoxAccessory(log, config, name) {
     this.log = log;
     this.config = config;
     this.name = name;
-
     this.reachability = true;
+    this.wasClosed = true;
+    
     this.initService();
 }
 
@@ -742,7 +745,6 @@ ParadoxAccessory.prototype.initService = function () {
             this.securitysystemService
                     .getCharacteristic(Characteristic.SecuritySystemTargetState)
                     .on('set', this.setAlarmState.bind(this));
-//            return [this.informationService, this.securitysystemService];
             break;
         case 'Garage Door':
             this.garagedooropenerService = new Service.GarageDoorOpener(this.name);
@@ -757,30 +759,31 @@ ParadoxAccessory.prototype.initService = function () {
             this.garagedooropenerService
                     .getCharacteristic(Characteristic.ObstructionDetected)
                     .on('get', this.getObstructed.bind(this));
-    
+
+            this.garagedooropenerService.operating = false;
+                        
             this.log("Initial Door State: ");
             if (zones[this.config.zone].status == 'off') {
+                this.wasClosed = true;
                 this.log('Closed');
                 this.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).setValue(Characteristic.CurrentDoorState.CLOSED);  /// Was TargetDoorState
                 this.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(Characteristic.TargetDoorState.CLOSED);
             } else {
+                this.wasClosed = false;
                 this.log('Open');
                 this.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).setValue(Characteristic.CurrentDoorState.OPEN);  /// Was TargetDoorState
                 this.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(Characteristic.TargetDoorState.OPEN);
             }
-//            return [this.informationService, this.garagedooropenerService];
             break;
         case 'Contact Sensor':
             this.contactsensorService = new Service.ContactSensor(this.name);
             this.informationService
                     .setCharacteristic(Characteristic.Model, 'Contact Sensor');
-//            return [this.informationService, this.contactsensorService];
             break;
         case 'Motion Sensor':
             this.motionsensorService = new Service.MotionSensor(this.name);
             this.informationService
                     .setCharacteristic(Characteristic.Model, 'Motion Sensor');
-//            return [this.informationService, this.motionsensorService];
         break;
     }
 };
@@ -791,24 +794,45 @@ ParadoxAccessory.prototype.initService = function () {
 // Garage Door Opener handler functions
 
 ParadoxAccessory.prototype.getDoorState = function (callback) {
-    var msg = null;
-    var state = 10;
     var self = this;
     var acc = this.garagedooropenerService;
     var config = this.config;
 
-    if (zones[config.zone].status == 'off') {
-        self.log('Closed');
-        acc.readstate = Characteristic.CurrentDoorState.CLOSED;  /// Was TargetDoorState
-    } else {
-        self.log('Open');
-        acc.readstate = Characteristic.CurrentDoorState.OPEN;  /// Was TargetDoorState
-    }
+//    if (zones[config.zone].status == 'off') {
+//        self.log('Closed');
+//        acc.readstate = Characteristic.CurrentDoorState.CLOSED;  /// Was TargetDoorState
+//    } else {
+//        self.log('Open');
+//        acc.readstate = Characteristic.CurrentDoorState.OPEN;  /// Was TargetDoorState
+//    }
+//
+//    this.reachability = true;
 
-    this.reachability = true;
-
-    callback(null, acc.readstate);
+    callback(null, this.targetState);
 };
+
+
+ParadoxAccessory.prototype.setFinalDoorState: function() {
+
+    var acc = this.garagedooropenerService;
+
+//    if (!this.hasClosedSensor() && !this.hasOpenSensor()) {
+//      var isClosed = !this.isClosed();
+//      var isOpen = this.isClosed();
+//    } else {
+//      var isClosed = this.isClosed();
+//      var isOpen = this.isOpen();
+//    }
+//    if ( (this.targetState == DoorState.CLOSED && !isClosed) || (this.targetState == DoorState.OPEN && !isOpen) ) {
+//      this.log("Was trying to " + (this.targetState == DoorState.CLOSED ? "CLOSE" : "OPEN") + " the door, but it is still " + (isClosed ? "CLOSED":"OPEN"));
+//      this.currentDoorState.setValue(DoorState.STOPPED);
+//    } else {
+      this.log("Set current state to " + (this.targetState == DoorState.CLOSED ? "CLOSED" : "OPEN"));
+      this.wasClosed = this.targetState == DoorState.CLOSED;
+      acc.currentDoorState.setValue(this.targetState);
+//    }
+    this.operating = false;
+}
 
 
 ParadoxAccessory.prototype.setDoorState = function (state, callback) {
@@ -817,27 +841,42 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
     var config = this.config;
     var self = this;
     
-    if (gettingstatus || controlAlarmstate) {
-        self.log('Alarm busy ... waiting 5s');
-        setTimeout (function () {
-            self.log('OK proceeding');
-            controlPGMstate = true;
-            muteStatus = true;
+    var isClosed;
+    
+    self.log('Setting state to ' + state);
+    this.targetState = state;
 
-            self.log('Setting state:');
-            self.log(state);
-//            self.log('acc.readstate:');
-//            self.log(acc.readstate);
-            self.log('PGM:');
-            self.log(config.pgm);
+    if (zones[config.zone].status == 'off') {
+        isClosed = true;
+    } else {
+        isClosed = false;
+    }
 
-            var options = {
-                mode: 'text',
-                encoding: 'utf8',
-                args: [config.pgm]
-            };
+    if ((state == DoorState.OPEN && isClosed) || (state == DoorState.CLOSED && !isClosed)) {
+        self.log("Triggering GarageDoor Relay");
+        this.operating = true;
+        if (state == DoorState.OPEN) {
+            acc.currentDoorState.setValue(DoorState.OPENING);
+        } else {
+            acc.currentDoorState.setValue(DoorState.CLOSING);
+        }
+	setTimeout(this.setFinalDoorState.bind(this), this.doorOpensInSeconds * 1000);
+    
+        if (gettingstatus || controlAlarmstate) {
+            self.log('Alarm busy ... waiting 5s');
+            setTimeout (function () {
+                self.log('OK proceeding');
+                controlPGMstate = true;
+                muteStatus = true;
 
-            if (acc.readstate != state) {
+                self.log('PGM:');
+                self.log(config.pgm);
+
+                var options = {
+                    mode: 'text',
+                    encoding: 'utf8',
+                    args: [config.pgm]
+                };
 
                 loggedin = false;
 
@@ -877,71 +916,30 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
                             controlPGM("OFF", config.pgm, self, client);
                             setTimeout(function () {
                                 client.end();
-                                self.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).setValue(state);
-//                                self.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(state);
-                                
-//                                if ( state == Characteristic.CurrentDoorState.CLOSED) {
-//                                    self.garagedooropenerService.setCharacteristic(Characteristic.CurrentDoorState, state);
-//                                    self.garagedooropenerService.setCharacteristic(Characteristic.TargetDoorState, state);
-//                                    self.garagedooropenerService.readstate = Characteristic.CurrentDoorState.OPENING;
-//                                    setTimeout(function () {
-//                                        self.garagedooropenerService.setCharacteristic(Characteristic.CurrentDoorState, Characteristic.CurrentDoorState.OPEN);
-//                                        self.garagedooropenerService.readstate = Characteristic.CurrentDoorState.OPEN;
-//                                        self.garagedooropenerService.setCharacteristic(Characteristic.TargetDoorState, Characteristic.CurrentDoorState.OPEN);
-//                                    }, DOOROPENTIME);
- //                              }
-//                                else {
-//                                    self.garagedooropenerService.setCharacteristic(Characteristic.CurrentDoorState, Characteristic.CurrentDoorState.CLOSING);                                    
-//                                    self.garagedooropenerService.readstate = Characteristic.CurrentDoorState.CLOSING;
-//                                    setTimeout(function () {
-//                                        self.garagedooropenerService.setCharacteristic(Characteristic.CurrentDoorState, Characteristic.CurrentDoorState.CLOSED);
-//                                        self.garagedooropenerService.readstate = Characteristic.CurrentDoorState.CLOSED;
-//                                        self.garagedooropenerService.setCharacteristic(Characteristic.TargetDoorState, Characteristic.CurrentDoorState.CLOSED);
-//                                    }, DOOROPENTIME);
-  //                              }
-//                                self.garagedooropenerService.readstate = state;
-//                                self.garagedooropenerService.setCharacteristic(Characteristic.CurrentDoorState, state);
                                 controlPGMstate = false;
                                 muteStatus = false;
-
                                 this.reachability = true;
-                                callback(null, state);
-                                
+                                callback();
                             }, 250);
                         }, 250);
                     }, 3000);
                 }, 500);
-            } else {
-                self.log('Status same - confirming')
-//                self.garagedooropenerService.readstate = state;
-//                self.garagedooropenerService.setCharacteristic(Characteristic.CurrentDoorState, state);
-                controlPGMstate = false;
-                muteStatus = false;                            
-                self.reachability = true;
-                callback(null, state);
-            }
-        }, 5000);
-        
-    } else {
-        // Wait for status get to finish or Control of Alarm to finish
-        
-        controlPGMstate = true;
-        muteStatus = true;
+            }, 5000);
 
-        self.log('Setting state:');
-        self.log(state);
- //       self.log('acc.readstate:');
- //       self.log(acc.readstate);
-        self.log('PGM:');
-        self.log(config.pgm);
+        } else {
+            // Wait for status get to finish or Control of Alarm to finish
 
-        var options = {
-            mode: 'text',
-            encoding: 'utf8',
-            args: [config.pgm]
-        };
+            controlPGMstate = true;
+            muteStatus = true;
 
-        if (acc.readstate != state) {
+            self.log('PGM:');
+            self.log(config.pgm);
+
+            var options = {
+                mode: 'text',
+                encoding: 'utf8',
+                args: [config.pgm]
+            };
 
             loggedin = false;
 
@@ -981,50 +979,15 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
                         controlPGM("OFF", config.pgm, self, client);
                         setTimeout(function () {
                             client.end();
-                                self.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).setValue(state);
-//                                self.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).updateValue(state);
-//                            if ( self.garagedooropenerService.readstate == Characteristic.CurrentDoorState.CLOSED) {
-//                                if ( state == Characteristic.CurrentDoorState.CLOSED) {
-//                            self.garagedooropenerService.setCharacteristic(Characteristic.CurrentDoorState, Characteristic.CurrentDoorState.OPENING);
-//                                self.garagedooropenerService.readstate = Characteristic.CurrentDoorState.OPEN;
-//                                setTimeout(function () {
-//                                    self.garagedooropenerService.setCharacteristic(Characteristic.CurrentDoorState, state);
-//                                    self.garagedooropenerService.setCharacteristic(Characteristic.TargetDoorState, state);
-//                                    self.garagedooropenerService.readstate = Characteristic.CurrentDoorState.OPENING;
- //                                   self.garagedooropenerService.setCharacteristic(Characteristic.TargetDoorState, Characteristic.CurrentDoorState.OPEN);
-//                                }, DOOROPENTIME);
-//                           }
-//                            else {
-//                                self.garagedooropenerService.setCharacteristic(Characteristic.CurrentDoorState, Characteristic.CurrentDoorState.CLOSING);                                    
-//                                self.garagedooropenerService.readstate = Characteristic.CurrentDoorState.CLOSING;
- //                               setTimeout(function () {
-//                                    self.garagedooropenerService.setCharacteristic(Characteristic.CurrentDoorState, Characteristic.CurrentDoorState.CLOSED);
-//                                    self.garagedooropenerService.readstate = Characteristic.CurrentDoorState.CLOSED;
-//                                    self.garagedooropenerService.setCharacteristic(Characteristic.TargetDoorState, Characteristic.CurrentDoorState.CLOSED);
-//                                }, DOOROPENTIME);
-//                            }
-//                            self.garagedooropenerService.readstate = state;
-//                            self.garagedooropenerService.setCharacteristic(Characteristic.CurrentDoorState, state);
                             controlPGMstate = false;
                             muteStatus = false;
-
                             this.reachability = true;
-                            callback(null, state);
-
+                            callback();
                         }, 250);
                     }, 250);
                 }, 3000);
             }, 500);
-        } else {
-            self.log('Status same - confirming')
-//            self.garagedooropenerService.readstate = state;
-//            self.garagedooropenerService.setCharacteristic(Characteristic.CurrentDoorState, state);
-            controlPGMstate = false;
-            muteStatus = false;            
-            self.reachability = true;
-            callback(null, state);
-        }   
-    }
+        }
 };
 
 
