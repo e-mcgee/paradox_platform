@@ -861,7 +861,7 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
         } else {
             acc.getCharacteristic(DoorState).setValue(DoorState.CLOSING);
         }
-	setTimeout(this.setFinalDoorState.bind(this), this.doorOpensInSeconds * 1000);
+	setTimeout(this.setFinalDoorState.bind(this), this.config.doorOpensInSeconds * 1000);
     
         if (gettingstatus || controlAlarmstate) {
             self.log('Alarm busy ... waiting 5s');
