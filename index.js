@@ -812,7 +812,7 @@ ParadoxAccessory.prototype.getDoorState = function (callback) {
 };
 
 
-ParadoxAccessory.prototype.setFinalDoorState: function() {
+ParadoxAccessory.prototype.setFinalDoorState = function() {
 
     var acc = this.garagedooropenerService;
 
@@ -988,6 +988,7 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
                 }, 3000);
             }, 500);
         }
+    }
 };
 
 
