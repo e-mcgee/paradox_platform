@@ -749,7 +749,7 @@ ParadoxAccessory.prototype.initService = function () {
             this.informationService
                     .setCharacteristic(Characteristic.Model, 'Garage Door');
             this.garagedooropenerService
-                    .getCharacteristic(Characteristic.CurrentDoorState)
+                    .getCharacteristic(DoorState)
                     .on('get', this.getDoorState.bind(this));
             this.garagedooropenerService
                     .getCharacteristic(Characteristic.TargetDoorState)
@@ -764,12 +764,12 @@ ParadoxAccessory.prototype.initService = function () {
             if (zones[this.config.zone].status == 'off') {
                 this.wasClosed = true;
                 this.log('Closed');
-                this.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).setValue(Characteristic.CurrentDoorState.CLOSED);  /// Was TargetDoorState
+                this.garagedooropenerService.getCharacteristic(DoorState).setValue(Characteristic.CurrentDoorState.CLOSED);  /// Was TargetDoorState
                 this.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(Characteristic.TargetDoorState.CLOSED);
             } else {
                 this.wasClosed = false;
                 this.log('Open');
-                this.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).setValue(Characteristic.CurrentDoorState.OPEN);  /// Was TargetDoorState
+                this.garagedooropenerService.getCharacteristic(DoorState).setValue(Characteristic.CurrentDoorState.OPEN);  /// Was TargetDoorState
                 this.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(Characteristic.TargetDoorState.OPEN);
             }
             break;
@@ -827,7 +827,7 @@ ParadoxAccessory.prototype.setFinalDoorState = function() {
 //    } else {
       this.log("Set current state to " + (this.targetState == DoorState.CLOSED ? "CLOSED" : "OPEN"));
       this.wasClosed = this.targetState == DoorState.CLOSED;
-      acc.currentDoorState.setValue(this.targetState);
+      acc.getCharacteristic(DoorState).setValue(this.targetState);
 //    }
     this.operating = false;
 }
@@ -854,9 +854,9 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
         self.log("Triggering GarageDoor Relay");
         this.operating = true;
         if (state == DoorState.OPEN) {
-            acc.currentDoorState.setValue(DoorState.OPENING);
+            acc.getCharacteristic(DoorState).setValue(DoorState.OPENING);
         } else {
-            acc.currentDoorState.setValue(DoorState.CLOSING);
+            acc.getCharacteristic(DoorState).setValue(DoorState.CLOSING);
         }
 	setTimeout(this.setFinalDoorState.bind(this), this.doorOpensInSeconds * 1000);
     
