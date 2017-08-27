@@ -559,22 +559,22 @@ function paradoxPlatform(log, config) {
                             var isClosed;
                             if (zones[i].status == 'off') {
                                 isClosed = true;
-                                state = Characteristic.CurrentDoorState.CLOSED;
+                                state = DoorState.CLOSED;
                             } else {
                                 isClosed = false;
-                                state = Characteristic.CurrentDoorState.OPEN;
+                                state = DoorState.OPEN;
                             }
 //                            if (zones[i].accessory.garagedooropenerService.readstate != state) {
 //                                zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).setValue(state);
 //                                zones[i].accessory.log('Zone state being changed');
 //                            }
                             
-                            if (isClosed != zones[i].accessory.garagedooropenerService.wasClosed) {
-                              if (!zones[i].accessory.garagedooropenerService.operating) {
+                            if (isClosed != zones[i].accessory.wasClosed) {
+                              if (!zones[i].accessory.operating) {
                                 zones[i].accessory.log('Door state changed');
-                                zones[i].accessory.garagedooropenerService.wasClosed = isClosed;
-                                zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.CurrentDoorState).setValue(state);
-                                zones[i].accessory.garagedooropenerService.targetState = state;
+                                zones[i].accessory.wasClosed = isClosed;
+                                zones[i].accessory.garagedooropenerService.getCharacteristic(DoorState).setValue(state);
+                                zones[i].accessory.targetState = state;
                               }
                             }
 
