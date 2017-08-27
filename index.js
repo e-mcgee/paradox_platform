@@ -569,8 +569,6 @@ function paradoxPlatform(log, config) {
 //                                zones[i].accessory.log('Zone state being changed');
 //                            }
                             
-                            var isClosed = this.isClosed();
-                            var isOpen = this.isOpen();
                             if (isClosed != zones[i].accessory.garagedooropenerService.wasClosed) {
                               if (!zones[i].accessory.garagedooropenerService.operating) {
                                 zones[i].accessory.log('Door state changed');
