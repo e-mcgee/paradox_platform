@@ -846,8 +846,11 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
 
     if (zones[config.zone].status == 'off') {
         isClosed = true;
+        self.log('Curently closed');
     } else {
         isClosed = false;
+        self.log('Curently open');
+
     }
 
     if ((state == DoorState.OPEN && isClosed) || (state == DoorState.CLOSED && !isClosed)) {
@@ -917,7 +920,7 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
                                 controlPGMstate = false;
                                 muteStatus = false;
                                 this.reachability = true;
-                                callback();
+//                                callback();
                             }, 250);
                         }, 250);
                     }, 3000);
@@ -980,13 +983,14 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
                             controlPGMstate = false;
                             muteStatus = false;
                             this.reachability = true;
-                            callback();
+//                            callback();
                         }, 250);
                     }, 250);
                 }, 3000);
             }, 500);
         }
     }
+    callback();
 };
 
 
