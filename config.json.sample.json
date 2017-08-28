@@ -19,7 +19,8 @@
         		"config": {
         			"type": "Garage Door",
         			"zone": 1,
-        			"pgm": 0
+        			"pgm": 0,
+                    "doorOpensInSeconds": 15
         			}
         	 	},
         	 	
@@ -47,7 +48,8 @@
         		"config": {
         			"type": "Garage Door",
         			"zone": 4,
-        			"pgm": 1
+        			"pgm": 1,
+                    "doorOpensInSeconds": 25
         			}
         	 	}        	 	
         	 ]
