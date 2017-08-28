@@ -808,9 +808,9 @@ ParadoxAccessory.prototype.setFinalDoorState = function() {
 //      this.log("Was trying to " + (this.targetState == DoorState.CLOSED ? "CLOSE" : "OPEN") + " the door, but it is still " + (isClosed ? "CLOSED":"OPEN"));
 //      this.currentDoorState.setValue(DoorState.STOPPED);
 //    } else {
-      this.log("Set current state to " + (this.targetState == DoorState.CLOSED ? "CLOSED" : "OPEN"));
-      this.wasClosed = this.targetState == DoorState.CLOSED;
-      acc.getCharacteristic(DoorState).setValue(this.targetState);
+//      this.log("Set current state to " + (this.targetState == DoorState.CLOSED ? "CLOSED" : "OPEN"));
+//      this.wasClosed = this.targetState == DoorState.CLOSED;
+//      acc.getCharacteristic(DoorState).setValue(this.targetState);
 //    }
     this.operating = false;
 }
