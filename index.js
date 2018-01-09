@@ -290,7 +290,7 @@ function _login(password, cl, acc) {
                         }, 250);
                     }, 250);
                 }, 250);
-            }, 350);
+            }, 250);
         } else {
             acc.log('Error logging in');
             cl.end();
@@ -376,7 +376,7 @@ function getAlarmStatus(acc) {
                 client.end();
                 gettingstatus = false;
             }, 550);
-        }, 3000);
+        }, 3500);
    }, 500);
 }
 
