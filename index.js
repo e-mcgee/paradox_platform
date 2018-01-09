@@ -909,7 +909,7 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
 //                                callback();
                         }, 250);
                     }, 250);
-                }, 3000);
+                }, 3500);
             }, 500);
         }, wait);
     }
@@ -1029,7 +1029,7 @@ ParadoxAccessory.prototype.setAlarmState = function (state, callback) {
                         self.reachability = true;
                         callback(null, state);                       
                     }, 500);                
-                }, 3000);
+                }, 3500);
             }, 500);
         }, wait);    
 
