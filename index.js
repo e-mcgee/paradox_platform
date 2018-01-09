@@ -290,7 +290,7 @@ function _login(password, cl, acc) {
                         }, 250);
                     }, 250);
                 }, 250);
-            }, 250);
+            }, 350);
         } else {
             acc.log('Error logging in');
             cl.end();
