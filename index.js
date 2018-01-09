@@ -59,6 +59,7 @@ const CONTROLPGM_MSG1 = [0xAA, 0x25, 0x00, 0x04, 0x08, 0x00, 0x00, 0x14, 0xEE, 0
 const CONTROLPGM_MSG2 = '\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
 
 const DOOROPENTIME = 16000;
+const LOGINDELAY = 3800;
 
 "use strict";
 
@@ -376,7 +377,7 @@ function getAlarmStatus(acc) {
                 client.end();
                 gettingstatus = false;
             }, 550);
-        }, 3500);
+        }, LOGINDELAY);
    }, 500);
 }
 
@@ -909,7 +910,7 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
 //                                callback();
                         }, 250);
                     }, 250);
-                }, 3500);
+                }, LOGINDELAY);
             }, 500);
         }, wait);
     }
@@ -1029,7 +1030,7 @@ ParadoxAccessory.prototype.setAlarmState = function (state, callback) {
                         self.reachability = true;
                         callback(null, state);                       
                     }, 500);                
-                }, 3500);
+                }, LOGINDELAY);
             }, 500);
         }, wait);    
 
