@@ -3,7 +3,7 @@ var net = require('net');
 
 // Global variables
 var loggedin = false;                           // indcates if logged in successful
-var alarmstatus = 'Unknown';                    // Current Alarm state
+var alarmstatus = 'Disarmed';                    // Current Alarm state
 var receivebuffer = Buffer.alloc(1024, 0x00);   // Data received from alarm is stored here
 var zonestatus = Buffer.alloc(32, 0x00);        // Current 32 zone status is stored here
 var gettingstatus = false;                      // Indicates if status get is in progress
