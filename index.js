@@ -740,6 +740,7 @@ ParadoxAccessory.prototype.initService = function () {
                     .on('set', this.setAlarmState.bind(this));
  
             this.log("Initial Alarm State: ");
+            this.log(alarmstatus);
             this.securitysystemService.getCharacteristic(AlarmS).setValue(GetHomebridgeStatus(alarmstatus));
             this.securitysystemService.getCharacteristic(Characteristic.SecuritySystemTargetState).setValue(GetHomebridgeStatus(alarmstatus));
             break;
