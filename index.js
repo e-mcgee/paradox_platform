@@ -571,6 +571,7 @@ function paradoxPlatform(log, config) {
                                 zones[i].accessory.log('Door state changed');
                                 zones[i].accessory.wasClosed = isClosed;
                                 zones[i].accessory.garagedooropenerService.getCharacteristic(DoorState).updateValue(state);
+                                zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).updateValue(state);
                                 zones[i].accessory.targetState = state;
                               }
                             }
@@ -819,7 +820,7 @@ ParadoxAccessory.prototype.setFinalDoorState = function() {
 //      this.wasClosed = this.targetState == DoorState.CLOSED;
       this.log("Setting final state...");
       acc.getCharacteristic(DoorState).setValue(this.targetState);
-//    }
+ //    }
     this.operating = false;
 }
 
