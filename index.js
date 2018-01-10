@@ -817,6 +817,7 @@ ParadoxAccessory.prototype.setFinalDoorState = function() {
 //    } else {
 //      this.log("Set current state to " + (this.targetState == DoorState.CLOSED ? "CLOSED" : "OPEN"));
 //      this.wasClosed = this.targetState == DoorState.CLOSED;
+      acc.log("Setting final state...");
       acc.getCharacteristic(DoorState).setValue(this.targetState);
 //    }
     this.operating = false;
@@ -851,7 +852,10 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
         } else {
             acc.getCharacteristic(DoorState).setValue(DoorState.CLOSING);
         }
-	setTimeout(this.setFinalDoorState.bind(this), this.config.doorOpensInSeconds * 1000);
+        self.log("Door will close in (s) :");
+        self.log(this.config.doorOpensInSeconds);
+
+        setTimeout(this.setFinalDoorState.bind(this), this.config.doorOpensInSeconds * 1000);
     
         if (gettingstatus || controlAlarmstate) {
             self.log('Alarm busy ... waiting 5s');
