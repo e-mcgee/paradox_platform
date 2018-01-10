@@ -519,6 +519,7 @@ module.exports = function (homebridge) {
     Characteristic = homebridge.hap.Characteristic;
     Service = homebridge.hap.Service;
     DoorState = homebridge.hap.Characteristic.CurrentDoorState;
+    AlarmS = homebridge.hap.Characteristic.SecuritySystemCurrentState;
 
     homebridge.registerPlatform("homebridge-paradox", "Paradox", paradoxPlatform);
 };
@@ -737,6 +738,10 @@ ParadoxAccessory.prototype.initService = function () {
             this.securitysystemService
                     .getCharacteristic(Characteristic.SecuritySystemTargetState)
                     .on('set', this.setAlarmState.bind(this));
+ 
+            this.log("Initial Alarm State: ");
+            this.securitysystemService.getCharacteristic(AlarmS).setValue(GetHomebridgeStatus(alarmstatus));
+            this.securitysystemService.getCharacteristic(Characteristic.SecuritySystemTargetState).setValue(GetHomebridgeStatus(alarmstatus));
             break;
         case 'Garage Door':
             this.garagedooropenerService = new Service.GarageDoorOpener(this.name);
