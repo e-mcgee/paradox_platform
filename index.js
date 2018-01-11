@@ -857,7 +857,7 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
         self.log("Door will close in (s) :");
         self.log(this.config.doorOpensInSeconds);
 
-        setTimeout(this.setFinalDoorState.bind(this,callback), this.config.doorOpensInSeconds * 1000);
+        setTimeout(this.setFinalDoorState.bind(this, callback), this.config.doorOpensInSeconds * 1000);
     
         if (gettingstatus || controlAlarmstate) {
             self.log('Alarm busy ... waiting 5s');
@@ -927,7 +927,7 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
             }, 500);
         }, wait);
     }
-    callback();
+//    callback();
 };
 
 
