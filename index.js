@@ -625,7 +625,7 @@ function paradoxPlatform(log, config) {
         }
     }, 10000);
     
-}
+};
 
 //
 // This is the function used by homebridge to create the accessories by parsing through the config.json file.
@@ -686,7 +686,7 @@ function ParadoxAccessory(log, config, name) {
     this.wasClosed = true;
     
     this.initService();
-}
+};
 
 
 //
@@ -918,6 +918,7 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
                             controlPGMstate = false;
                             muteStatus = false;
                             this.reachability = true;
+                            callback(null,state);
 //                                callback();
                         }, 250);
                     }, 250);
@@ -925,7 +926,6 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
             }, 500);
         }, wait);
     }
-    callback(null, state);
 };
 
 
