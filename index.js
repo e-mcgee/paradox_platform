@@ -925,7 +925,7 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
             }, 500);
         }, wait);
     }
-    callback();
+    callback(null, state);
 };
 
 
