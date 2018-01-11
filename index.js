@@ -822,7 +822,7 @@ ParadoxAccessory.prototype.setFinalDoorState = function(callback) {
       acc.getCharacteristic(DoorState).setValue(this.targetState);
  //    }
     this.operating = false;
-    callback(null, this.targetState);
+    callback();
 };
 
 
