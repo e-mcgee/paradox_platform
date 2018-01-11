@@ -819,7 +819,7 @@ ParadoxAccessory.prototype.setFinalDoorState = function() {
       this.log("Set current state to " + (this.targetState == DoorState.CLOSED ? "CLOSED" : "OPEN"));
       this.wasClosed = this.targetState == DoorState.CLOSED;
       this.log("Setting final state...");
-      acc.getCharacteristic(DoorState).updateValue(this.targetState);
+      this.getCharacteristic(DoorState).setValue(this.targetState);
  //    }
     this.operating = false;
 }
