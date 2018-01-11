@@ -801,7 +801,7 @@ ParadoxAccessory.prototype.getDoorState = function (callback) {
 };
 
 
-ParadoxAccessory.prototype.setFinalDoorState = function() {
+ParadoxAccessory.prototype.setFinalDoorState = function(callback) {
 
     var acc = this.garagedooropenerService;
 
@@ -822,6 +822,7 @@ ParadoxAccessory.prototype.setFinalDoorState = function() {
       acc.getCharacteristic(DoorState).setValue(this.targetState);
  //    }
     this.operating = false;
+    callback();
 };
 
 
@@ -856,7 +857,7 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
         self.log("Door will close in (s) :");
         self.log(this.config.doorOpensInSeconds);
 
-        setTimeout(this.setFinalDoorState.bind(this), this.config.doorOpensInSeconds * 1000);
+        setTimeout(this.setFinalDoorState.bind(this,callback), this.config.doorOpensInSeconds * 1000);
     
         if (gettingstatus || controlAlarmstate) {
             self.log('Alarm busy ... waiting 5s');
@@ -926,7 +927,7 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
             }, 500);
         }, wait);
     }
-    callback();
+//    callback();
 };
 
 
