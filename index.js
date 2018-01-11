@@ -918,7 +918,7 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
                             controlPGMstate = false;
                             muteStatus = false;
                             this.reachability = true;
-                            callback(state);
+//                            callback(state);
 //                                callback();
                         }, 250);
                     }, 250);
