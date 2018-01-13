@@ -911,7 +911,7 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
                 _login(alarm_password, client, self);
                 setTimeout(function () {
                     controlPGM("ON", config.pgm, self, client);
-                    setTimeout(this.setFinalDoorState.bind(this, callback, state), this.config.doorOpensInSeconds * 1000);
+                    setTimeout(self.setFinalDoorState.bind(this, callback, state), self.config.doorOpensInSeconds * 1000);
                     setTimeout(function () {
                         controlPGM("OFF", config.pgm, self, client);
                         setTimeout(function () {
