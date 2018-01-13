@@ -571,7 +571,7 @@ function paradoxPlatform(log, config) {
                                 zones[i].accessory.log('Door state changed');
                                 zones[i].accessory.wasClosed = isClosed;
 //                                zones[i].accessory.garagedooropenerService.getCharacteristic(DoorState).updateValue(state);
-//                                zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).updateValue(state);
+                                zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(state);
                                 zones[i].accessory.targetState = state;
                               }
                             }
@@ -856,13 +856,12 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
         }
         self.log("Door will close in (s) :");
         self.log(this.config.doorOpensInSeconds);
-
-        setTimeout(this.setFinalDoorState.bind(this, callback, state), this.config.doorOpensInSeconds * 1000);
     
         if (gettingstatus || controlAlarmstate) {
             self.log('Alarm busy ... waiting 5s');
             wait = 5000;
         }
+        
         
         setTimeout (function () {
             self.log('OK proceeding');
@@ -912,6 +911,7 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
                 _login(alarm_password, client, self);
                 setTimeout(function () {
                     controlPGM("ON", config.pgm, self, client);
+                    setTimeout(this.setFinalDoorState.bind(this, callback, state), this.config.doorOpensInSeconds * 1000);
                     setTimeout(function () {
                         controlPGM("OFF", config.pgm, self, client);
                         setTimeout(function () {
