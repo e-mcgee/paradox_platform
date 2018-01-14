@@ -820,7 +820,7 @@ ParadoxAccessory.prototype.setFinalDoorState = function(callback, state) {
       this.log("Set current state to " + (this.targetState == DoorState.CLOSED ? "CLOSED" : "OPEN"));
       this.wasClosed = this.targetState == DoorState.CLOSED;
       this.log("Setting final state...");
-      this.garagedooropenerService.getCharacteristic(DoorState).setValue(this.targetState);
+      this.garagedooropenerService.setCharacteristic(DoorState, this.targetState);
 //      this.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(this.targetState);
   
     //    }
