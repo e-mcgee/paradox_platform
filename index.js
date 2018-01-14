@@ -570,7 +570,7 @@ function paradoxPlatform(log, config) {
                               if (!zones[i].accessory.operating) {
                                 zones[i].accessory.log('Door state changed');
                                 zones[i].accessory.wasClosed = isClosed;
-//                                zones[i].accessory.garagedooropenerService.getCharacteristic(DoorState).updateValue(state);
+                                zones[i].accessory.garagedooropenerService.getCharacteristic(DoorState).updateValue(state);
                                 zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(state);
                                 zones[i].accessory.targetState = state;
                               }
