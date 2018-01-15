@@ -376,7 +376,7 @@ function getAlarmStatus(acc) {
             setTimeout(function () {
                 client.end();
                 gettingstatus = false;
-            }, 550);
+            }, 750);
         }, LOGINDELAY);
    }, 500);
 }
