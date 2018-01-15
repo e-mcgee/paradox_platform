@@ -30,6 +30,8 @@ var alarmstate = {
 var alarm_ip_address = "192.168.1.0";           // Alarm IP address on local LAN
 var alarm_port = 10000;                         // Alarm Port used
 var alarm_password = "password";                // Store alarm password in here
+var message_count = 0;                          // Count number of received status messages
+var status_valid = false;                       // Flag indicating valid status received
 
 
 // Global constants
@@ -366,19 +368,26 @@ function getAlarmStatus(acc) {
 //            acc.log(data.length);
             receivebuffer = Buffer.from(data);
             _parsestatus(acc, client);
+            message_count++;
         }
     });
 
    setTimeout(function () {
+        message_count = 0;
+        status_valid = false;
         _login(alarm_password, client, acc);
         setTimeout(function () {
             _getalarmstatus(client, acc);
             setTimeout(function () {
                 client.end();
                 gettingstatus = false;
+                acc.log("Messagecount:");
+                acc.log(message_count);
+                if (message_count>5) status_valid = true;
             }, 1000);
         }, LOGINDELAY);
    }, 500);
+   return(status_valid);
 }
 
 
@@ -548,8 +557,8 @@ function paradoxPlatform(log, config) {
     //  Each accsory can also have a pgm mapped to it.  this is also mapped in the config.json file.
     setInterval(function () {
         alarmstate.accessory.log('Mute : [%s]', muteStatus);
-        if (!muteStatus) {
-            getAlarmStatus(self);
+        if (!muteStatus && getAlarmStatus(self)) {
+                    //            getAlarmStatus(self);
             var state;
             alarmstate.accessory.log('Got status');
             alarmstate.accessory.log('Results:');
