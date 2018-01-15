@@ -377,14 +377,16 @@ function getAlarmStatus(acc) {
         status_valid = false;
         _login(alarm_password, client, acc);
         setTimeout(function () {
-            _getalarmstatus(client, acc);
-            setTimeout(function () {
-                client.end();
-                gettingstatus = false;
-                acc.log("Messagecount:");
-                acc.log(message_count);
-                if (message_count>8) status_valid = true;
-            }, 1000);
+            if (message_count > 5) {
+                _getalarmstatus(client, acc);
+                setTimeout(function () {
+                    client.end();
+                    gettingstatus = false;
+                    acc.log("Messagecount:");
+                    acc.log(message_count);
+                    status_valid = true;
+                }, 1000);
+            }
         }, LOGINDELAY);
    }, 500);
    return(status_valid);
