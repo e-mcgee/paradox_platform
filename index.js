@@ -383,7 +383,7 @@ function getAlarmStatus(acc) {
                 gettingstatus = false;
                 acc.log("Messagecount:");
                 acc.log(message_count);
-                if (message_count>5) status_valid = true;
+                if (message_count>8) status_valid = true;
             }, 1000);
         }, LOGINDELAY);
    }, 500);
