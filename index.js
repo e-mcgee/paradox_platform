@@ -104,6 +104,7 @@ function _parsestatus(acc, cl) {
         if (receivebuffer[19] == 0x01) {
             // Alarm status
             acc.log('Alarm State received');
+            status_valid = true;
             if (receivebuffer[33] > 0x10) {
                 alarmstatus = "In Alarm";
             } else {
@@ -384,7 +385,7 @@ function getAlarmStatus(acc) {
                     gettingstatus = false;
                     acc.log("Messagecount:");
                     acc.log(message_count);
-                    status_valid = true;
+//                    status_valid = true;
                 }, 1000);
             }
         }, LOGINDELAY);
