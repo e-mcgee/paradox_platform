@@ -377,7 +377,7 @@ function getAlarmStatus(acc) {
         status_valid = false;
         _login(alarm_password, client, acc);
         setTimeout(function () {
-            if (message_count > 5) {
+            if (message_count > 8) {
                 _getalarmstatus(client, acc);
                 setTimeout(function () {
                     client.end();
