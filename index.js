@@ -3,7 +3,7 @@ var net = require('net');
 
 // Global variables
 var loggedin = false;                           // indcates if logged in successful
-var alarmstatus = 'Disarmed';                    // Current Alarm state
+var alarmstatus = 'Disarmed';                   // Current Alarm state
 var receivebuffer = Buffer.alloc(1024, 0x00);   // Data received from alarm is stored here
 var zonestatus = Buffer.alloc(32, 0x00);        // Current 32 zone status is stored here
 var gettingstatus = false;                      // Indicates if status get is in progress
@@ -26,6 +26,8 @@ var alarmstate = {
     status: "Disarmed",
     accessory: null
 };
+
+var alarms = new Array();
 
 var alarm_ip_address = "192.168.1.0";           // Alarm IP address on local LAN
 var alarm_port = 10000;                         // Alarm Port used
@@ -74,6 +76,10 @@ for (i = 0; i < 32; i++) {
 });
 }
 
+// Initialise alarms
+for (i = 0; i < 2; i++) {
+    alarms.push({status: "Disarmed", accessory: null});
+}
 
 function _checksum() {
     var checksum = 0;
@@ -92,13 +98,17 @@ function _parsestatus(acc, cl) {
     
     var checkok = false;
     
-    if (_checksum()) {
+//    if (_checksum()) {
 //        acc.log('Checksum OK');
-        checkok = true;    
-    }
-    else checkok = false;
-    acc.log("Checksum :");
-    acc.log(checkok);
+//        checkok = true;    
+//    }
+//    else checkok = false;
+//    acc.log("Checksum :");
+//    acc.log(checkok);
+
+    for (i = 0; i < 36; i++)
+        acc.log(receivebuffer[i]);
+    
     
     if (receivebuffer[16] == 0x52) {
         if (receivebuffer[19] == 0x01) {
