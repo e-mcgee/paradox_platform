@@ -671,26 +671,27 @@ function paradoxPlatform(log, config) {
             }
             
             for (i = 0; i < 2; i++) {
-                if (alarm[i].status != alarmstatus[i]) {
-                    if (alarmstatus[i] == 'In Alarm' || alarmstatus[i] == 'Armed Perimeter' || alarmstatus[i] == 'Armed Sleep' || alarmstatus[i] == 'Armed Away' || alarmstatus[i] == 'Disarmed') {
-                        alarm[i].status = alarmstatus[i];
-                        var stat = GetHomebridgeStatus(alarmstatus[i]);
-                        if (alarmstatus[i] == 'In Alarm') {
-                            var alarmtype = 'Zone(s) triggered:';                        
-                            for (i = 0; i < 32; i++) {
-                                if (zones[i].accessory != null) {
-                                    alarmtype += zones[i].name + ' ';
+                if (alarm[i].accessory != null) {
+                    if (alarm[i].status != alarmstatus[i]) {
+                        if (alarmstatus[i] == 'In Alarm' || alarmstatus[i] == 'Armed Perimeter' || alarmstatus[i] == 'Armed Sleep' || alarmstatus[i] == 'Armed Away' || alarmstatus[i] == 'Disarmed') {
+                            alarm[i].status = alarmstatus[i];
+                            var stat = GetHomebridgeStatus(alarmstatus[i]);
+                            if (alarmstatus[i] == 'In Alarm') {
+                                var alarmtype = 'Zone(s) triggered:';                        
+                                for (i = 0; i < 32; i++) {
+                                    if (zones[i].accessory != null) {
+                                        alarmtype += zones[i].name + ' ';
+                                    }
                                 }
                             }
+                            alarm[0].accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemAlarmType).updateValue(alarmtype);                    
+                            alarm[0].accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemCurrentState).updateValue(stat);
+                            alarm[0].accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemTargetState).updateValue(stat);
                         }
-                        alarm[0].accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemAlarmType).updateValue(alarmtype);                    
-                        alarm[0].accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemCurrentState).updateValue(stat);
-                        alarm[0].accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemTargetState).updateValue(stat);
                     }
+                    alarm[0].accessory.log('Alarmstatus :' + alarm[0].status);
                 }
-                alarm[0].accessory.log('Alarmstatus :' + alarm[0].status);
             }
-
 
         } else {
             alarm[0].accessory.log('Busy with alarm - not getting status now.');
@@ -803,21 +804,27 @@ ParadoxAccessory.prototype.initService = function () {
 
     switch (this.config.type) {
         case 'Alarm':
-            this.securitysystemService = new Service.SecuritySystem(this.name);
-            this.informationService
-                    .setCharacteristic(Characteristic.Model, 'Alarm');
-            this.securitysystemService
-                    .getCharacteristic(Characteristic.SecuritySystemCurrentState)
-                    .on('get', this.getAlarmState.bind(this));
-            this.securitysystemService
-                    .getCharacteristic(Characteristic.SecuritySystemTargetState)
-                    .on('set', this.setAlarmState.bind(this));
- 
-            this.log("Initial Alarm State: ");
-            this.log(alarmstatus[this.config.partition]);
-            this.securitysystemService.getCharacteristic(AlarmS).setValue(GetHomebridgeStatus(alarmstatus[this.config.partition]));
-            this.securitysystemService.getCharacteristic(Characteristic.SecuritySystemTargetState).setValue(GetHomebridgeStatus(alarmstatus[this.config.partition]));
-            break;
+            if (this.name == "inactive") {
+                this.log("Partition 2 inactive");
+                this = null;
+                break;
+            } else {
+                this.securitysystemService = new Service.SecuritySystem(this.name);
+                this.informationService
+                        .setCharacteristic(Characteristic.Model, 'Alarm');
+                this.securitysystemService
+                        .getCharacteristic(Characteristic.SecuritySystemCurrentState)
+                        .on('get', this.getAlarmState.bind(this));
+                this.securitysystemService
+                        .getCharacteristic(Characteristic.SecuritySystemTargetState)
+                        .on('set', this.setAlarmState.bind(this));
+
+                this.log("Initial Alarm State: ");
+                this.log(alarmstatus[this.config.partition]);
+                this.securitysystemService.getCharacteristic(AlarmS).setValue(GetHomebridgeStatus(alarmstatus[this.config.partition]));
+                this.securitysystemService.getCharacteristic(Characteristic.SecuritySystemTargetState).setValue(GetHomebridgeStatus(alarmstatus[this.config.partition]));
+                break;
+            }
         case 'Garage Door':
             this.garagedooropenerService = new Service.GarageDoorOpener(this.name);
             this.informationService
