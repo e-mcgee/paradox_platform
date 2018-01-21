@@ -149,6 +149,8 @@ function _parsestatus(acc, cl) {
                         break;
                     default:
                         alarmstatus = "Unknown";
+                };
+                
                 switch (receivebuffer[37]) {
                     case 0x00:
                         alarmstatus_p2 = "Disarmed";
@@ -179,7 +181,7 @@ function _parsestatus(acc, cl) {
                         break;
                     default:
                         alarmstatus_p2 = "Unknown";
-                }
+                };
             }
         }
         if (receivebuffer[19] == 0x00) {
