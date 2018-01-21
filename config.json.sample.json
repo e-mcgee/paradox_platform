@@ -16,7 +16,7 @@
         	 	},
                         
        		        {
-        		"name": "Alarm_Partition_2",
+        		"name": "Alarm_Partition_2|inactive",
         		"config": {
         			"type": "Alarm",
                                 "partition": 1
