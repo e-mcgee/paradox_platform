@@ -1,13 +1,13 @@
 {
   "name": "homebridge-paradox-securitysystem",
-  "version": "0.0.221",
+  "version": "0.0.222",
   "description": "Paradox Platform plugin for homebridge: https://github.com/nfarina/homebridge",
   "license": "ISC",
   "keywords": [
     "homebridge-plugin"
   ],
   "repository": {
-    "type": "git",
+    "type": "git"
     "url": "https://github.com/e-mcgee/paradox_platform/tree/master"
   },
   "bugs": {
