@@ -28,7 +28,7 @@ var alarmstate = {
     accessory: null
 };
 
-var alarm_p1_p2 = new Array();
+var alarms = new Array();
 
 var alarm_ip_address = "192.168.1.0";           // Alarm IP address on local LAN
 var alarm_port = 10000;                         // Alarm Port used
@@ -79,7 +79,7 @@ for (i = 0; i < 32; i++) {
 
 // Initialise alarms
 for (i = 0; i < 2; i++) {
-    alarm_p1_p2.push({status: "Disarmed", accessory: null});
+    alarms.push({status: "Disarmed", accessory: null});
 }
 
 function _checksum() {
@@ -150,7 +150,7 @@ function _parsestatus(acc, cl) {
                     default:
                         alarmstatus_p1 = "Unknown";
                         
-                switch (receivebuffer[37]) {
+                switch (receivebuffer[33]) {
                     case 0x00:
                         alarmstatus_p2 = "Disarmed";
                         break;
@@ -577,7 +577,7 @@ module.exports = function (homebridge) {
     Characteristic = homebridge.hap.Characteristic;
     Service = homebridge.hap.Service;
     DoorState = homebridge.hap.Characteristic.CurrentDoorState;
-//    AlarmS = homebridge.hap.Characteristic.SecuritySystemCurrentState;
+    AlarmS = homebridge.hap.Characteristic.SecuritySystemCurrentState;
 
     homebridge.registerPlatform("homebridge-paradox", "Paradox", paradoxPlatform);
 };
@@ -802,7 +802,7 @@ ParadoxAccessory.prototype.initService = function () {
             this.log("Initial Alarm State: ");
             this.log(alarmstatus_p1);
             this.log(alarmstatus_p2);
-            this.securitysystemService.getCharacteristic(Characteristic.SecuritySystemCurrentState).setValue(GetHomebridgeStatus(alarmstatus_p1));
+            this.securitysystemService.getCharacteristic(AlarmS).setValue(GetHomebridgeStatus(alarmstatus_p1));
             this.securitysystemService.getCharacteristic(Characteristic.SecuritySystemTargetState).setValue(GetHomebridgeStatus(alarmstatus_p1));
             break;
         case 'Garage Door':
