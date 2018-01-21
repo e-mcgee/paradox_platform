@@ -1043,12 +1043,12 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
                     setTimeout(self.setFinalDoorState.bind(self, callback, state), self.config.doorOpensInSeconds * 1000);
                     setTimeout(function () {
                         controlPGM("OFF", config.pgm, self, client);
-                        setTimeout(function () {
-                            client.end();
+            //            setTimeout(function () {
+            //                client.end();
                             controlPGMstate = false;
                             muteStatus = false;
                             this.reachability = true;
-                        }, 250);
+            //            }, 250);
                     }, 250);
 //                }, LOGINDELAY);
 //            }, 500);
