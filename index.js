@@ -725,23 +725,26 @@ paradoxPlatform.prototype.accessories = function (callback) {
             }
 
             self.log('Found: %s [%s]', accessoryName, accConfig.type);
+            
+            if (accessoryName != "inactive") {
 
-            var a = new ParadoxAccessory(self.log, accConfig, accessoryName);
+                var a = new ParadoxAccessory(self.log, accConfig, accessoryName);
 
-            if (accConfig.type == 'Garage Door' || accConfig.type == 'Contact Sensor' || accConfig.type == 'Motion Sensor') {
-                zones[accConfig.zone].accessory = a;
-                zones[accConfig.zone].type = accConfig.type;
-            }
-            if (accConfig.type == 'Garage Door') {
-                zones[accConfig.zone].doorOpensInSeconds = accConfig.doorOpensInSeconds;
-                self.log('Door open in seconds:');
-                self.log(accConfig.doorOpensInSeconds);
-            }
+                if (accConfig.type == 'Garage Door' || accConfig.type == 'Contact Sensor' || accConfig.type == 'Motion Sensor') {
+                    zones[accConfig.zone].accessory = a;
+                    zones[accConfig.zone].type = accConfig.type;
+                }
+                if (accConfig.type == 'Garage Door') {
+                    zones[accConfig.zone].doorOpensInSeconds = accConfig.doorOpensInSeconds;
+                    self.log('Door open in seconds:');
+                    self.log(accConfig.doorOpensInSeconds);
+                }
 
-            if (accConfig.type == 'Alarm') {
-                alarm[accConfig.partition].accessory = a;
+                if (accConfig.type == 'Alarm') {
+                    alarm[accConfig.partition].accessory = a;
+                }
+                acc.push(a);
             }
-            acc.push(a);
         });
     } else {
         this.log('No config for platform');
@@ -804,27 +807,21 @@ ParadoxAccessory.prototype.initService = function () {
 
     switch (this.config.type) {
         case 'Alarm':
-            if (this.name == "inactive") {
-                this.log("Partition 2 inactive");
-                this = null;
-                break;
-            } else {
-                this.securitysystemService = new Service.SecuritySystem(this.name);
-                this.informationService
-                        .setCharacteristic(Characteristic.Model, 'Alarm');
-                this.securitysystemService
-                        .getCharacteristic(Characteristic.SecuritySystemCurrentState)
-                        .on('get', this.getAlarmState.bind(this));
-                this.securitysystemService
-                        .getCharacteristic(Characteristic.SecuritySystemTargetState)
-                        .on('set', this.setAlarmState.bind(this));
+            this.securitysystemService = new Service.SecuritySystem(this.name);
+            this.informationService
+                    .setCharacteristic(Characteristic.Model, 'Alarm');
+            this.securitysystemService
+                    .getCharacteristic(Characteristic.SecuritySystemCurrentState)
+                    .on('get', this.getAlarmState.bind(this));
+            this.securitysystemService
+                    .getCharacteristic(Characteristic.SecuritySystemTargetState)
+                    .on('set', this.setAlarmState.bind(this));
 
-                this.log("Initial Alarm State: ");
-                this.log(alarmstatus[this.config.partition]);
-                this.securitysystemService.getCharacteristic(AlarmS).setValue(GetHomebridgeStatus(alarmstatus[this.config.partition]));
-                this.securitysystemService.getCharacteristic(Characteristic.SecuritySystemTargetState).setValue(GetHomebridgeStatus(alarmstatus[this.config.partition]));
-                break;
-            }
+            this.log("Initial Alarm State: ");
+            this.log(alarmstatus[this.config.partition]);
+            this.securitysystemService.getCharacteristic(AlarmS).setValue(GetHomebridgeStatus(alarmstatus[this.config.partition]));
+            this.securitysystemService.getCharacteristic(Characteristic.SecuritySystemTargetState).setValue(GetHomebridgeStatus(alarmstatus[this.config.partition]));
+            break;
         case 'Garage Door':
             this.garagedooropenerService = new Service.GarageDoorOpener(this.name);
             this.informationService
