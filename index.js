@@ -361,6 +361,7 @@ function _getalarmstatus(cl, acc) {
             buf = Buffer.from(STATUS_MSG2);
             cl.write(buf);
             setTimeout(function () {
+                acc.log(Statusses:);
                 acc.log(alarmstatus);
                 acc.log(alarmstatus_p2);
             }, 250);
