@@ -610,7 +610,7 @@ function paradoxPlatform(log, config) {
     alarm_password = this.config.password;
 
     client = net.createConnection({port: alarm_port, host: alarm_ip_address}, () => {
-        acc.log('Getting Status - Connected to alarm!');
+        this.log('Getting Status - Connected to alarm!');
     });
 
     client.on('end', () => {
@@ -642,7 +642,7 @@ function paradoxPlatform(log, config) {
     });
     
 //    message_count = 0;
-    _login(alarm_password, client, acc);
+    _login(alarm_password, client, self);
     setTimeout(function () {
     }, LOGINDELAY );
 //        if (message_count > 5) {
