@@ -65,7 +65,7 @@ const CONTROLALARM_STAY_P1_MSG   = '\x40\x00\x01\x01\x00\x00\x00\x00\x00\x00\x00
 const CONTROLPGM_MSG1 = [0xAA, 0x25, 0x00, 0x04, 0x08, 0x00, 0x00, 0x14, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE];
 const CONTROLPGM_MSG2 = '\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
 
-const DOOROPENTIME = 16000;
+//const DOOROPENTIME = 16000;
 const LOGINDELAY = 3800;
 
 "use strict";
@@ -202,11 +202,12 @@ function _parsestatus(acc, cl) {
                 acc.log('Zone State received');
                 for (i = 0; i < 4; i++) {
                     for (j = 0; j < 8; j++) {
-                        if (receivebuffer[i + 35] & 0x01 << j) {
-                            zones[j + i * 8].status = "on";
-                        } else {
-                            zones[j + i * 8].status = "off";
-
+                        if (!zones[j + i * 8].accessory.operating) {
+                            if (receivebuffer[i + 35] & 0x01 << j) {
+                                zones[j + i * 8].status = "on";
+                            } else {
+                                zones[j + i * 8].status = "off";
+                            }
                         }
                     }
                 }
@@ -293,6 +294,7 @@ function _login(password, cl, acc) {
                             buf3 = Buffer.concat([buf, buf2], totalLength);
                             cl.write(buf3);
                             setTimeout(function () {
+// add code here to extract product id and firmware version to information service
                                 buf[7] = 0x14;
                                 buftemp = Buffer.alloc(23, 0x00);
                                 receivebuffer.copy(buftemp, 0, 16, 26);
@@ -666,6 +668,9 @@ function paradoxPlatform(log, config) {
     //  Each accsory can also have a pgm mapped to it.  this is also mapped in the config.json file.
     setInterval(function () {
         alarm[0].accessory.log('Mute : [%s]', muteStatus);
+        if (!loggedin) {
+            _login(alarm_password, client, self);
+        }
         if (!muteStatus && getAlarmStatus(self)) {
             var state;
             alarm[0].accessory.log('Got status');
