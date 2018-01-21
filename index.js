@@ -988,7 +988,7 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
     
         if (gettingstatus || controlAlarmstate) {
             self.log('Alarm busy ... waiting 5s');
-            wait = 5000;
+            wait = 1000;
         }
         
         
@@ -1109,7 +1109,7 @@ ParadoxAccessory.prototype.setAlarmState = function (state, callback) {
         
         if (controlPGMstate || gettingstatus) {
             self.log('Busy with alarm .... Waiting to complete');
-            wait = 5000;
+            wait = 1000;
         }
         
         setTimeout (function () {
