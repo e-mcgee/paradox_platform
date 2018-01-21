@@ -4,7 +4,7 @@ var net = require('net');
 // Global variables
 var loggedin = false;                           // indcates if logged in successful
 var alarmstatus = 'Disarmed';                   // Current Alarm state
-var alarmstatus_p2 = 'Disarmed';                   // Current Alarm state
+//var alarmstatus_p2 = 'Disarmed';                   // Current Alarm state
 var receivebuffer = Buffer.alloc(1024, 0x00);   // Data received from alarm is stored here
 var zonestatus = Buffer.alloc(32, 0x00);        // Current 32 zone status is stored here
 var gettingstatus = false;                      // Indicates if status get is in progress
@@ -151,37 +151,38 @@ function _parsestatus(acc, cl) {
                         alarmstatus = "Unknown";
                 }
                 
-//                switch (receivebuffer[37]) {
-//                    case 0x00:
-//                        alarmstatus_p2 = "Disarmed";
-//                        break;
-//                    case 0x01:
-//                        alarmstatus_p2 = "Armed Away";
-//                        break;
-//                    case 0x02:
-//                        alarmstatus_p2 = "Armed Sleep";
-//                        break;
-//                    case 0x03:
-//                        alarmstatus_p2 = "Armed Sleep";
-//                        break;
-//                    case 0x06:
-//                        alarmstatus_p2 = "Armed Sleep";
-//                        break;
-//                    case 0x04:
-//                        alarmstatus_p2 = "Armed Perimeter";
-//                        break;
-//                    case 0x05:
-//                        alarmstatus_p2 = "Armed Perimeter";
-//                        break;
-//                    case 0x08:
-//                        alarmstatus_p2 = "Instant Armed";
-//                        break;
-//                    case 0x09:
-//                        alarmstatus_p2 = "Instant Armed";
-//                        break;
-//                    default:
-//                        alarmstatus_p2 = "Unknown";
-//                };
+                switch (receivebuffer[37]) {
+                    case 0x00:
+                        alarmstatus_p2 = "Disarmed";
+                        break;
+                    case 0x01:
+                        alarmstatus_p2 = "Armed Away";
+                        break;
+                    case 0x02:
+                        alarmstatus_p2 = "Armed Sleep";
+                        break;
+                    case 0x03:
+                        alarmstatus_p2 = "Armed Sleep";
+                        break;
+                    case 0x06:
+                        alarmstatus_p2 = "Armed Sleep";
+                        break;
+                    case 0x04:
+                        alarmstatus_p2 = "Armed Perimeter";
+                        break;
+                    case 0x05:
+                        alarmstatus_p2 = "Armed Perimeter";
+                        break;
+                    case 0x08:
+                        alarmstatus_p2 = "Instant Armed";
+                        break;
+                    case 0x09:
+                        alarmstatus_p2 = "Instant Armed";
+                        break;
+                    default:
+                        alarmstatus_p2 = "Unknown";
+                }
+                
             }
         }
         if (receivebuffer[19] == 0x00) {
@@ -361,7 +362,7 @@ function _getalarmstatus(cl, acc) {
             buf = Buffer.from(STATUS_MSG2);
             cl.write(buf);
             setTimeout(function () {
-                acc.log(Statusses:);
+                acc.log("Statusses:");
                 acc.log(alarmstatus);
                 acc.log(alarmstatus_p2);
             }, 250);
