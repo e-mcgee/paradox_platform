@@ -149,6 +149,7 @@ function _parsestatus(acc, cl) {
                         break;
                     default:
                         alarmstatus_p1 = "Unknown";
+                        
                 switch (receivebuffer[37]) {
                     case 0x00:
                         alarmstatus_p2 = "Disarmed";
@@ -799,9 +800,10 @@ ParadoxAccessory.prototype.initService = function () {
                     .on('set', this.setAlarmState.bind(this));
  
             this.log("Initial Alarm State: ");
-            this.log(alarmstatus);
-            this.securitysystemService.getCharacteristic(AlarmS).setValue(GetHomebridgeStatus(alarmstatus));
-            this.securitysystemService.getCharacteristic(Characteristic.SecuritySystemTargetState).setValue(GetHomebridgeStatus(alarmstatus));
+            this.log(alarmstatus_p1);
+            this.log(alarmstatus_p2);
+            this.securitysystemService.getCharacteristic(AlarmS).setValue(GetHomebridgeStatus(alarmstatus_p1));
+            this.securitysystemService.getCharacteristic(Characteristic.SecuritySystemTargetState).setValue(GetHomebridgeStatus(alarmstatus_p1));
             break;
         case 'Garage Door':
             this.garagedooropenerService = new Service.GarageDoorOpener(this.name);
@@ -1078,7 +1080,7 @@ ParadoxAccessory.prototype.setAlarmState = function (state, callback) {
                 setTimeout(function () {
                     _getalarmstatus(client, self);
                     setTimeout(function () {
-                        if (GetHomebridgeStatus(alarmstatus) != targetstate) {
+                        if (GetHomebridgeStatus(alarmstatus_p1) != targetstate) {
                             switch (targetstate) {
                                 case Characteristic.SecuritySystemTargetState.STAY_ARM:
                                     controlAlarm("STAY", 0, self, client);
