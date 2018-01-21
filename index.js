@@ -202,11 +202,13 @@ function _parsestatus(acc, cl) {
                 acc.log('Zone State received');
                 for (i = 0; i < 4; i++) {
                     for (j = 0; j < 8; j++) {
-                        if (!zones[j + i * 8].accessory.operating) {
-                            if (receivebuffer[i + 35] & 0x01 << j) {
-                                zones[j + i * 8].status = "on";
-                            } else {
-                                zones[j + i * 8].status = "off";
+                        if (zones[j + i * 8].accessory != null) {
+                            if (zones[j + i * 8].accessory.operating != true) {
+                                if (receivebuffer[i + 35] & 0x01 << j) {
+                                    zones[j + i * 8].status = "on";
+                                } else {
+                                    zones[j + i * 8].status = "off";
+                                }
                             }
                         }
                     }
