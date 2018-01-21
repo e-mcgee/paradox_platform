@@ -149,7 +149,7 @@ function _parsestatus(acc, cl) {
                         break;
                     default:
                         alarmstatus = "Unknown";
-                };
+                }
                 
 //                switch (receivebuffer[37]) {
 //                    case 0x00:
