@@ -636,7 +636,7 @@ function paradoxPlatform(log, config) {
 //            acc.log("message length = ");
 //            acc.log(data.length);
             receivebuffer = Buffer.from(data);
-            _parsestatus(acc, client);
+            _parsestatus(self, client);
             message_count++;
         }
     });
