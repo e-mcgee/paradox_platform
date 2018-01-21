@@ -151,37 +151,37 @@ function _parsestatus(acc, cl) {
                         alarmstatus = "Unknown";
                 };
                 
-                switch (receivebuffer[37]) {
-                    case 0x00:
-                        alarmstatus_p2 = "Disarmed";
-                        break;
-                    case 0x01:
-                        alarmstatus_p2 = "Armed Away";
-                        break;
-                    case 0x02:
-                        alarmstatus_p2 = "Armed Sleep";
-                        break;
-                    case 0x03:
-                        alarmstatus_p2 = "Armed Sleep";
-                        break;
-                    case 0x06:
-                        alarmstatus_p2 = "Armed Sleep";
-                        break;
-                    case 0x04:
-                        alarmstatus_p2 = "Armed Perimeter";
-                        break;
-                    case 0x05:
-                        alarmstatus_p2 = "Armed Perimeter";
-                        break;
-                    case 0x08:
-                        alarmstatus_p2 = "Instant Armed";
-                        break;
-                    case 0x09:
-                        alarmstatus_p2 = "Instant Armed";
-                        break;
-                    default:
-                        alarmstatus_p2 = "Unknown";
-                };
+//                switch (receivebuffer[37]) {
+//                    case 0x00:
+//                        alarmstatus_p2 = "Disarmed";
+//                        break;
+//                    case 0x01:
+//                        alarmstatus_p2 = "Armed Away";
+//                        break;
+//                    case 0x02:
+//                        alarmstatus_p2 = "Armed Sleep";
+//                        break;
+//                    case 0x03:
+//                        alarmstatus_p2 = "Armed Sleep";
+//                        break;
+//                    case 0x06:
+//                        alarmstatus_p2 = "Armed Sleep";
+//                        break;
+//                    case 0x04:
+//                        alarmstatus_p2 = "Armed Perimeter";
+//                        break;
+//                    case 0x05:
+//                        alarmstatus_p2 = "Armed Perimeter";
+//                        break;
+//                    case 0x08:
+//                        alarmstatus_p2 = "Instant Armed";
+//                        break;
+//                    case 0x09:
+//                        alarmstatus_p2 = "Instant Armed";
+//                        break;
+//                    default:
+//                        alarmstatus_p2 = "Unknown";
+//                };
             }
         }
         if (receivebuffer[19] == 0x00) {
