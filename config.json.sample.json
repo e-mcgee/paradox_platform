@@ -8,9 +8,18 @@
             "password": "password",
             "accessories": [
         		{
-        		"name": "Alarm",
+        		"name": "Alarm_Partition_1",
         		"config": {
-        			"type": "Alarm"
+        			"type": "Alarm",
+                                "partition": 0
+        			}
+        	 	},
+                        
+       		        {
+        		"name": "Alarm_Partition_2",
+        		"config": {
+        			"type": "Alarm",
+                                "partition": 1
         			}
         	 	},
         	 	
@@ -20,7 +29,7 @@
         			"type": "Garage Door",
         			"zone": 1,
         			"pgm": 0,
-                    "doorOpensInSeconds": 15
+                                "doorOpensInSeconds": 15
         			}
         	 	},
         	 	
