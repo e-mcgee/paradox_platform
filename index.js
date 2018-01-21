@@ -150,7 +150,7 @@ function _parsestatus(acc, cl) {
                     default:
                         alarmstatus_p1 = "Unknown";
                         
-                switch (receivebuffer[37]) {
+                switch (receivebuffer[33]) {
                     case 0x00:
                         alarmstatus_p2 = "Disarmed";
                         break;
