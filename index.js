@@ -934,6 +934,8 @@ ParadoxAccessory.prototype.initService = function () {
             break;
         case 'Connected':
             this.switchService = new Service.Switch(this.name);
+            this.log("Initialy connected to alarm");            
+            this.switchService.setCharacteristic(Characteristic.On, true);
             this.informationService
                     .setCharacteristic(Characteristic.Model, 'Connected switch');
             this.switchService
@@ -942,7 +944,7 @@ ParadoxAccessory.prototype.initService = function () {
             this.switchService
                 .getCharacteristic(Characteristic.On)
                 .on('set', this.setConnectedState.bind(this));
-
+            break;
     }
 };
 
