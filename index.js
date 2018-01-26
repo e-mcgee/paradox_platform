@@ -935,10 +935,12 @@ ParadoxAccessory.prototype.initService = function () {
         case 'Connected':
             this.informationService
                     .setCharacteristic(Characteristic.Model, 'Connected switch');
-            this.switchService = new Service.Switch("Connected");
+            this.switchService = new Service.Switch(this.name);
             this.switchService
                 .getCharacteristic(Characteristic.On)
-                .on('get', this.getConnectedState.bind(this))
+                .on('get', this.getConnectedState.bind(this));
+            this.switchService
+                .getCharacteristic(Characteristic.On)
                 .on('set', this.setConnectedState.bind(this));
 
     }
