@@ -933,9 +933,9 @@ ParadoxAccessory.prototype.initService = function () {
                     .setCharacteristic(Characteristic.Model, 'Motion Sensor');
             break;
         case 'Connected':
+            this.switchService = new Service.Switch(this.name);
             this.informationService
                     .setCharacteristic(Characteristic.Model, 'Connected switch');
-            this.switchService = new Service.Switch(this.name);
             this.switchService
                 .getCharacteristic(Characteristic.On)
                 .on('get', this.getConnectedState.bind(this));
@@ -966,7 +966,8 @@ ParadoxAccessory.prototype.getConnectedState = function (callback) {
 //    } else {
 //        state = ;
 //    }
-    callback(null, connected);    
+//    callback(null, connected);    
+    callback();    
 }
 
 ParadoxAccessory.prototype.setConnectedState = function (callback) {
