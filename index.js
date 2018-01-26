@@ -37,6 +37,7 @@ var alarm_port = 10000;                         // Alarm Port used
 var alarm_password = "password";                // Store alarm password in here
 var message_count = 0;                          // Count number of received status messages
 var status_valid = false;                       // Flag indicating valid status received
+var connected = true;                           // Flag to disable alarm connection for 3rd party access
 
 
 // Global constants
@@ -64,6 +65,9 @@ const CONTROLALARM_STAY_P1_MSG   = '\x40\x00\x01\x01\x00\x00\x00\x00\x00\x00\x00
 
 const CONTROLPGM_MSG1 = [0xAA, 0x25, 0x00, 0x04, 0x08, 0x00, 0x00, 0x14, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE];
 const CONTROLPGM_MSG2 = '\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+
+const CLOSECONNECTION_MSG = '\x70\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+
 
 //const DOOROPENTIME = 16000;
 const LOGINDELAY = 3800;
@@ -346,7 +350,7 @@ function _login(password, cl, acc) {
                                         cl.write(buf3);
                                         setTimeout(function () {
                                             loggedin = true;
-                                        }, 250);
+                                        }, LOGINDELAY);
                                     }, 250);
                                 }, 250);
                             }, 250);
@@ -361,6 +365,18 @@ function _login(password, cl, acc) {
         }
     }, 600);
 }
+
+
+function _logout(cl, acc) {
+
+    var buf = Buffer.from(CLOSECONNECTION_MSG);   
+
+    loginresult = 0;
+    loggedin = false;
+    acc.log('Close alarm connection');
+
+    cl.write(buf);
+}    
 
 
 //
@@ -647,8 +663,6 @@ function paradoxPlatform(log, config) {
     
 //    message_count = 0;
     _login(alarm_password, client, self);
-    setTimeout(function () {
-    }, LOGINDELAY );
 //        if (message_count > 5) {
 //            _getalarmstatus(client, acc);
 //               setTimeout(function () {
@@ -803,7 +817,7 @@ paradoxPlatform.prototype.accessories = function (callback) {
                 acc.push(a);
             }
         });
-    } else {
+   } else {
         this.log('No config for platform');
     }
     callback(acc);
@@ -917,7 +931,16 @@ ParadoxAccessory.prototype.initService = function () {
             this.motionsensorService = new Service.MotionSensor(this.name);
             this.informationService
                     .setCharacteristic(Characteristic.Model, 'Motion Sensor');
-        break;
+            break;
+        case 'Connected':
+            this.informationService
+                    .setCharacteristic(Characteristic.Model, 'Connected switch');
+            this.switchService = new Service.Switch("Connected");
+            this.switchService
+                .getCharacteristic(Characteristic.On)
+                .on('get', this.getConnectedState.bind(this))
+                .on('set', this.setConnectedState.bind(this));
+
     }
 };
 
@@ -933,6 +956,27 @@ ParadoxAccessory.prototype.getDoorState = function (callback) {
 
     callback(null, this.targetState);
 };
+
+ParadoxAccessory.prototype.getConnectedState = function (callback) {
+//    var state;
+//    if (connected) {
+//        state = ;
+//    } else {
+//        state = ;
+//    }
+    callback(null, connected);    
+}
+
+ParadoxAccessory.prototype.setConnectedState = function (callback) {
+    if (!connected) {
+       _login(alarm_password, client, self);
+       connected = true;
+   } else {
+       _logout(client, self)
+       connected = false;
+   }
+   callback();
+}
 
 
 ParadoxAccessory.prototype.setFinalDoorState = function(callback, state) {
