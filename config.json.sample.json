@@ -24,7 +24,10 @@
         	 	},
                         
                         {
-                        "name": "Connected"    
+                        "name": "Connected",
+                        "config": {
+                                "type": "Connected"
+                                }
                         },
         	 	
         		{
