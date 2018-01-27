@@ -371,10 +371,8 @@ function _logout(cl, acc) {
 
     acc.log('Creating close message');
     var buf = Buffer.from(CONTROLALARM_MSG1);
-    var message1 = Buffer.from(CLOSECONNECTION_MSG);
-    acc.log('Formatting Message');
+    message1 = CLOSECONNECTION_MSG;
     message1 = format37ByteMessage(message1);
-    acc.log('Message formatted');
     var buf2 = Buffer.from(message1, 'hex');
     var totalLength = buf.length + buf2.length;
     var buf3 = Buffer.concat([buf, buf2], totalLength);
