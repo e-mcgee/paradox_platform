@@ -639,6 +639,7 @@ function paradoxPlatform(log, config) {
     client.on('end', () => {
 //        self.log('Finished Getting Status - Disconnected from  alarm');
         loggedin = false;
+        connected = false;
     });
 
     client.on('timeout', () => {
@@ -985,15 +986,20 @@ ParadoxAccessory.prototype.setConnectedState = function (state, callback) {
     this.log("Changing connected state");
     if (!connected) {
         this.log("Logging in again");
-       _login(alarm_password, client, self);
-       connected = true;
+        client = net.createConnection({port: alarm_port, host: alarm_ip_address}, () => {
+            this.log('Getting Status - Connected to alarm!');
+        });
+        setTimeout (function() {
+           _login(alarm_password, client, self);
+           connected = true;
+        } ,250);
    } else {
        this.log("Disconnecting from alarm");
        _logout(client, self);
        connected = false;
    }
    state = connected;
-   callback(null, connected);
+   callback(null, state);
 }
 
 
