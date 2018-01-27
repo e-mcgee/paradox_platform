@@ -976,11 +976,14 @@ ParadoxAccessory.prototype.getConnectedState = function (callback) {
 }
 
 ParadoxAccessory.prototype.setConnectedState = function (callback) {
+    this.log("Changing connected state");
     if (!connected) {
+        this.log("Logging in again")
        _login(alarm_password, client, self);
        connected = true;
    } else {
-       _logout(client, self)
+       this.log("Disconnecting from alarm")
+ //      _logout(client, self)
        connected = false;
    }
    callback();
