@@ -989,11 +989,44 @@ ParadoxAccessory.prototype.setConnectedState = function (state, callback) {
         client = net.createConnection({port: alarm_port, host: alarm_ip_address}, () => {
             this.log('Getting Status - Connected to alarm!');
         });
-        setTimeout (function() {
+
+        client.on('end', () => {
+    //        self.log('Finished Getting Status - Disconnected from  alarm');
+            loggedin = false;
+            connected = false;
+        });
+
+        client.on('timeout', () => {
+    //        self.log('No response from alarm - Disconnected from alarm');
+            loggedin = false;
+            client.end();
+        });
+
+        client.on('error', () => {
+    //        self.log('Error communicating with alarm - Disconnected from alarm');
+            loggedin = false;
+            client.end();
+        });
+
+        client.on('data', (data) => {
+            if (data.length > 37) {
+    //            acc.log("Message received");
+    //            acc.log("message length = ");
+    //            acc.log(data.length);
+                receivebuffer = Buffer.from(data);
+                _parsestatus(self, client);
+                message_count++;
+            }
+        });
+       
+        setTimeout ( function() {
            _login(alarm_password, client, self);
-           connected = true;
-        } ,250);
-   } else {
+           setTimeout ( function () {
+                connected = true;               
+           }, LOGINDELAY);
+        } ,1000);
+
+    } else {
        this.log("Disconnecting from alarm");
        _logout(client, self);
        connected = false;
