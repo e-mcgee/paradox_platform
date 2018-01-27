@@ -118,8 +118,8 @@ function _parsestatus(acc, cl) {
 //    acc.log("Checksum :");
 //    acc.log(checkok);
 
-    for (i = 0; i < 36; i++)
-        acc.log(receivebuffer[i]);
+//    for (i = 0; i < 36; i++)
+//        acc.log(receivebuffer[i]);
     
     
     if (receivebuffer[16] == 0x52) {
@@ -376,6 +376,9 @@ function _logout(cl, acc) {
     acc.log('Close alarm connection');
 
     cl.write(buf);
+    setTimeout(function() {
+        cl.end();
+    }, 500);
 }    
 
 
