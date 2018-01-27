@@ -369,13 +369,13 @@ function _login(password, cl, acc) {
 
 function _logout(cl, acc) {
 
-    var buf = Buffer.from(CLOSECONNECTION_MSG);   
+//    var buf = Buffer.from(CLOSECONNECTION_MSG);   
 
-    loginresult = 0;
-    loggedin = false;
+//    loginresult = 0;
+//    loggedin = false;
     acc.log('Close alarm connection');
 
-    cl.write(buf);
+//    cl.write(buf);
 }    
 
 
