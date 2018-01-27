@@ -971,7 +971,7 @@ ParadoxAccessory.prototype.getConnectedState = function (callback) {
 //    } else {
 //        state = ;
 //    }
-//    callback(null, connected);    
+    callback(null, connected);    
 //    callback();    
 }
 
