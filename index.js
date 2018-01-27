@@ -986,7 +986,7 @@ ParadoxAccessory.prototype.setConnectedState = function (callback) {
  //      _logout(client, self)
        connected = false;
    }
-   callback();
+   callback(null, connected);
 }
 
 
