@@ -862,6 +862,9 @@ ParadoxAccessory.prototype.getServices = function () {
         case 'Motion Sensor':
             return [this.informationService, this.motionsensorService];
             break;
+        case 'Connected':
+            return [this.informationService, this.switchService];
+            break;
     }
 };
 
