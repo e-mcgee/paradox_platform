@@ -975,7 +975,7 @@ ParadoxAccessory.prototype.getConnectedState = function (callback) {
     callback();    
 }
 
-ParadoxAccessory.prototype.setConnectedState = function (callback) {
+ParadoxAccessory.prototype.setConnectedState = function (callback, state) {
     this.log("Changing connected state");
     if (!connected) {
         this.log("Logging in again")
@@ -986,8 +986,8 @@ ParadoxAccessory.prototype.setConnectedState = function (callback) {
  //      _logout(client, self)
        connected = false;
    }
-//   state = connected;
-//   callback(null, connected);
+   state = connected;
+   callback(null, connected);
 }
 
 
