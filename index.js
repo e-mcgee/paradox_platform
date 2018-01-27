@@ -369,7 +369,7 @@ function _login(password, cl, acc) {
 
 function _logout(cl, acc) {
 
-//    var buf = Buffer.from(CLOSECONNECTION_MSG);   
+    var buf = Buffer.from(CLOSECONNECTION_MSG);   
 
 //    loginresult = 0;
 //    loggedin = false;
@@ -983,7 +983,7 @@ ParadoxAccessory.prototype.setConnectedState = function (callback, state) {
        connected = true;
    } else {
        this.log("Disconnecting from alarm")
- //      _logout(client, self)
+       _logout(client, self)
        connected = false;
    }
    state = connected;
