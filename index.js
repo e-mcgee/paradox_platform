@@ -411,12 +411,12 @@ function getAlarmStatus(acc) {
     
     self = this;
 
-    if (controlPGMstate || controlAlarmstate) {
+    if (controlPGMstate || controlAlarmstate || !connected) {
         acc.log('Busy with alarm now - not getting status');
-        return;
+        return false;
     }
 
-    gettingstatus = true;
+//    gettingstatus = true;
 
 //    var client = net.createConnection({port: alarm_port, host: alarm_ip_address}, () => {
 //        acc.log('Getting Status - Connected to alarm!');
@@ -684,7 +684,7 @@ function paradoxPlatform(log, config) {
     //  Each accsory can also have a pgm mapped to it.  this is also mapped in the config.json file.
     setInterval(function () {
         alarm[0].accessory.log('Mute : [%s]', muteStatus);
-        if (!loggedin) {
+        if (connected && !loggedin) {
             _login(alarm_password, client, self);
         }
         if (!muteStatus && getAlarmStatus(self)) {
