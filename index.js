@@ -14,6 +14,7 @@ var controlPGMstate = false;                    // Indicates if controlling of P
 var loginresult = 0;                            // Flag used to ignre login messages causing zone status messages
 var muteStatus = false;                         // Mute flag to allow sending commands to Paradox.  This flag mutes the Zone and Alarm status polling.
 
+var PanelProduct = 'SP5500';
 // Global Zones status array
 // Each Zone stores :
 //   status : either on or off
@@ -31,6 +32,7 @@ var zones = new Array();
 
 var alarm = new Array();
 var alarmstatus = new Array();
+var PanelFirmware = new Array();
 
 var alarm_ip_address = "192.168.1.0";           // Alarm IP address on local LAN
 var alarm_port = 10000;                         // Alarm Port used
@@ -77,11 +79,16 @@ const DELAY_BETWEEN_CMDS = 250;
 const LOGOUT_DELAY = 500;
 const LOGIN_DELAY_AFTER_RECONNECT = 1000;
 
+const FIRMWARE = '\x00\x00\x00';
+
 "use strict";
 
 var Characteristic, Service, DoorState;
 
-
+// Initialise firmware version
+for (i=0; i < 3; i++) {
+    PanelFirmware[i] = 0;
+}
 // Initialise zones
 for (i = 0; i < 32; i++) {
     zones.push({status: "off", accessory: null, type: null, doorOpensInSeconds: null
@@ -125,7 +132,36 @@ function _parsestatus(acc, cl) {
 
 //    for (i = 0; i < 36; i++)
 //        acc.log(receivebuffer[i]);
-    
+
+    if (receivebuffer[16] == 0x02) {
+        switch (receivebuffer[20]) {
+            case 0x15:
+                PanelProduct = 'SP5500';
+                break;
+            case 0x16:
+                PanelProduct = 'SP6000';
+                break;
+            case 0x17:
+                PanelProduct = 'SP7000';
+                break;
+            case 0x40:
+                PanelProduct = 'MG5000';
+                break;
+            case 0x42:
+                PanelProduct = 'MG5050';
+                break;
+        }
+        for (i=0;i < 3; i++) {
+            PanelFirmware[i] = receivebuffer[21+i];
+        }
+        var Firmware = PanelFirmware[0] + PanelFirmware[1] + PanelFirmware[2];
+        var str = toString(Firmware);
+
+        acc.informationService
+            .setCharacteristic(Characteristic.SerialNumber, PanelProduct)
+            .setCharacteristic(Characteristic.FirmwareRevision, str);
+
+    }
     
     if (receivebuffer[16] == 0x52) {
         if (receivebuffer[19] == 0x01) {
