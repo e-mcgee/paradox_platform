@@ -163,6 +163,15 @@ function _parsestatus(acc, cl) {
 
     }
     
+    if (receivebuffer[16] == 0x0E) {
+        if (receivebuffer[23] == 3) {
+            if (receivebuffer[24] > 1 && receivebuffer[24] < 7) {
+                acc.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED);
+            }
+        }
+    }
+
+    
     if (receivebuffer[16] == 0x52) {
         if (receivebuffer[19] == 0x01) {
             // Alarm status
