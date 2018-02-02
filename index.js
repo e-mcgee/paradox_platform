@@ -71,6 +71,11 @@ const CLOSECONNECTION_MSG        = '\x70\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00
 
 //const DOOROPENTIME = 16000;
 const LOGINDELAY = 3800;
+const POLL_DELAY = 5000;
+const WAIT_AFTER_LOGIN = 600;
+const DELAY_BETWEEN_CMDS = 250;
+const LOGOUT_DELAY = 500;
+const LOGIN_DELAY_AFTER_RECONNECT = 1000;
 
 "use strict";
 
@@ -351,19 +356,19 @@ function _login(password, cl, acc) {
                                         setTimeout(function () {
                                             loggedin = true;
                                         }, LOGINDELAY);
-                                    }, 250);
-                                }, 250);
-                            }, 250);
-                        }, 250);
-                    }, 250);
-                }, 250);
-            }, 250);
+                                    }, DELAY_BETWEEN_CMDS);
+                                }, DELAY_BETWEEN_CMDS);
+                            }, DELAY_BETWEEN_CMDS);
+                        }, DELAY_BETWEEN_CMDS);
+                    }, DELAY_BETWEEN_CMDS);
+                }, DELAY_BETWEEN_CMDS);
+            }, DELAY_BETWEEN_CMDS);
         } else {
             acc.log('Error logging in');
             cl.end();
             loggedin = false;
         }
-    }, 600);
+    }, WAIT_AFTER_LOGIN);
 }
 
 
@@ -384,7 +389,7 @@ function _logout(cl, acc) {
     cl.write(buf3);
     setTimeout(function() {
         cl.end();
-    }, 500);
+    }, LOGOUT_DELAY);
 }    
 
 
@@ -403,10 +408,10 @@ function _getalarmstatus(cl, acc) {
             cl.write(buf);
             setTimeout(function () {
                 acc.log("Statusses:");
-                acc.log(alarmstatus[0]);
-                acc.log(alarmstatus[1]);
-            }, 250);
-        }, 250);
+                acc.log('Area 1 - ' + alarmstatus[0]);
+                acc.log('Area 2 - ' + alarmstatus[1]);
+            }, DELAY_BETWEEN_CMDS);
+        }, DELAY_BETWEEN_CMDS);
     } else {
         acc.log('Cannot get status - not logged in');
     }
@@ -717,7 +722,7 @@ function paradoxPlatform(log, config) {
         } else {
             alarm[0].accessory.log('Busy with alarm - not getting status now.');
         }
-    }, 10000);
+    }, POLL_DELAY);
     
 };
 
@@ -973,7 +978,7 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
         self.log("Door will close in (s) :");
         self.log(this.config.doorOpensInSeconds);
     
-        if (gettingstatus || controlAlarmstate) {
+        if (gettingstatus || controlAlarmstate || controlPGMstate) {
             self.log('Alarm busy ... waiting 5s');
             wait = 1000;
         }
@@ -995,10 +1000,12 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
             setTimeout(self.setFinalDoorState.bind(self, callback, state), self.config.doorOpensInSeconds * 1000);
             setTimeout(function () {
                 controlPGM("OFF", config.pgm, self, client);
+                setTimeout(function () {
                     controlPGMstate = false;
                     muteStatus = false;
                     this.reachability = true;
-            }, 250);
+                }, DELAY_BETWEEN_CMDS);
+            }, DELAY_BETWEEN_CMDS);
         }, wait);
     }
     else {
@@ -1054,7 +1061,7 @@ ParadoxAccessory.prototype.setAlarmState = function (state, callback) {
         // Need to suspend status update timer while changing alarm state and then
         // reinstate the timer afterwards to avoid contention on alarm while setting state
         
-        if (controlPGMstate || gettingstatus) {
+        if (controlPGMstate || gettingstatus || controlAlarmstate) {
             self.log('Busy with alarm .... Waiting to complete');
             wait = 1000;
         }
@@ -1087,7 +1094,7 @@ ParadoxAccessory.prototype.setAlarmState = function (state, callback) {
                 muteStatus = false;
                 self.reachability = true;
                 callback(null, state);                       
-            }, 500);                
+            }, LOGOUT_DELAY);                
         }, wait);    
     } else {
         self.log('Alarm status error - ignoring');
@@ -1144,7 +1151,7 @@ ParadoxAccessory.prototype.setConnectedState = function (state, callback) {
            setTimeout ( function () {
                 connected = true;               
            }, LOGINDELAY);
-        } ,1000);
+        } ,LOGIN_DELAY_AFTER_RECONNECT);
 
     } else {
        this.log("Disconnecting from alarm");
