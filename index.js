@@ -72,12 +72,12 @@ const CLOSECONNECTION_MSG        = '\x70\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00
 
 
 //const DOOROPENTIME = 16000;
-const LOGINDELAY = 3800;
-const POLL_DELAY = 5000;
-const WAIT_AFTER_LOGIN = 600;
-const DELAY_BETWEEN_CMDS = 250;
-const LOGOUT_DELAY = 500;
-const LOGIN_DELAY_AFTER_RECONNECT = 1000;
+var LOGINDELAY = 3800;
+var POLL_DELAY = 5000;
+var WAIT_AFTER_LOGIN = 600;
+var DELAY_BETWEEN_CMDS = 250;
+var LOGOUT_DELAY = 500;
+var LOGIN_DELAY_AFTER_RECONNECT = 1000;
 
 const FIRMWARE = '\x00\x00\x00';
 
@@ -640,6 +640,13 @@ function paradoxPlatform(log, config) {
     alarm_ip_address = this.config.ip;
     alarm_port = this.config.port;
     alarm_password = this.config.password;
+    LOGINDELAY = this.config.logindelay;
+    POLL_DELAY = this.config.polldelay;
+    WAIT_AFTER_LOGIN = this.config.waitafterlogin;
+    DELAY_BETWEEN_CMDS = this.config.delaybetweencmds;
+    LOGOUT_DELAY = this.config.logoutdelay;
+    LOGIN_DELAY_AFTER_RECONNECT = this.config.logindelayafterreconnect;
+   
 
     client = net.createConnection({port: alarm_port, host: alarm_ip_address}, () => {
         this.log('Getting Status - Connected to alarm!');
