@@ -6,6 +6,12 @@
             "ip": "192.168.1.1",
             "port": 10000,
             "password": "password",
+            "logindelay": 3800,
+            "polldelay": 5000,
+            "waitafterlogin": 600,
+            "delaybetweencmds": 250,
+            "logoutdelay": 500,
+            "logindelayafterreconnect": 1000,
             "accessories": [
         		{
         		"name": "Alarm_Partition_1",
