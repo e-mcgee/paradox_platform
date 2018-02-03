@@ -12,7 +12,8 @@ I have now added a switch control accessory to the Paradox platform to control c
 This is useful if you want to connect to the alarm with other apps such as iParadox or the Web page.
 You simply toggle the switch to control logged in status.
 
-I have also added parameters to the config of the platform to tweak all the delays between commands and plugins.See the wiki for description of this and sample config.json file.
+Change log:
+1) I have also added parameters to the config of the platform to tweak all the delays between commands and plugins.See the wiki for description of this and sample config.json file.
 
 Please note:
 The maximum password length is 16 characters.
