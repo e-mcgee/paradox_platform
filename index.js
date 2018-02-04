@@ -657,6 +657,7 @@ function paradoxPlatform(log, config) {
 
     if (this.config.mqtt) {
   	this.url = this.config.mqtturl;
+        this.log("MQTT URL - " + this.url);
         this.publish_options = {
             qos: ((this.config.qos !== undefined) ? this.config.qos : 0),
 	    retain: ((this.config.retain !== undefined) ? config.config.retain : false)
