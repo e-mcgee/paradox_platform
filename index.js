@@ -662,7 +662,9 @@ function paradoxPlatform(log, config) {
             qos: ((this.config.qos !== undefined) ? this.config.qos : 0),
 	    retain: ((this.config.retain !== undefined) ? config.config.retain : false)
         };
+        this.log("Publish Options");
 	this.client_Id = 'mqttjs_' + Math.random().toString(16).substr(2, 8);
+        this.log("Client ID");        
 	this.options = {
 	    keepalive: 10,
             clientId: this.client_Id,
