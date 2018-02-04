@@ -6,6 +6,7 @@ var mqtt = require('mqtt');
 var loggedin = false;                           // indcates if logged in successful
 var client;
 var mqttclient;
+var mqttenabled = false;
 
 //var alarmstatus = 'Disarmed';                   // Current Alarm state
 //var alarmstatus_p2 = 'Disarmed';                   // Current Alarm state
@@ -656,6 +657,7 @@ function paradoxPlatform(log, config) {
 
 
     if (this.config.mqtt) {
+        mqttenabled = true;
   	this.url = this.config.mqtturl;
         this.log("MQTT URL - " + this.url);
         this.publish_options = {
@@ -797,8 +799,8 @@ function paradoxPlatform(log, config) {
                 }
                 if (zones[i].accessory != null) {
                     zones[i].accessory.log('Zone ' + i.toString() + ' ' + zones[i].status + ' (' + zones[i].accessory.name + ')');
-                    if (this.config.mqtt) {
-//                        mqttclient.publish(zones[i].topic, zones[i].status, this.publish_options);
+                    if (mqttenabled) {
+                        mqttclient.publish(zones[i].topic, zones[i].status, this.publish_options);
                     }
                 }
             }
@@ -823,7 +825,7 @@ function paradoxPlatform(log, config) {
                         }
                     }
                     alarm[0].accessory.log('Alarmstatus :' + alarm[0].status);
-                    if (this.config.mqtt) {
+                    if (mqttenabled) {
                         mqttclient.publish(alarm[i].topic, alarm[i].status, this.publish_options);
                     }
                 }
