@@ -679,10 +679,11 @@ function paradoxPlatform(log, config) {
 	    username: this.config.mqttusername,
 	    password: this.config.mqttpassword,
             rejectUnauthorized: false
-	};        
+	};
+        this.log("Connecting to MQTT Broker");
         mqttclient = mqtt.connect(this.url, this.options);
 
-        this.mqttclient.on('message', function (topic, message) {
+//        this.mqttclient.on('message', function (topic, message) {
 //        if (topic == that.topicStatusGet) {
 //            var status = message.toString();
 //            if (status == that.onValue || status == that.offValue) {
@@ -690,7 +691,7 @@ function paradoxPlatform(log, config) {
 //                    that.service.getCharacteristic(Characteristic.On).setValue(that.switchStatus, undefined, 'fromSetValue');
 //            }
 //        }
-        });
+//        });
     }        
 //    this.client.subscribe(this.topicStatusGet);
 //    this.client.publish(this.topicStatusSet, this.statusCmd, this.publish_options);
