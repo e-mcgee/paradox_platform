@@ -825,7 +825,7 @@ function paradoxPlatform(log, config) {
                     }
                     alarm[0].accessory.log('Alarmstatus :' + alarm[0].status);
                     if (this.config.mqtt) {
-                        this.mqttclient.publish(alarm[i].topic, alarm[i].status, this.publish_options);
+                        mqttclient.publish(alarm[i].topic, alarm[i].status, this.publish_options);
                     }
                 }
             }
