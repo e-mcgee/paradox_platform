@@ -1,6 +1,6 @@
 {
   "name": "homebridge-paradox-securitysystem",
-  "version": "0.0.254",
+  "version": "0.0.255",
   "description": "Paradox Platform plugin for homebridge: https://github.com/nfarina/homebridge",
   "license": "ISC",
   "keywords": [
@@ -18,6 +18,7 @@
     "homebridge": ">=0.4.36"
   },
   "dependencies": {
-    "net": ""
+    "net": "",
+    "mqtt": ""
   }
 }
