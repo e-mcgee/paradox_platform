@@ -684,7 +684,7 @@ function paradoxPlatform(log, config) {
             rejectUnauthorized: false
 	};
         this.log("Connecting to MQTT Broker");
-        mqttclient = mqtt.connect(this.url, this.options);
+        this.mqttclient = mqtt.connect(this.url, this.options);
 
 //        this.mqttclient.on('message', function (topic, message) {
 //        if (topic == that.topicStatusGet) {
@@ -825,7 +825,7 @@ function paradoxPlatform(log, config) {
                     }
                     alarm[0].accessory.log('Alarmstatus :' + alarm[0].status);
                     if (this.config.mqtt) {
-                        mqttclient.publish(alarm[i].topic, alarm[i].status, this.publish_options);
+                        this.mqttclient.publish(alarm[i].topic, alarm[i].status, this.publish_options);
                     }
                 }
             }
