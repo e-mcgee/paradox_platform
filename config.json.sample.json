@@ -6,6 +6,12 @@
             "ip": "192.168.1.1",
             "port": 10000,
             "password": "password",
+            "mqtt": true,
+            "mqtturl": "x.x.x.x",
+            "qos": 0,
+            "retain": false,
+            "mqttusername": "user",
+            "mqttpassword": "password", 
             "logindelay": 3800,
             "polldelay": 5000,
             "waitafterlogin": 600,
@@ -17,7 +23,8 @@
         		"name": "Alarm_Partition_1",
         		"config": {
         			"type": "Alarm",
-                                "partition": 0
+                                "partition": 0,
+                                "topic": "Paradox/partition1/"
         			}
         	 	},
                         
@@ -25,7 +32,8 @@
         		"name": "Alarm_Partition_2|inactive",
         		"config": {
         			"type": "Alarm",
-                                "partition": 1
+                                "partition": 1,
+                                "topic": "Paradox/partition2/"
         			}
         	 	},
                         
@@ -42,7 +50,8 @@
         			"type": "Garage Door",
         			"zone": 1,
         			"pgm": 0,
-                                "doorOpensInSeconds": 15
+                                "doorOpensInSeconds": 15,
+                                "topic": "Paradox/garagedoor1/"                         
         			}
         	 	},
         	 	
@@ -51,7 +60,8 @@
         		"name": "Bedroom",
         		"config": {
         			"type": "Motion Sensor",
-        			"zone": 2
+        			"zone": 2,
+                                "topic": "Paradox/motionsensor1/"                         
         			}
         	 	},
         	 	
@@ -60,7 +70,8 @@
         		"name": "Back Door",
         		"config": {
         			"type": "Contact Sensor",
-        			"zone": 3
+        			"zone": 3,
+                                "topic": "Paradox/contactsensor1/"                         
         			}
         	 	},
         	 	
@@ -71,7 +82,8 @@
         			"type": "Garage Door",
         			"zone": 4,
         			"pgm": 1,
-                    "doorOpensInSeconds": 25
+                                "doorOpensInSeconds": 25,
+                                "topic": "Paradox/gate1/"                                                  
         			}
         	 	}        	 	
         	 ]
