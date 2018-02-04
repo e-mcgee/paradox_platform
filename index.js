@@ -660,7 +660,7 @@ function paradoxPlatform(log, config) {
         this.log("MQTT URL - " + this.url);
         this.publish_options = {
             qos: ((this.config.qos !== undefined) ? this.config.qos : 0),
-	    retain: ((this.config.retain !== undefined) ? config.config.retain : false)
+	    retain: ((this.config.retain !== undefined) ? this.config.retain : false)
         };
         this.log("Publish Options");
 	this.client_Id = 'mqttjs_' + Math.random().toString(16).substr(2, 8);
