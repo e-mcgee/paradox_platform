@@ -798,9 +798,8 @@ function paradoxPlatform(log, config) {
                 if (zones[i].accessory != null) {
                     zones[i].accessory.log('Zone ' + i.toString() + ' ' + zones[i].status + ' (' + zones[i].accessory.name + ')');
                     if (this.config.mqtt) {
-                        mqttclient.publish(zones[i].topic, zones[i].status, this.publish_options);
+//                        mqttclient.publish(zones[i].topic, zones[i].status, this.publish_options);
                     }
-                    
                 }
             }
             
