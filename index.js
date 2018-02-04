@@ -1,9 +1,12 @@
 // Requires
 var net = require('net');
+var mqtt = require('mqtt');
 
 // Global variables
 var loggedin = false;                           // indcates if logged in successful
 var client;
+var mqttclient;
+
 //var alarmstatus = 'Disarmed';                   // Current Alarm state
 //var alarmstatus_p2 = 'Disarmed';                   // Current Alarm state
 var receivebuffer = Buffer.alloc(1024, 0x00);   // Data received from alarm is stored here
@@ -164,8 +167,8 @@ function _parsestatus(acc, cl) {
     }
     
     if (receivebuffer[16] == 0x0E) {
-        if (receivebuffer[23] == 3) {
-            if (receivebuffer[24] > 1 && receivebuffer[24] < 7) {
+        if (receivebuffer[23] == 0x03) {
+            if (receivebuffer[24] > 0x01 && receivebuffer[24] < 0x07) {
                 acc.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED);
             }
         }
@@ -646,7 +649,52 @@ function paradoxPlatform(log, config) {
     DELAY_BETWEEN_CMDS = this.config.delaybetweencmds;
     LOGOUT_DELAY = this.config.logoutdelay;
     LOGIN_DELAY_AFTER_RECONNECT = this.config.logindelayafterreconnect;
-   
+
+//    if (this.config.mqtt) {
+//        this.client.publish(this.topicStatusSet, this.statusCmd, this.publish_options);
+//    }
+
+
+    if (this.config.mqtt) {
+  	this.url = this.config.mqtturl;
+        this.publish_options = {
+            qos: ((this.config.qos !== undefined) ? this.config.qos : 0),
+	    retain: ((this.config.retain !== undefined) ? config.config.retain : false)
+        };
+	this.client_Id = 'mqttjs_' + Math.random().toString(16).substr(2, 8);
+	this.options = {
+	    keepalive: 10,
+            clientId: this.client_Id,
+	    protocolId: 'MQTT',
+            protocolVersion: 4,
+            clean: true,
+            reconnectPeriod: 1000,
+            connectTimeout: 30 * 1000,
+	    will: {
+                topic: 'WillMsg',
+                payload: 'Connection Closed abnormally..!',
+                qos: 0,
+                retain: ((this.config.retain !== undefined) ? this.config.retain : false)
+            },
+	    username: this.config.mqttusername,
+	    password: this.config.mqttpassword,
+            rejectUnauthorized: false
+	};        
+        mqttclient = mqtt.connect(this.url, this.options);
+
+        this.mqttclient.on('message', function (topic, message) {
+//        if (topic == that.topicStatusGet) {
+//            var status = message.toString();
+//            if (status == that.onValue || status == that.offValue) {
+//                    that.switchStatus = (status == that.onValue) ? true : false;
+//                    that.service.getCharacteristic(Characteristic.On).setValue(that.switchStatus, undefined, 'fromSetValue');
+//            }
+//        }
+        });
+    }        
+//    this.client.subscribe(this.topicStatusGet);
+//    this.client.publish(this.topicStatusSet, this.statusCmd, this.publish_options);
+
 
     client = net.createConnection({port: alarm_port, host: alarm_ip_address}, () => {
         this.log('Getting Status - Connected to alarm!');
@@ -745,6 +793,10 @@ function paradoxPlatform(log, config) {
                 }
                 if (zones[i].accessory != null) {
                     zones[i].accessory.log('Zone ' + i.toString() + ' ' + zones[i].status + ' (' + zones[i].accessory.name + ')');
+                    if (this.config.mqtt) {
+                        this.mqttclient.publish(zones[i].topic, zones[i].status, this.publish_options);
+                    }
+                    
                 }
             }
             
@@ -768,6 +820,9 @@ function paradoxPlatform(log, config) {
                         }
                     }
                     alarm[0].accessory.log('Alarmstatus :' + alarm[0].status);
+                    if (this.config.mqtt) {
+                        this.mqttclient.publish(alarm[i].topic, alarm[i].status, this.publish_options);
+                    }
                 }
             }
 
@@ -811,6 +866,7 @@ paradoxPlatform.prototype.accessories = function (callback) {
                 if (accConfig.type == 'Garage Door' || accConfig.type == 'Contact Sensor' || accConfig.type == 'Motion Sensor') {
                     zones[accConfig.zone].accessory = a;
                     zones[accConfig.zone].type = accConfig.type;
+                    zones[accConfig.zone].topic = accConfig.topic;                
                 }
                 if (accConfig.type == 'Garage Door') {
                     zones[accConfig.zone].doorOpensInSeconds = accConfig.doorOpensInSeconds;
@@ -820,6 +876,7 @@ paradoxPlatform.prototype.accessories = function (callback) {
 
                 if (accConfig.type == 'Alarm') {
                     alarm[accConfig.partition].accessory = a;
+                    alarm[accConfig.partition].topic = accConfig.topic;
                 }
                 acc.push(a);
             }
