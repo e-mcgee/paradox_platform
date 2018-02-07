@@ -167,7 +167,7 @@ function _parsestatus(acc, cl) {
 
     }
     
-    if (receivebuffer[16] == 0x0E) {
+    if (receivebuffer[16] == 0xE2) {
         if (receivebuffer[23] == 0x03) {
             if (receivebuffer[24] > 0x01 && receivebuffer[24] < 0x07) {
                 acc.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED);
@@ -731,6 +731,9 @@ function paradoxPlatform(log, config) {
             self.log(data.length);
             receivebuffer = Buffer.from(data);
             self.log(receivebuffer[16]);
+            self.log(receivebuffer[23]);
+            self.log(receivebuffer[24]);
+            self.log(receivebuffer[25]);            
             _parsestatus(self, client);
             message_count++;
         }
