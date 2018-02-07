@@ -730,6 +730,7 @@ function paradoxPlatform(log, config) {
             self.log("message length = ");
             self.log(data.length);
             receivebuffer = Buffer.from(data);
+            self.log(receivebuffer[16]);
             _parsestatus(self, client);
             message_count++;
         }
