@@ -726,9 +726,9 @@ function paradoxPlatform(log, config) {
 
     client.on('data', (data) => {
         if (data.length > 37) {
-//            acc.log("Message received");
-//            acc.log("message length = ");
-//            acc.log(data.length);
+            acc.log("Message received");
+            acc.log("message length = ");
+            acc.log(data.length);
             receivebuffer = Buffer.from(data);
             _parsestatus(self, client);
             message_count++;
