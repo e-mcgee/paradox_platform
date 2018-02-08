@@ -235,6 +235,8 @@ function _parsestatus(acc, cl) {
     if (receivebuffer[16] == 0xE2) {
         acc.log(receivebuffer[23]);
         acc.log(eventMap[receivebuffer[23]]);
+        acc.log(receivebuffer[24]);
+        acc.log(eventMap[receivebuffer[24]]);        
         if (receivebuffer[23] == 0x25) {
 //            if (receivebuffer[24] > 0x01 && receivebuffer[24] < 0x07) {
                 acc.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED);
