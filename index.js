@@ -75,6 +75,71 @@ const CONTROLPGM_MSG2            = '\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00
 const CLOSECONNECTION_MSG        = '\x70\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
 
 
+
+var eventMap = {
+    0: "Zone OK",
+    1: "Zone open",
+    2: "Partition status",
+    3: "Bell status (Partition 1)",
+    5: "Non-Reportable Event",
+    6: "Non-reportable event",
+    7: "PGM Activation",
+    8: "Button B pressed on remote",
+    9: "Button C pressed on remote",
+    10: "Button D pressed on remote",
+    11: "Button E pressed on remote",
+    12: "Cold start wireless zone",
+    13: "Cold start wireless module (Partition 1)",
+    14: "Bypass programming",
+    15: "User code activated output (Partition 1)",
+    16: "Wireless smoke maintenance signal",
+    17: "Delay zone alarm transmission",
+    18: "Zone signal strength weak 1 (Partition 1)",
+    19: "Zone signal strength weak 2 (Partition 1)",
+    20: "Zone signal strength weak 3 (Partition 1)",
+    21: "Zone signal strength weak 4 (Partition 1)",
+    22: "Button 5 pressed on remote",
+    23: "Button 6 pressed on remote",
+    24: "Fire delay started",
+    25: "N/A",
+    26: "Software access",
+    27: "Bus module event",
+    28: "StayD pass acknowledged",
+    29: "Arming with user",
+    30: "Special arming",
+    31: "Disarming with user",
+    32: "Disarming after alarm with user",
+    33: "Alarm cancelled with user",
+    34: "Special disarming",
+    35: "Zone bypassed",
+    36: "Zone in alarm",
+    37: "Fire alarm",
+    38: "Zone alarm restore",
+    39: "Fire alarm restore",
+    40: "Special alarm",
+    41: "Zone shutdown",
+    42: "Zone tampered",
+    43: "Zone tamper restore",
+    44: "New trouble (Partition 1:both for sub event 7",
+    45: "Trouble restored ",
+    46: "Bus / EBus / Wireless module new trouble (Partition 1)",
+    47: "Bus / EBus / Wireless module trouble restored (Partition 1)",
+    48: "Special (Partition 1)",
+    49: "Low battery on zone",
+    50: "Low battery on zone restore",
+    51: "Zone supervision trouble",
+    52: "Zone supervision restore",
+    53: "Wireless module supervision trouble (Partition 1)",
+    54: "Wireless module supervision restore (Partition 1)",
+    55: "Wireless module tamper trouble (Partition 1)",
+    56: "Wireless module tamper restore (Partition 1)",
+    57: "Non-medical alarm (paramedic)",
+    58: "Zone forced",
+    59: "Zone included",
+    64: "System Status"
+};
+
+
 //const DOOROPENTIME = 16000;
 var LOGINDELAY = 3800;
 var POLL_DELAY = 5000;
@@ -168,6 +233,7 @@ function _parsestatus(acc, cl) {
     }
     
     if (receivebuffer[16] == 0xE2) {
+        acc.log(eventMap[23]);
         if (receivebuffer[23] == 0x25) {
 //            if (receivebuffer[24] > 0x01 && receivebuffer[24] < 0x07) {
                 acc.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED);
