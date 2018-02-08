@@ -455,7 +455,7 @@ function _parsestatus(acc, cl) {
                 acc.log(nonReportableEvents[receivebuffer[24]]);
                 break;
             case 26:
-                acc.log(softwareAccess[recevebuffer[24]]);
+                acc.log(softwareAccess[receivebuffer[24]]);
                 break;
             case 27:
                 acc.log(busModuleEvent[receivebuffer[24]]);
@@ -473,7 +473,7 @@ function _parsestatus(acc, cl) {
                 acc.log(newTrouble[receivebuffer[24]]);
                 break;
             case 45:
-                acc.log(troubleRestored[recevebuffer[24]]);
+                acc.log(troubleRestored[receivebuffer[24]]);
                 break;
             case 46:
                 acc.log(moduleTrouble[receivebuffer[24]]);
@@ -482,14 +482,14 @@ function _parsestatus(acc, cl) {
                 acc.log(moduleTroubleRestore[receivebuffer[24]]);
                 break;
             case 48:
-                acc.log(special[receivebuufer[24]]);
+                acc.log(special[receivebuffer[24]]);
                 break;
             case 64:
-                acc.log(systemStatus[receivebiffer[24]]);
+                acc.log(systemStatus[receivebuffer[24]]);
                 break;
         }
-        acc.log(receivebuffer[24]);
-        acc.log(eventMap[receivebuffer[24]]);        
+//        acc.log(receivebuffer[24]);
+//        acc.log(eventMap[receivebuffer[24]]);        
         if (receivebuffer[23] == 0x25) {
 //            if (receivebuffer[24] > 0x01 && receivebuffer[24] < 0x07) {
                 acc.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED);
