@@ -139,6 +139,35 @@ var eventMap = {
     64: "System Status"
 };
 
+var partitionStatus = {       
+    0:"N/A" ,
+    1:"N/A" ,
+    2:"Silent alarm" ,
+    3:"Buzzer alarm" ,
+    4:"Steady alarm" ,
+    5:"Pulse alarm" ,
+    6:"Strobe" ,
+    7:"Alarm stopped" ,
+    8:"Squawk ON (Partition 1)" ,
+    9:"Squawk OFF (Partition 1)" ,
+    10:"Ground Start (Partition 1)" ,
+    11:"Disarm partition" ,
+    12:"Arm partition" ,
+    13:"Entry delay started" ,
+    14:"Exit delay started" ,
+    15:"Pre-alarm delay" ,
+    16:"Report confirmation" ,
+    99:"Any partition status event"
+};
+
+var bellStatus = {
+    0:" Bell OFF" ,
+    1:" Bell ON" ,
+    2:" Bell squawk arm" ,
+    3:" Bell squawk disarm" ,
+    99:"Any bell status event"
+};
+
 
 //const DOOROPENTIME = 16000;
 var LOGINDELAY = 3800;
@@ -233,8 +262,19 @@ function _parsestatus(acc, cl) {
     }
     
     if (receivebuffer[16] == 0xE2) {
-        acc.log(receivebuffer[23]);
+//        acc.log(receivebuffer[23]);
         acc.log(eventMap[receivebuffer[23]]);
+        switch (receivebuffer[23]) {
+            case 1:
+                acc.log('Zone:' + zones[receivebuffer[24]].accessory.name);
+                break;
+            case 2:
+                acc.log(partitionStatus[receivebuffer[24]]);
+                break;
+            case 3:
+                acc.log(bellStatus[receivebuffer[24]]);
+                break;
+        }
         acc.log(receivebuffer[24]);
         acc.log(eventMap[receivebuffer[24]]);        
         if (receivebuffer[23] == 0x25) {
