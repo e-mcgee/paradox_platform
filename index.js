@@ -442,7 +442,7 @@ function _parsestatus(acc, cl) {
         switch (receivebuffer[23]) {
             case 0:
             case 1:
-                acc.log('Zone:' + receivebuffer[24];
+                acc.log('Zone:' + receivebuffer[24]);
                 break;
             case 2:
                 acc.log(partitionStatus[receivebuffer[24]]);
