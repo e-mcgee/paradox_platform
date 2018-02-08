@@ -248,7 +248,7 @@ function _parsestatus(acc, cl) {
     if (receivebuffer[16] == 0x52) {
         if (receivebuffer[19] == 0x01) {
             // Alarm status
-            acc.log('Alarm State received');
+//            acc.log('Alarm State received');
             status_valid = true;
             if (receivebuffer[33] > 0x10) {
                 alarmstatus[0] = "In Alarm";
@@ -326,7 +326,7 @@ function _parsestatus(acc, cl) {
         if (receivebuffer[19] == 0x00) {
             // Zone status
             if (loginresult == 0) {             // only get zone status if this message is not as a result of a login message sent to alarm          
-                acc.log('Zone State received');
+//                acc.log('Zone State received');
                 for (i = 0; i < 4; i++) {
                     for (j = 0; j < 8; j++) {
                         if (zones[j + i * 8].accessory != null) {
@@ -795,9 +795,9 @@ function paradoxPlatform(log, config) {
 
     client.on('data', (data) => {
         if (data.length > 37) {
-            self.log("Message received");
+//            self.log("Message received");
 //            self.log("message length = ");
-            self.log(data.length);
+//            self.log(data.length);
             receivebuffer = Buffer.from(data);
 //            self.log(receivebuffer[16]);
 //            self.log(receivebuffer[23]);
