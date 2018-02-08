@@ -168,6 +168,181 @@ var bellStatus = {
     99:"Any bell status event"
 };
 
+var nonReportableEvents = {
+    0:"Telephone line trouble" ,
+    1:"[ENTER]/[CLEAR]/[POWER] key was pressed (Partition 1 only)" ,
+    2:"N/A" ,
+    3:"Arm in stay mode" ,
+    4:"Arm in sleep mode" ,
+    5:"Arm in force mode" ,
+    6:"Full arm when armed in stay mode" ,
+    7:"PC fail to communicate (Partition 1)" ,
+    8:"Utility Key 1 pressed (keys [1] and [2]) (Partition 1)" ,
+    9:"Utility Key 2 pressed (keys [4] and [5]) (Partition 1)" ,
+    10:"Utility Key 3 pressed (keys [7] and [8]) (Partition 1)" ,
+    11:"Utility Key 4 pressed (keys [2] and [3]) (Partition 1)" ,
+    12:"Utility Key 5 pressed (keys [5] and [6]) (Partition 1)" ,
+    13:"Utility Key 6 pressed (keys [8] and [9]) (Partition 1)" ,
+    14:"Tamper generated alarm" ,
+    15:"Supervision loss generated alarm" ,
+    16:"N/A" ,
+    17:"N/A" ,
+    18:"N/A" ,
+    19:"N/A" ,
+    20:"Full arm when armed in sleep mode" ,
+    21:"Firmware upgrade -Partition 1 only (non-PGM event)" ,
+    22:"N/A" ,
+    23:"StayD mode activated" ,
+    24:"StayD mode deactivated" ,
+    25:"IP Registration status change" ,
+    26:"GPRS Registration status change" ,
+    99:"Any non-reportable event"
+};
+
+newTrouble = {
+    0:"N/A" ,
+    1:"AC failure" ,
+    2:"Battery failure" ,
+    3:"Auxiliary current overload" ,
+    4:"Bell current overload" ,
+    5:"Bell disconnected" ,
+    6:"Clock loss" ,
+    7:"Fire loop trouble" ,
+    8:"Fail to communicate to monitoring station telephone #1" ,
+    9:"Fail to communicate to monitoring station telephone #2" ,
+    11:"Fail to communicate to voice report" ,
+    12:"RF jamming" ,
+    13:"GSM RF jamming" ,
+    14:"GSM no service" ,
+    15:"GSM supervision lost" ,
+    16:"Fail To Communicate IP Receiver 1 (GPRS)" ,
+    17:"Fail To Communicate IP Receiver 2 (GPRS)" ,
+    18:"IP Module No Service" ,
+    19:"IP Module Supervision Loss" ,
+    20:"Fail To Communicate IP Receiver 1 (IP)" ,
+    21:"Fail To Communicate IP Receiver 2 (IP)" ,
+    99:"Any new trouble event"
+};
+
+var troubleRestored = {
+    0:"Telephone line restore" ,
+    1:"AC failure restore" ,
+    2:"Battery failure restore" ,
+    3:"Auxiliary current overload restore" ,
+    4:"Bell current overload restore" ,
+    5:"Bell disconnected restore" ,
+    6:"Clock loss restore" ,
+    7:"Fire loop trouble restore" ,
+    8:"Fail to communicate to monitoring station telephone #1 restore" ,
+    9:"Fail to communicate to monitoring station telephone #2 restore" ,
+    11:"Fail to communicate to voice report restore" ,
+    12:"RF jamming restore" ,
+    13:"GSM RF jamming restore" ,
+    14:"GSM no service restore" ,
+    15:"GSM supervision lost restore" ,
+    16:"Fail To Communicate IP Receiver 1 (GPRS) restore" ,
+    17:"Fail To Communicate IP Receiver 2 (GPRS) restore" ,
+    18:"IP Module No Service restore" ,
+    19:"IP Module Supervision Loss restore" ,
+    20:"Fail To Communicate IP Receiver 1 (IP) restore" ,
+    21:"Fail To Communicate IP Receiver 2 (IP) restore" ,
+    99:"Any trouble event restore"
+};
+
+var specialArming = {
+    0:"Auto-arming (on time/no movement)" ,
+    1:"Late to close" ,
+    2:"No movement arming" ,
+    3:"Partial arming" ,
+    4:"Quick arming" ,
+    5:"Arming through WinLoad" ,
+    6:"Arming with keyswitch" ,
+    99:"Any special arming"
+};
+
+var specialDisarming = {
+    0:"Auto-arm cancelled (on time/no movement)" ,
+    1:"Disarming through WinLoad" ,
+    2:"Disarming through WinLoad after alarm" ,
+    3:"Alarm cancelled through WinLoad" ,
+    4:"Paramedical alarm cancelled" ,
+    5:"Disarm with keyswitch" ,
+    6:"Disarm with keyswitch after an alarm" ,
+    7:"Alarm cancelled with keyswitch" ,
+    99:"Any special disarming"
+};
+
+var specialAlarm = {
+    0:"Panic non-medical emergency" ,
+    1:"Panic medical" ,
+    2:"Panic fire" ,
+    3:"Recent closing" ,
+    4:"Global shutdown" ,
+    5:"Duress alarm" ,
+    6:"Keypad lockout (Partition 1)" ,
+    99:"Any special alarm event"
+};
+
+var softwareAccess = {
+    0:"Non-valid source ID" ,
+    1:"WinLoad direct" ,
+    2:"WinLoad through IP module" ,
+    3:"WinLoad through GSM module" ,
+    4:"WinLoad through modem" ,
+    9:"IP150 direct" ,
+    10:"VDMP3 direct" ,
+    11:"Voice through GSM module" ,
+    12:"Remote access" ,
+    13:"SMS through GSM module" ,
+    99:"Any software access"
+};
+
+var busModuleEvent = {
+    0:"A bus module was added" ,
+    1:"A bus module was removed" ,
+    2:"2-way RF Module Communication Failure" ,
+    3:"2-way RF Module Communication Restored"
+};
+
+var moduleTrouble = {
+    0:"Bus / EBus / Wireless module communication fault" ,
+    1:"Tamper trouble" ,
+    2:"Power fail" ,
+    3:"Battery failure" ,
+    99:"Any bus module new trouble event" 
+};
+
+var moduleTroubleRestore = {
+    0:"Bus / EBus / Wireless module communication fault restore" ,
+    1:"Tamper trouble restore" ,
+    2:"Power fail restore" ,
+    3:"Battery failure restore" ,
+    99:"Any bus module trouble restored event"
+};
+
+ var special = {
+    0:"System power up" ,
+    1:"Reporting test" ,
+    2:"Software log on" ,
+    3:"Software log off" ,
+    4:"Installer in programming mode" ,
+    5:"Installer exited programming mode" ,
+    6:"Maintenance in programming mode" ,
+    7:"Maintenance exited programming mode" ,
+    8:"Closing delinquency delay elapsed" ,
+    99:"Any special event"
+};
+
+var systemStatus = {
+    0:"Follow Arm LED status" ,
+    1:"PGM pulse fast in alarm" ,
+    2:"PGM pulse fast in exit delay below 10 sec." ,
+    3:"PGM pulse slow in exit delay over 10 sec." ,
+    4:"PGM steady ON if armed" ,
+    5:"PGM OFF if disarmed"
+};
+
+
 
 //const DOOROPENTIME = 16000;
 var LOGINDELAY = 3800;
@@ -265,14 +440,52 @@ function _parsestatus(acc, cl) {
 //        acc.log(receivebuffer[23]);
         acc.log(eventMap[receivebuffer[23]]);
         switch (receivebuffer[23]) {
+            case 0:
             case 1:
-                acc.log('Zone:' + zones[receivebuffer[24]].accessory.name);
+                acc.log('Zone:' + receivebuffer[24];
                 break;
             case 2:
                 acc.log(partitionStatus[receivebuffer[24]]);
                 break;
             case 3:
                 acc.log(bellStatus[receivebuffer[24]]);
+                break;
+            case 5:
+            case 6:
+                acc.log(nonReportableEvents[receivebuffer[24]]);
+                break;
+            case 26:
+                acc.log(softwareAccess[recevebuffer[24]]);
+                break;
+            case 27:
+                acc.log(busModuleEvent[receivebuffer[24]]);
+                break;
+            case 30:
+                acc.log(specialArming[receivebuffer[24]]);
+                break;
+            case 34:
+                acc.log(specialDisarming[receivebuffer[24]]);
+                break;
+            case 40:
+                acc.log(specialAlarm[receivebuffer[24]]);
+                break;
+            case 44:
+                acc.log(newTrouble[receivebuffer[24]]);
+                break;
+            case 45:
+                acc.log(troubleRestored[recevebuffer[24]]);
+                break;
+            case 46:
+                acc.log(moduleTrouble[receivebuffer[24]]);
+                break;
+            case 47:
+                acc.log(moduleTroubleRestore[receivebuffer[24]]);
+                break;
+            case 48:
+                acc.log(special[receivebuufer[24]]);
+                break;
+            case 64:
+                acc.log(systemStatus[receivebiffer[24]]);
                 break;
         }
         acc.log(receivebuffer[24]);
