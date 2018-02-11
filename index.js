@@ -442,52 +442,52 @@ function _parsestatus(acc, cl) {
         acc.log(eventMap[receivebuffer[23]]);
         switch (receivebuffer[23]) {
             case 0: 
-                zones[receivebuffer[24]].status = 'off'; 
+                zones[receivebuffer[24]-1].status = 'off'; 
             case 1:                
-                if (receivebuffer[23] == 1) zones[receivebuffer[24]].status = 'on';
+                if (receivebuffer[23] == 1) zones[receivebuffer[24]-1].status = 'on';
                 var state;
-                if (zones[receivebuffer[24]].accessory != null) {
+                if (zones[receivebuffer[24]-1].accessory != null) {
                     switch (zones[receivebuffer[24]].type) {
                         case 'Garage Door':
                             var isClosed;
-                            if (zones[receivebuffer[24]].status == 'off') {
+                            if (zones[receivebuffer[24]-1].status == 'off') {
                                 isClosed = true;
                                 state = DoorState.CLOSED;
                             } else {
                                 isClosed = false;
                                 state = DoorState.OPEN;
                             }                            
-                            if (isClosed != zones[receivebuffer[24]].accessory.wasClosed) {
-                              if (!zones[receivebuffer[24]].accessory.operating) {
-                                zones[receivebuffer[24]].accessory.log('Door state changed');
-                                zones[receivebuffer[24]].accessory.wasClosed = isClosed;
-                                zones[receivebuffer[24]].accessory.garagedooropenerService.getCharacteristic(DoorState).updateValue(state);
-                                zones[receivebuffer[24]].accessory.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(state);
-                                zones[receivebuffer[24]].accessory.targetState = state;
+                            if (isClosed != zones[receivebuffer[24]-1].accessory.wasClosed) {
+                              if (!zones[receivebuffer[24]-1].accessory.operating) {
+                                zones[receivebuffer[24]-1].accessory.log('Door state changed');
+                                zones[receivebuffer[24]-1].accessory.wasClosed = isClosed;
+                                zones[receivebuffer[24]-1].accessory.garagedooropenerService.getCharacteristic(DoorState).updateValue(state);
+                                zones[receivebuffer[24]-1].accessory.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(state);
+                                zones[receivebuffer[24]-1].accessory.targetState = state;
                               }
                             }
                             break;
                         case 'Alarm':
                             break;
                         case 'Contact Sensor':
-                            if (zones[receivebuffer[24]].status == 'off') {
+                            if (zones[receivebuffer[24]-1].status == 'off') {
                                 state = Characteristic.ContactSensorState.CONTACT_DETECTED;
                             } else {
                                 state = Characteristic.ContactSensorState.CONTACT_NOT_DETECTED;
                             }
-                            zones[receivebuffer[24]].accessory.contactsensorService.getCharacteristic(Characteristic.ContactSensorState).setValue(state);
+                            zones[receivebuffer[24]-1].accessory.contactsensorService.getCharacteristic(Characteristic.ContactSensorState).setValue(state);
                             break;
                         case 'Motion Sensor':
-                            if (zones[receivebuffer[24]].status == 'off') {
+                            if (zones[receivebuffer[24]-1].status == 'off') {
                                 state = false;
                             } else {
                                 state = true;
                             }
-                            zones[receivebuffer[24]].accessory.motionsensorService.getCharacteristic(Characteristic.MotionDetected).setValue(state);
+                            zones[receivebuffer[24]-1].accessory.motionsensorService.getCharacteristic(Characteristic.MotionDetected).setValue(state);
                             break;
                     }
                 }
-                acc.log('Zone:' + receivebuffer[24]);
+                acc.log('Zone:' + receivebuffer[24]-1);
                 break;
             case 2:
                 acc.log(partitionStatus[receivebuffer[24]]);
