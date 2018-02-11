@@ -692,9 +692,11 @@ function _login(password, cl, acc) {
             buf[5] = 0xF2;
             cl.write(buf);
             setTimeout(function () {
+                acc.log('Step 1');
                 buf[5] = 0xF3;
                 cl.write(buf);
                 setTimeout(function () {
+                    acc.log('Step 2');
                     buf[1] = 0x25;
                     buf[3] = 0x04;
                     buf[5] = 0x00;
@@ -705,6 +707,7 @@ function _login(password, cl, acc) {
                     var buf3 = Buffer.concat([buf, buf2], totalLength);
                     cl.write(buf3);
                     setTimeout(function () {
+                        acc.log('Step 3');
                         buf[1] = 0x26;
                         buf[3] = 0x03;
                         buf[5] = 0xF8;
