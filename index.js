@@ -1112,7 +1112,7 @@ function paradoxPlatform(log, config) {
     });
     
     _login(alarm_password, client, self);
-
+    this.log("Fin logged in")
     // Status poll loop
     //  This loop sends the status request message to the alarm and then retrives the values form the buffer.
     //  It then parses the values corretcly to reflect the correct Homekit status, depending on what tye of accessory the status belongs to.
