@@ -33,7 +33,7 @@ var zones = new Array();
 
 
 var alarm = new Array();
-//var alarmstatus = new Array();
+var alarmstatus = new Array();
 var PanelFirmware = new Array();
 
 var alarm_ip_address = "192.168.1.0";           // Alarm IP address on local LAN
