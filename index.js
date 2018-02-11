@@ -436,9 +436,9 @@ function _parsestatus(acc, cl) {
         acc.log(eventMap[receivebuffer[23]]);
         switch (receivebuffer[23]) {
             case 0: 
-                zones[receivebuffer[24]].status = 'off'; 
+                zone[receivebuffer[24]].status = 'off'; 
             case 1:                
-                if (receivebuffer[23] == 1) zones[receivebuffer[24]].status = 'on';
+                if (receivebuffer[23] == 1) zone[receivebuffer[24]].status = 'on';
                 var state;
                 if (zones[receivebuffer[24]].accessory != null) {
                     switch (zones[receivebuffer[24]].type) {
