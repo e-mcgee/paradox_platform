@@ -776,6 +776,7 @@ function _login(password, cl, acc) {
                                         cl.write(buf3);
                                         setTimeout(function () {
                                             loggedin = true;
+                                            acc.log('Done logging in');
                                         }, LOGINDELAY);
                                     }, DELAY_BETWEEN_CMDS);
                                 }, DELAY_BETWEEN_CMDS);
