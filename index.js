@@ -1184,7 +1184,7 @@ function paradoxPlatform(log, config) {
             for (i = 0; i < 2; i++) {
                 if (alarm[i].accessory != null) {
 //                    if (alarm[i].status != alarmstatus[i]) {
-                        if (alarm[i].status == 'In Alarm' || alarm[i].status == 'Armed Perimeter' || alarm[i].status == 'Armed Sleep' || alarm[i].status == 'Armed Away' || alarmstatus[i] == 'Disarmed') {
+                        if (alarm[i].status == 'In Alarm' || alarm[i].status == 'Armed Perimeter' || alarm[i].status == 'Armed Sleep' || alarm[i].status == 'Armed Away' || alarm[i].status == 'Disarmed') {
 //                            alarm[i].status = alarmstatus[i];
                             var stat = GetHomebridgeStatus(alarm[i].status);
                             if (alarm[i].status == 'In Alarm') {
