@@ -8,12 +8,14 @@ var client;
 var mqttclient;
 var mqttenabled = false;
 
+//var alarmstatus = 'Disarmed';                   // Current Alarm state
+//var alarmstatus_p2 = 'Disarmed';                   // Current Alarm state
 var receivebuffer = Buffer.alloc(1024, 0x00);   // Data received from alarm is stored here
-//var zonestatus = Buffer.alloc(32, 0x00);        // Current 32 zone status is stored here
+var zonestatus = Buffer.alloc(32, 0x00);        // Current 32 zone status is stored here
 var gettingstatus = false;                      // Indicates if status get is in progress
-var controlAlarmstate = false;                  // Indicates if controlling of alarm is in progress
+var controlAlarmstate = false;                  // Indicates if conreolling of alarm is in progress
 var controlPGMstate = false;                    // Indicates if controlling of PGMs are in progress
-var loginresult = 0;                            // Flag used to ignore login messages causing zone status messages
+var loginresult = 0;                            // Flag used to ignre login messages causing zone status messages
 var muteStatus = false;                         // Mute flag to allow sending commands to Paradox.  This flag mutes the Zone and Alarm status polling.
 
 var PanelProduct = 'SP5500';
@@ -22,15 +24,15 @@ var PanelProduct = 'SP5500';
 //   status : either on or off
 //   accessory : store the accessory so that it can be accessed when a change occurs
 //   Type : either GarageDoorOpener, MotionSensor, or ContactSensor
-//   doorOpensInSeconds : Number of seconds for door or gate to close. Ignored for other accessory types.
 var zones = new Array();
 
 // Global alarmstate
-// Each partition stores:
 //   status: is either Armed Away, Armed Perimeter, Armed Sleep, or Disarmed
 //   accessory : store the accessory so that it can be accessed when a change occurs
-//   partition: 0|1
-
+//var alarmstate = {
+//    status: "Disarmed",
+//    accessory: null
+//};
 
 var alarm = new Array();
 var alarmstatus = new Array();
@@ -71,6 +73,8 @@ const CONTROLPGM_MSG1            = [0xAA, 0x25, 0x00, 0x04, 0x08, 0x00, 0x00, 0x
 const CONTROLPGM_MSG2            = '\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
 
 const CLOSECONNECTION_MSG        = '\x70\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00';
+
+
 
 var eventMap = {
     0: "Zone OK",
@@ -338,6 +342,9 @@ var systemStatus = {
     5:"PGM OFF if disarmed"
 };
 
+
+
+//const DOOROPENTIME = 16000;
 var LOGINDELAY = 3800;
 var POLL_DELAY = 5000;
 var WAIT_AFTER_LOGIN = 600;
@@ -355,7 +362,6 @@ var Characteristic, Service, DoorState;
 for (i=0; i < 3; i++) {
     PanelFirmware[i] = 0;
 }
-
 // Initialise zones
 for (i = 0; i < 32; i++) {
     zones.push({status: "off", accessory: null, type: null, doorOpensInSeconds: null
@@ -368,9 +374,9 @@ for (i = 0; i < 2; i++) {
 }
 
 // Initialise alarms
-//for (i = 0; i < 2; i++) {
-//    alarmstatus.push({status: "Disarmed"});
-//}
+for (i = 0; i < 2; i++) {
+    alarmstatus.push({status: "Disarmed"});
+}
 
 function _checksum() {
     var checksum = 0;
@@ -382,7 +388,6 @@ function _checksum() {
         return true;
     else return false;
 }
-
 //
 // Function to retrieve alram status and zone status from buffer data received from alarm.
 //  This is used in periodic status pole as well as in alarm control and pgm control functions
@@ -428,6 +433,7 @@ function _parsestatus(acc, cl) {
         acc.informationService
             .setCharacteristic(Characteristic.SerialNumber, PanelProduct)
             .setCharacteristic(Characteristic.FirmwareRevision, str);
+
     }
     
     if (receivebuffer[16] == 0xE2) {
@@ -485,9 +491,6 @@ function _parsestatus(acc, cl) {
                 break;
             case 2:
                 acc.log(partitionStatus[receivebuffer[24]]);
-                if (partitionStatus[receivebuffer[24]] > 2 || partitionStatus[receivebuffer[24]] < 7) {
-                    alarm[receivebuffer[25]].accessory.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED);
-                }
                 break;
             case 3:
                 acc.log(bellStatus[receivebuffer[24]]);
@@ -507,14 +510,6 @@ function _parsestatus(acc, cl) {
                 break;
             case 34:
                 acc.log(specialDisarming[receivebuffer[24]]);
-                break;
-            case 36:
-                acc.log('Zone in alarm : ' + zones[receivebuffer[24]].name);
-                alarm[receivebuffer[25]].accessory.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED);
-                break;
-            case 36:
-                acc.log('Zone alarm restored : ' + zones[receivebuffer[24]].name);
-                alarm[receivebuffer[25]].accessory.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED);
                 break;
             case 40:
                 acc.log(specialAlarm[receivebuffer[24]]);
@@ -554,74 +549,74 @@ function _parsestatus(acc, cl) {
 //            acc.log('Alarm State received');
             status_valid = true;
             if (receivebuffer[33] > 0x10) {
-                alarm[0].status = "In Alarm";
+                alarmstatus[0] = "In Alarm";
             } else {
                 switch (receivebuffer[33]) {
                     case 0x00:
-                        alarm[0].status = "Disarmed";
+                        alarmstatus[0] = "Disarmed";
                         break;
                     case 0x01:
-                        alarm[0].status = "Armed Away";
+                        alarmstatus[0] = "Armed Away";
                         break;
                     case 0x02:
-                        alarm[0].status = "Armed Sleep";
+                        alarmstatus[0] = "Armed Sleep";
                         break;
                     case 0x03:
-                        alarm[0].status = "Armed Sleep";
+                        alarmstatus[0] = "Armed Sleep";
                         break;
                     case 0x06:
-                        alarm[0].status = "Armed Sleep";
+                        alarmstatus[0] = "Armed Sleep";
                         break;
                     case 0x04:
-                        alarm[0].status = "Armed Perimeter";
+                        alarmstatus[0] = "Armed Perimeter";
                         break;
                     case 0x05:
-                        alarm[0].status = "Armed Perimeter";
+                        alarmstatus[0] = "Armed Perimeter";
                         break;
                     case 0x08:
-                        alarm[0].status = "Instant Armed";
+                        alarmstatus[0] = "Instant Armed";
                         break;
                     case 0x09:
-                        alarm[0].status = "Instant Armed";
+                        alarmstatus[0] = "Instant Armed";
                         break;
                     default:
-                        alarm[0].status = "Unknown";
+                        alarmstatus[0] = "Unknown";
                 }
             }
             
             if (receivebuffer[37] > 0x10) {
-                alarm[1].status = "In Alarm";
+                alarmstatus[1] = "In Alarm";
             } else {            
                 switch (receivebuffer[37]) {
                     case 0x00:
-                        alarm[1].status = "Disarmed";
+                        alarmstatus[1] = "Disarmed";
                         break;
                     case 0x01:
-                        alarm[1].status = "Armed Away";
+                        alarmstatus[1] = "Armed Away";
                         break;
                     case 0x02:
-                        alarm[1].status = "Armed Sleep";
+                        alarmstatus[1] = "Armed Sleep";
                         break;
                     case 0x03:
-                        alarm[1].status = "Armed Sleep";
+                        alarmstatus[1] = "Armed Sleep";
                         break;
                     case 0x06:
-                        alarm[1].status = "Armed Sleep";
+                        alarmstatus[1] = "Armed Sleep";
                         break;
                     case 0x04:
-                        alarm[1].status = "Armed Perimeter";
+                        alarmstatus[1] = "Armed Perimeter";
                         break;
                     case 0x05:
-                        alarm[1].status = "Armed Perimeter";
+                        alarmstatus[1] = "Armed Perimeter";
                         break;
                     case 0x08:
-                        alarm[1].status = "Instant Armed";
+                        alarmstatus[1] = "Instant Armed";
                         break;
                     case 0x09:
-                        alarm[1].status = "Instant Armed";
+                        alarmstatus[1] = "Instant Armed";
                         break;
                     default:
-                        alarm[1].status = "Unknown";
+                        alarmstatus[1] = "Unknown";
                 }
                 
             }
@@ -833,8 +828,8 @@ function _getalarmstatus(cl, acc) {
             cl.write(buf);
             setTimeout(function () {
                 acc.log("Statusses:");
-                acc.log('Area 1 - ' + alarm[0].status);
-                acc.log('Area 2 - ' + alarm[1].status);
+                acc.log('Area 1 - ' + alarmstatus[0]);
+                acc.log('Area 2 - ' + alarmstatus[1]);
             }, DELAY_BETWEEN_CMDS);
         }, DELAY_BETWEEN_CMDS);
     } else {
@@ -1187,11 +1182,11 @@ function paradoxPlatform(log, config) {
             
             for (i = 0; i < 2; i++) {
                 if (alarm[i].accessory != null) {
-//                    if (alarm[i].status != alarmstatus[i]) {
-                        if (alarm[i].status == 'In Alarm' || alarm[i].status == 'Armed Perimeter' || alarm[i].status == 'Armed Sleep' || alarm[i].status == 'Armed Away' || alarm[i].status == 'Disarmed') {
-//                            alarm[i].status = alarmstatus[i];
-                            var stat = GetHomebridgeStatus(alarm[i].status);
-                            if (alarm[i].status == 'In Alarm') {
+                    if (alarm[i].status != alarmstatus[i]) {
+                        if (alarmstatus[i] == 'In Alarm' || alarmstatus[i] == 'Armed Perimeter' || alarmstatus[i] == 'Armed Sleep' || alarmstatus[i] == 'Armed Away' || alarmstatus[i] == 'Disarmed') {
+                            alarm[i].status = alarmstatus[i];
+                            var stat = GetHomebridgeStatus(alarmstatus[i]);
+                            if (alarmstatus[i] == 'In Alarm') {
                                 var alarmtype = 'Zone(s) triggered:';                        
                                 for (i = 0; i < 32; i++) {
                                     if (zones[i].accessory != null) {
@@ -1203,8 +1198,8 @@ function paradoxPlatform(log, config) {
                             alarm[i].accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemCurrentState).updateValue(stat);
                             alarm[i].accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemTargetState).updateValue(stat);
                         }
-//                    }
-//                    alarm[0].accessory.log('Alarmstatus :' + alarm[0].status);
+                    }
+                    alarm[0].accessory.log('Alarmstatus :' + alarm[0].status);
                     if (mqttenabled) {
                         mqttclient.publish(alarm[i].topic, alarm[i].status, this.publish_options);
                     }
@@ -1341,9 +1336,9 @@ ParadoxAccessory.prototype.initService = function () {
                     .on('set', this.setAlarmState.bind(this));
 
             this.log("Initial Alarm State: ");
-            this.log(alarm[this.config.partition].status);
-            this.securitysystemService.getCharacteristic(AlarmS).setValue(GetHomebridgeStatus(alarm[this.config.partition].status));
-            this.securitysystemService.getCharacteristic(Characteristic.SecuritySystemTargetState).setValue(GetHomebridgeStatus(alarm[this.config.partition].status));
+            this.log(alarmstatus[this.config.partition]);
+            this.securitysystemService.getCharacteristic(AlarmS).setValue(GetHomebridgeStatus(alarmstatus[this.config.partition]));
+            this.securitysystemService.getCharacteristic(Characteristic.SecuritySystemTargetState).setValue(GetHomebridgeStatus(alarmstatus[this.config.partition]));
             break;
         case 'Garage Door':
             this.garagedooropenerService = new Service.GarageDoorOpener(this.name);
@@ -1565,7 +1560,7 @@ ParadoxAccessory.prototype.setAlarmState = function (state, callback) {
             controlAlarmstate = true;
             _getalarmstatus(client, self);
             setTimeout(function () {
-                if (GetHomebridgeStatus(alarm[this.config.partition].status) != targetstate) {
+                if (GetHomebridgeStatus(alarmstatus[config.partition]) != targetstate) {
                     switch (targetstate) {
                         case Characteristic.SecuritySystemTargetState.STAY_ARM:
                             controlAlarm("STAY", config.partition, self, client);
