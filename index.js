@@ -489,10 +489,10 @@ function _parsestatus(acc, cl) {
                             break;
                     }
                 }
-                if (zones[i].accessory != null) {
-                    zones[i].accessory.log('Zone ' + i.toString() + ' ' + zones[i].status + ' (' + zones[i].accessory.name + ')');
+                if (zones[receivebuffer[24]-1].accessory != null) {
+                    zones[receivebuffer[24]-1].accessory.log('Zone ' + (receivebuffer[24]-1).toString() + ' ' + zones[receivebuffer[24]-1].status + ' (' + zones[receivebuffer[24]-1].accessory.name + ')');
                     if (mqttenabled) {
-                        mqttclient.publish(zones[i].topic, zones[i].status, this.publish_options);
+                        mqttclient.publish(zones[receivebuffer[24]-1].topic, zones[receivebuffer[24]-1].status, this.publish_options);
                     }
                 }                
                 acc.log('Zone:' + zones[receivebuffer[24]-1].accessory.name);
