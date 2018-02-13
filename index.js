@@ -447,7 +447,7 @@ function _parsestatus(acc, cl) {
                 if (receivebuffer[23] == 1) zones[receivebuffer[24]-1].status = 'on';
                 var state;
                 if (zones[receivebuffer[24]-1].accessory != null) {
-                    switch (zones[receivebuffer[24]].type) {
+                    switch (zones[receivebuffer[24]-1].type) {
                         case 'Garage Door':
                             var isClosed;
                             if (zones[receivebuffer[24]-1].status == 'off') {
