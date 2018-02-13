@@ -487,7 +487,7 @@ function _parsestatus(acc, cl) {
                             break;
                     }
                 }
-                acc.log('Zone:' + receivebuffer[24]-1);
+                acc.log('Zone:' + zones[receivebuffer[24]-1].accessory.name);
                 break;
             case 2:
                 acc.log(partitionStatus[receivebuffer[24]]);
