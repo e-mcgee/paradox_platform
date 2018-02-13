@@ -441,9 +441,11 @@ function _parsestatus(acc, cl) {
 //        acc.log(receivebuffer[23]);
         acc.log(eventMap[receivebuffer[23]]);
         switch (receivebuffer[23]) {
-            case 0: 
+            case 0:
+                // "Zone OK",
                 zones[receivebuffer[24]-1].status = 'off'; 
-            case 1:                
+            case 1:
+                // "Zone open",
                 if (receivebuffer[23] == 1) zones[receivebuffer[24]-1].status = 'on';
                 var state;
                 if (zones[receivebuffer[24]-1].accessory != null) {
@@ -490,9 +492,29 @@ function _parsestatus(acc, cl) {
                 acc.log('Zone:' + zones[receivebuffer[24]-1].accessory.name);
                 break;
             case 2:
+                // "Partition status"
+                //0:"N/A" ,
+                //1:"N/A" ,
+                //2:"Silent alarm" ,
+                //3:"Buzzer alarm" ,
+                //4:"Steady alarm" ,
+                //5:"Pulse alarm" ,
+                //6:"Strobe" ,
+                //7:"Alarm stopped" ,
+                //8:"Squawk ON (Partition 1)" ,
+                //9:"Squawk OFF (Partition 1)" ,
+                //10:"Ground Start (Partition 1)" ,
+                //11:"Disarm partition" ,
+                //12:"Arm partition" ,
+                //13:"Entry delay started" ,
+                //14:"Exit delay started" ,
+                //15:"Pre-alarm delay" ,
+                //16:"Report confirmation" ,
+                //99:"Any partition status event"                
                 acc.log(partitionStatus[receivebuffer[24]]);
                 break;
             case 3:
+                // "Bell status (Partition 1)"
                 acc.log(bellStatus[receivebuffer[24]]);
                 break;
             case 5:
@@ -511,13 +533,32 @@ function _parsestatus(acc, cl) {
             case 34:
                 acc.log(specialDisarming[receivebuffer[24]]);
                 break;
+            case 36:
+                // "Zone in alarm"
+                zones[receivebuffer[24]-1].accessory.log('Zone:' + zones[receivebuffer[24]-1].accessory.name + 'in alarm.');
+                alarm[receivebuffer[25]-1].accessory.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED);
+                break;
+            case 38:
+                // "Zone alarm restore"
+                zones[receivebuffer[24]-1].accessory.log('Zone:' + zones[receivebuffer[24]-1].accessory.name + 'alarm restored.');
+                alarm[receivebuffer[25]-1].accessory.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.DISARMED);
+                break;                
             case 40:
                 acc.log(specialAlarm[receivebuffer[24]]);
                 break;
+            case 42:
+                // "Trouble restored "
+                acc.log([receivebuffer[24]]);
+                break;
             case 44:
+                // "New trouble (Partition 1:both for sub event 7"
+                // SecuritySystem
+                //  // Optional Characteristics
+                //  this.addOptionalCharacteristic(Characteristic.StatusFault);
                 acc.log(newTrouble[receivebuffer[24]]);
                 break;
             case 45:
+                // "Trouble restored "
                 acc.log(troubleRestored[receivebuffer[24]]);
                 break;
             case 46:
@@ -529,16 +570,23 @@ function _parsestatus(acc, cl) {
             case 48:
                 acc.log(special[receivebuffer[24]]);
                 break;
+//    42: "Zone tampered",
+//    43: "Zone tamper restore",
+//    49: "Low battery on zone",
+// ContacSensor
+//  // Optional Characteristics
+//  this.addOptionalCharacteristic(Characteristic.StatusTampered);
+//  this.addOptionalCharacteristic(Characteristic.StatusLowBattery);
+//
+// MotionSensor
+//  // Optional Characteristics
+//  this.addOptionalCharacteristic(Characteristic.StatusTampered);
+//  this.addOptionalCharacteristic(Characteristic.StatusLowBattery);
+
+
             case 64:
                 acc.log(systemStatus[receivebuffer[24]]);
                 break;
-        }
-//        acc.log(receivebuffer[24]);
-//        acc.log(eventMap[receivebuffer[24]]);        
-        if (receivebuffer[23] == 0x25) {
-//            if (receivebuffer[24] > 0x01 && receivebuffer[24] < 0x07) {
-                acc.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED);
-//            }
         }
     }
 
