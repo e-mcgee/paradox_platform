@@ -489,6 +489,12 @@ function _parsestatus(acc, cl) {
                             break;
                     }
                 }
+                if (zones[i].accessory != null) {
+                    zones[i].accessory.log('Zone ' + i.toString() + ' ' + zones[i].status + ' (' + zones[i].accessory.name + ')');
+                    if (mqttenabled) {
+                        mqttclient.publish(zones[i].topic, zones[i].status, this.publish_options);
+                    }
+                }                
                 acc.log('Zone:' + zones[receivebuffer[24]-1].accessory.name);
                 break;
             case 2:
@@ -537,11 +543,19 @@ function _parsestatus(acc, cl) {
                 // "Zone in alarm"
                 zones[receivebuffer[24]-1].accessory.log('Zone:' + zones[receivebuffer[24]-1].accessory.name + 'in alarm.');
                 alarm[receivebuffer[25]-1].accessory.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED);
+                alarm[receivebuffer[25]-1].accessory.log('Alarmstatus :' + alarm[receivebuffer[25]-1].status);
+                if (mqttenabled) {
+                    mqttclient.publish(alarm[receivebuffer[25]-1].topic, alarm[receivebuffer[25]-1].status, acc.publish_options);
+                }
                 break;
             case 38:
                 // "Zone alarm restore"
                 zones[receivebuffer[24]-1].accessory.log('Zone:' + zones[receivebuffer[24]-1].accessory.name + 'alarm restored.');
                 alarm[receivebuffer[25]-1].accessory.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.DISARMED);
+                alarm[receivebuffer[25]-1].accessory.log('Alarmstatus :' + alarm[receivebuffer[25]-1].status);
+                if (mqttenabled) {
+                    mqttclient.publish(alarm[receivebuffer[25]-1].topic, alarm[receivebuffer[25]-1].status, acc.publish_options);
+                }
                 break;                
             case 40:
                 acc.log(specialAlarm[receivebuffer[24]]);
@@ -1247,7 +1261,7 @@ function paradoxPlatform(log, config) {
                             alarm[i].accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemTargetState).updateValue(stat);
                         }
                     }
-                    alarm[0].accessory.log('Alarmstatus :' + alarm[0].status);
+                    alarm[i].accessory.log('Alarmstatus :' + alarm[i].status);
                     if (mqttenabled) {
                         mqttclient.publish(alarm[i].topic, alarm[i].status, this.publish_options);
                     }
