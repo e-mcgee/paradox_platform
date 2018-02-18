@@ -1222,7 +1222,7 @@ function paradoxPlatform(log, config) {
     //  It handles garage door, contact zones and motion detection homekit accessories.
     //  The zone accessory type is mapped in the config.json file.
     //  Each accsory can also have a pgm mapped to it.  this is also mapped in the config.json file.
-    setInterval(function (client) {
+    setInterval(function () {
         alarm[0].accessory.log('Mute : [%s]', muteStatus);
         if (connected && !loggedin) {
             client = setupClient();
