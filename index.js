@@ -726,9 +726,9 @@ function format37ByteMessage(message) {
     return message;
 }
 
-function setupClient(cl,acc) {
+function setupClient(cl) {
     cl = net.createConnection({port: alarm_port, host: alarm_ip_address}, () => {
-        acc.log('Getting Status - Connected to alarm!');
+ //       acc.log('Getting Status - Connected to alarm!');
     });
 
     cl.on('end', () => {
@@ -1262,7 +1262,7 @@ function paradoxPlatform(log, config) {
 //                    message_count++;
 //                }
 //            });
-             setupClient(client,self);
+             setupClient(client);
             _login(alarm_password, client, self);                
         }
         if (!muteStatus && getAlarmStatus(self)) {
