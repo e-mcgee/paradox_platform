@@ -1213,8 +1213,9 @@ function paradoxPlatform(log, config) {
 //            message_count++;
 //        }
 //    });
-//    
-//    _login(alarm_password, client, self);
+//
+    client = setupClient();
+    _login(alarm_password, client, self);
 //    this.log("Fin logged in")
     // Status poll loop
     //  This loop sends the status request message to the alarm and then retrives the values form the buffer.
