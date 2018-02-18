@@ -727,29 +727,29 @@ function format37ByteMessage(message) {
 }
 
 function setupClient() {
-    client = net.createConnection({port: alarm_port, host: alarm_ip_address}, () => {
+    var cl = net.createConnection({port: alarm_port, host: alarm_ip_address}, () => {
         this.log('Getting Status - Connected to alarm!');
     });
 
-    client.on('end', () => {
+    cl.on('end', () => {
 //        self.log('Finished Getting Status - Disconnected from  alarm');
         loggedin = false;
         connected = false;
     });
 
-    client.on('timeout', () => {
+    cl.on('timeout', () => {
 //        self.log('No response from alarm - Disconnected from alarm');
         loggedin = false;
-        client.end();
+        cl.end();
     });
 
-    client.on('error', () => {
+    cl.on('error', () => {
 //        self.log('Error communicating with alarm - Disconnected from alarm');
         loggedin = false;
-        client.end();
+        cl.end();
     });
 
-    client.on('data', (data) => {
+    cl.on('data', (data) => {
         if (data.length > 37) {
 //            self.log("Message received");
 //            self.log("message length = ");
@@ -763,6 +763,8 @@ function setupClient() {
             message_count++;
         }
     });
+    
+    return cl;
 }
 
 //
@@ -1220,10 +1222,10 @@ function paradoxPlatform(log, config) {
     //  It handles garage door, contact zones and motion detection homekit accessories.
     //  The zone accessory type is mapped in the config.json file.
     //  Each accsory can also have a pgm mapped to it.  this is also mapped in the config.json file.
-    setInterval(function () {
+    setInterval(function (client) {
         alarm[0].accessory.log('Mute : [%s]', muteStatus);
         if (connected && !loggedin) {
-            setupClient();
+            client = setupClient();
             _login(alarm_password, client, self);
         }
         if (!muteStatus && getAlarmStatus(self)) {
