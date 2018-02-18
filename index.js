@@ -726,46 +726,46 @@ function format37ByteMessage(message) {
     return message;
 }
 
-function setupClient(cl) {
-    cl = net.createConnection({port: alarm_port, host: alarm_ip_address}, () => {
- //       acc.log('Getting Status - Connected to alarm!');
-    });
-
-    cl.on('end', () => {
-//        self.log('Finished Getting Status - Disconnected from  alarm');
-        loggedin = false;
-//        connected = false;
-    });
-
-    cl.on('timeout', () => {
-//        self.log('No response from alarm - Disconnected from alarm');
-        loggedin = false;
-        cl.end();
-    });
-
-    cl.on('error', () => {
-//        self.log('Error communicating with alarm - Disconnected from alarm');
-        loggedin = false;
-        cl.end();
-    });
-
-    cl.on('data', (data) => {
-        if (data.length > 37) {
-//            self.log("Message received");
-//            self.log("message length = ");
-//            self.log(data.length);
-            receivebuffer = Buffer.from(data);
-//            self.log(receivebuffer[16]);
-//            self.log(receivebuffer[23]);
-//            self.log(receivebuffer[24]);
-//            self.log(receivebuffer[25]);            
-            _parsestatus(self, cl);
-            message_count++;
-        }
-    });
-    
-//    return cl;
-}
+//function setupClient(cl) {
+//    cl = net.createConnection({port: alarm_port, host: alarm_ip_address}, () => {
+// //       acc.log('Getting Status - Connected to alarm!');
+//    });
+//
+//    cl.on('end', () => {
+////        self.log('Finished Getting Status - Disconnected from  alarm');
+//        loggedin = false;
+////        connected = false;
+//    });
+//
+//    cl.on('timeout', () => {
+////        self.log('No response from alarm - Disconnected from alarm');
+//        loggedin = false;
+//        cl.end();
+//    });
+//
+//    cl.on('error', () => {
+////        self.log('Error communicating with alarm - Disconnected from alarm');
+//        loggedin = false;
+//        cl.end();
+//    });
+//
+//    cl.on('data', (data) => {
+//        if (data.length > 37) {
+////            self.log("Message received");
+////            self.log("message length = ");
+////            self.log(data.length);
+//            receivebuffer = Buffer.from(data);
+////            self.log(receivebuffer[16]);
+////            self.log(receivebuffer[23]);
+////            self.log(receivebuffer[24]);
+////            self.log(receivebuffer[25]);            
+//            _parsestatus(self, cl);
+//            message_count++;
+//        }
+//    });
+//    
+////    return cl;
+//}
 
 //
 // This is the login function to the alarm.  It takes the alarm password, the socket handle, and the accessory in order to be able to log message for the ccessory
@@ -1226,43 +1226,43 @@ function paradoxPlatform(log, config) {
     setInterval(function () {
         alarm[0].accessory.log('Mute : [%s]', muteStatus);
         if (connected && !loggedin) {
-//            client = net.createConnection({port: alarm_port, host: alarm_ip_address}, () => {
-//                alarm[0].accessory.log('Getting Status - Connected to alarm!');
-//            });
-//
-//            client.on('end', () => {
-//        //        self.log('Finished Getting Status - Disconnected from  alarm');
-//                loggedin = false;
-//                connected = false;
-//            });
-//
-//            client.on('timeout', () => {
-//        //        self.log('No response from alarm - Disconnected from alarm');
-//                loggedin = false;
-//                client.end();
-//            });
-//
-//            client.on('error', () => {
-//        //        self.log('Error communicating with alarm - Disconnected from alarm');
-//                loggedin = false;
-//                client.end();
-//            });
-//
-//            client.on('data', (data) => {
-//                if (data.length > 37) {
-//        //            self.log("Message received");
-//        //            self.log("message length = ");
-//        //            self.log(data.length);
-//                    receivebuffer = Buffer.from(data);
-//        //            self.log(receivebuffer[16]);
-//        //            self.log(receivebuffer[23]);
-//        //            self.log(receivebuffer[24]);
-//        //            self.log(receivebuffer[25]);            
-//                    _parsestatus(self, client);
-//                    message_count++;
-//                }
-//            });
-             setupClient(client);
+            client = net.createConnection({port: alarm_port, host: alarm_ip_address}, () => {
+                alarm[0].accessory.log('Getting Status - Connected to alarm!');
+            });
+
+            client.on('end', () => {
+        //        self.log('Finished Getting Status - Disconnected from  alarm');
+                loggedin = false;
+                connected = false;
+            });
+
+            client.on('timeout', () => {
+        //        self.log('No response from alarm - Disconnected from alarm');
+                loggedin = false;
+                client.end();
+            });
+
+            client.on('error', () => {
+        //        self.log('Error communicating with alarm - Disconnected from alarm');
+                loggedin = false;
+                client.end();
+            });
+
+            client.on('data', (data) => {
+                if (data.length > 37) {
+        //            self.log("Message received");
+        //            self.log("message length = ");
+        //            self.log(data.length);
+                    receivebuffer = Buffer.from(data);
+        //            self.log(receivebuffer[16]);
+        //            self.log(receivebuffer[23]);
+        //            self.log(receivebuffer[24]);
+        //            self.log(receivebuffer[25]);            
+                    _parsestatus(self, client);
+                    message_count++;
+                }
+            });
+//             setupClient(client);
             _login(alarm_password, client, self);                
         }
         if (!muteStatus && getAlarmStatus(self)) {
