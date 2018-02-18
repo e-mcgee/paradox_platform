@@ -1227,7 +1227,7 @@ function paradoxPlatform(log, config) {
         alarm[0].accessory.log('Mute : [%s]', muteStatus);
         if (connected && !loggedin) {
             client = net.createConnection({port: alarm_port, host: alarm_ip_address}, () => {
-                this.log('Getting Status - Connected to alarm!');
+                alarm[0].accessory.log('Getting Status - Connected to alarm!');
             });
 
             client.on('end', () => {
