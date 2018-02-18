@@ -734,7 +734,7 @@ function setupClient() {
     cl.on('end', () => {
 //        self.log('Finished Getting Status - Disconnected from  alarm');
         loggedin = false;
-        connected = false;
+//        connected = false;
     });
 
     cl.on('timeout', () => {
@@ -759,7 +759,7 @@ function setupClient() {
 //            self.log(receivebuffer[23]);
 //            self.log(receivebuffer[24]);
 //            self.log(receivebuffer[25]);            
-            _parsestatus(self, client);
+            _parsestatus(self, cl);
             message_count++;
         }
     });
