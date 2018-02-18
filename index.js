@@ -1226,7 +1226,9 @@ function paradoxPlatform(log, config) {
         alarm[0].accessory.log('Mute : [%s]', muteStatus);
         if (connected && !loggedin) {
             client = setupClient();
-            _login(alarm_password, client, self);
+            setTimeout(function () {
+                _login(alarm_password, client, self);                
+            }) , WAIT_AFTER_LOGIN;
         }
         if (!muteStatus && getAlarmStatus(self)) {
             var state;
