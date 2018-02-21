@@ -1400,7 +1400,9 @@ paradoxPlatform.prototype.accessories = function (callback) {
                     zones[accConfig.zone].accessory = a;
                     zones[accConfig.zone].type = accConfig.type;
                     zones[accConfig.zone].topic = accConfig.topic;
-                    zones[accConfig.zone].debounceDelay  = accConfig.debounceDelay;                  
+                    zones[accConfig.zone].debounceDelay = accConfig.debounceDelay;
+                    self.log('Debounce delay:');
+                    self.log(zones[accConfig.zone].debounceDelay);
                 }
                 if (accConfig.type == 'Garage Door') {
                     zones[accConfig.zone].doorOpensInSeconds = accConfig.doorOpensInSeconds;
