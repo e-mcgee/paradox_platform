@@ -460,7 +460,8 @@ function _parsestatus(acc, cl) {
                 var state;
                 if (zones[receivebuffer[24]-1].accessory != null && !zones[receivebuffer[24]-1].debounce) {
                     zones[receivebuffer[24]-1].debounce = true;
-                    zones[receivebuffer[24]-1].accessory.log('Starting debounce');
+                    zones[receivebuffer[24]-1].accessory.log('Starting debounce delay:');
+                    zones[receivebuffer[24]-1].accessory.log(zones[receivebuffer[24]-1].debounceDelay);
                    switch (zones[receivebuffer[24]-1].type) {
                         case 'Garage Door':
                             var isClosed;
