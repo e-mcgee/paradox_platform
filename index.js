@@ -452,11 +452,11 @@ function _parsestatus(acc, cl) {
                 // "Zone open",
                 if (!zones[receivebuffer[24]-1].debounce) {
                     if (receivebuffer[23] == 1) zones[receivebuffer[24]-1].status = 'on';
-                }
-                setTimeout(function () {
-                    zones[receivebuffer[24]-1].debounce = false;
-                    zones[receivebuffer[24]-1].accessory.log('Stopping debounce');
-                }, zones[receivebuffer[24]-1].debounceDelay);
+                    setTimeout(function () {
+                        zones[receivebuffer[24]-1].debounce = false;
+                        zones[receivebuffer[24]-1].accessory.log('Stopping debounce');
+                    }, zones[receivebuffer[24]-1].debounceDelay);
+                }                    
                 var state;
                 if (zones[receivebuffer[24]-1].accessory != null && !zones[receivebuffer[24]-1].debounce) {
                     zones[receivebuffer[24]-1].debounce = true;
