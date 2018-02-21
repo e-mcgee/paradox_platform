@@ -352,6 +352,7 @@ var WAIT_AFTER_LOGIN = 600;
 var DELAY_BETWEEN_CMDS = 250;
 var LOGOUT_DELAY = 500;
 var LOGIN_DELAY_AFTER_RECONNECT = 1000;
+var DEBOUNCE_DELAY = 600;
 
 const FIRMWARE = '\x00\x00\x00';
 
@@ -365,7 +366,7 @@ for (i=0; i < 3; i++) {
 }
 // Initialise zones
 for (i = 0; i < 32; i++) {
-    zones.push({status: "off", accessory: null, type: null, doorOpensInSeconds: null
+    zones.push({status: "off", accessory: null, type: null, doorOpensInSeconds: null, debounce: false, debounceDelay: 0
 });
 }
 
@@ -444,12 +445,20 @@ function _parsestatus(acc, cl) {
         switch (receivebuffer[23]) {
             case 0:
                 // "Zone OK",
-                zones[receivebuffer[24]-1].status = 'off'; 
+                if (!zones[receivebuffer[24]-1].debounce) {
+                    zones[receivebuffer[24]-1].status = 'off';
+                } 
             case 1:
                 // "Zone open",
-                if (receivebuffer[23] == 1) zones[receivebuffer[24]-1].status = 'on';
+                if (!zones[receivebuffer[24]-1].debounce) {
+                    if (receivebuffer[23] == 1) zones[receivebuffer[24]-1].status = 'on';
+                }
+                setTimeout(function () {
+                    zones[receivebuffer[24]-1].debounce = false;
+                }) ,zones[receivebuffer[24]-1].debounceDelay;
                 var state;
-                if (zones[receivebuffer[24]-1].accessory != null) {
+                if (zones[receivebuffer[24]-1].accessory != null && !zones[receivebuffer[24]-1].debounce) {
+                    zones[receivebuffer[24]-1].debounce = true;
                     switch (zones[receivebuffer[24]-1].type) {
                         case 'Garage Door':
                             var isClosed;
@@ -542,20 +551,20 @@ function _parsestatus(acc, cl) {
                 break;
             case 36:
                 // "Zone in alarm"
-                zones[receivebuffer[24]-1].accessory.log('Zone:' + zones[receivebuffer[24]-1].accessory.name + 'in alarm.');
-                alarm[receivebuffer[25]-1].accessory.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED);
-                alarm[receivebuffer[25]-1].accessory.log('Alarmstatus :' + alarm[receivebuffer[25]-1].status);
+                zones[receivebuffer[24]-1].accessory.log('Zone:' + zones[receivebuffer[24]-1].accessory.name + ' in alarm.');
+                alarm[receivebuffer[25]].accessory.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED);
+                alarm[receivebuffer[25]].accessory.log('Alarmstatus :' + alarm[receivebuffer[25]].status);
                 if (mqttenabled) {
-                    mqttclient.publish(alarm[receivebuffer[25]-1].topic, alarm[receivebuffer[25]-1].status, acc.publish_options);
+                    mqttclient.publish(alarm[receivebuffer[25]].topic, alarm[receivebuffer[25]].status, acc.publish_options);
                 }
                 break;
             case 38:
                 // "Zone alarm restore"
-                zones[receivebuffer[24]-1].accessory.log('Zone:' + zones[receivebuffer[24]-1].accessory.name + 'alarm restored.');
-                alarm[receivebuffer[25]-1].accessory.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.DISARMED);
-                alarm[receivebuffer[25]-1].accessory.log('Alarmstatus :' + alarm[receivebuffer[25]-1].status);
+                zones[receivebuffer[24]-1].accessory.log('Zone:' + zones[receivebuffer[24]-1].accessory.name + ' alarm restored.');
+                alarm[receivebuffer[25]].accessory.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.DISARMED);
+                alarm[receivebuffer[25]].accessory.log('Alarmstatus :' + alarm[receivebuffer[25]].status);
                 if (mqttenabled) {
-                    mqttclient.publish(alarm[receivebuffer[25]-1].topic, alarm[receivebuffer[25]-1].status, acc.publish_options);
+                    mqttclient.publish(alarm[receivebuffer[25]].topic, alarm[receivebuffer[25]].status, acc.publish_options);
                 }
                 break;                
             case 40:
@@ -1311,7 +1320,7 @@ function paradoxPlatform(log, config) {
                             zones[i].accessory.motionsensorService.getCharacteristic(Characteristic.MotionDetected).setValue(state);
                             break;
                         default:
-                            alarm[0].accessory.log('Not Supported: %s [%s]', accessoryName, accConfig.type);
+                            alarm[0].accessory.log('Not Supported: %s [%s]', zones[i].name, zones[i].type);
                     }
                 }
                 if (zones[i].accessory != null) {
@@ -1388,7 +1397,8 @@ paradoxPlatform.prototype.accessories = function (callback) {
                 if (accConfig.type == 'Garage Door' || accConfig.type == 'Contact Sensor' || accConfig.type == 'Motion Sensor') {
                     zones[accConfig.zone].accessory = a;
                     zones[accConfig.zone].type = accConfig.type;
-                    zones[accConfig.zone].topic = accConfig.topic;                
+                    zones[accConfig.zone].topic = accConfig.topic;
+                    zones[accConfig.zone].debounceDelay  = accConfig.debounceDelay;                  
                 }
                 if (accConfig.type == 'Garage Door') {
                     zones[accConfig.zone].doorOpensInSeconds = accConfig.doorOpensInSeconds;
