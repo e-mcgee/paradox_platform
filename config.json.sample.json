@@ -51,7 +51,8 @@
         			"zone": 1,
         			"pgm": 0,
                                 "doorOpensInSeconds": 15,
-                                "topic": "Paradox/garagedoor1/"                         
+                                "topic": "Paradox/garagedoor1/",
+                                "debounceDelay" : 500
         			}
         	 	},
         	 	
@@ -61,7 +62,8 @@
         		"config": {
         			"type": "Motion Sensor",
         			"zone": 2,
-                                "topic": "Paradox/motionsensor1/"                         
+                                "topic": "Paradox/motionsensor1/",                         
+                                "debounceDelay" : 0
         			}
         	 	},
         	 	
@@ -71,7 +73,9 @@
         		"config": {
         			"type": "Contact Sensor",
         			"zone": 3,
-                                "topic": "Paradox/contactsensor1/"                         
+                                "topic": "Paradox/contactsensor1/",
+                                "debounceDelay" : 0
+
         			}
         	 	},
         	 	
@@ -83,7 +87,8 @@
         			"zone": 4,
         			"pgm": 1,
                                 "doorOpensInSeconds": 25,
-                                "topic": "Paradox/gate1/"                                                  
+                                "topic": "Paradox/gate1/",
+                                "debounceDelay" : 500
         			}
         	 	}        	 	
         	 ]
