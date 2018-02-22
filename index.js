@@ -555,7 +555,7 @@ function _parsestatus(acc, cl) {
             case 36:
                 // "Zone in alarm"
                 zones[receivebuffer[24]-1].accessory.log('Zone:' + zones[receivebuffer[24]-1].accessory.name + ' in alarm.');
-                alarm[receivebuffer[25]].accessory.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED);
+                alarm[receivebuffer[25]].accessory.securitysystemService.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED);
                 alarm[receivebuffer[25]].accessory.log('Alarmstatus :' + alarm[receivebuffer[25]].status);
                 if (mqttenabled) {
                     mqttclient.publish(alarm[receivebuffer[25]].topic, alarm[receivebuffer[25]].status, acc.publish_options);
@@ -564,7 +564,7 @@ function _parsestatus(acc, cl) {
             case 38:
                 // "Zone alarm restore"
                 zones[receivebuffer[24]-1].accessory.log('Zone:' + zones[receivebuffer[24]-1].accessory.name + ' alarm restored.');
-                alarm[receivebuffer[25]].accessory.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.DISARMED);
+                alarm[receivebuffer[25]].accessory.securitysystemService.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.DISARMED);
                 alarm[receivebuffer[25]].accessory.log('Alarmstatus :' + alarm[receivebuffer[25]].status);
                 if (mqttenabled) {
                     mqttclient.publish(alarm[receivebuffer[25]].topic, alarm[receivebuffer[25]].status, acc.publish_options);
