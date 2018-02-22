@@ -24,7 +24,7 @@ var PanelProduct = 'SP5500';
 // Each Zone stores :
 //   status : either on or off
 //   accessory : store the accessory so that it can be accessed when a change occurs
-//   Type : either GarageDoorOpener, MotionSensor, or ContactSensor
+//   Type : either GarageDoorOpener, MotionSensor, ContactSensor or SmokeSensor
 var zones = new Array();
 
 // Global alarmstate
@@ -499,6 +499,14 @@ function _parsestatus(acc, cl) {
                                 state = true;
                             }
                             zones[receivebuffer[24]-1].accessory.motionsensorService.getCharacteristic(Characteristic.MotionDetected).setValue(state);
+                            break;
+                        case 'Smoke Sensor':
+                            if (zones[receivebuffer[24]-1].status == 'off') {
+                                state = false;
+                            } else {
+                                state = true;
+                            }
+                            zones[receivebuffer[24]-1].accessory.smokesensorService.getCharacteristic(Characteristic.SmokeDetected).setValue(state);
                             break;
                     }
                 }
@@ -1232,7 +1240,7 @@ function paradoxPlatform(log, config) {
     // Status poll loop
     //  This loop sends the status request message to the alarm and then retrives the values form the buffer.
     //  It then parses the values corretcly to reflect the correct Homekit status, depending on what tye of accessory the status belongs to.
-    //  It handles garage door, contact zones and motion detection homekit accessories.
+    //  It handles garage door, contact zones, motion detection and smoke sensor homekit accessories.
     //  The zone accessory type is mapped in the config.json file.
     //  Each accsory can also have a pgm mapped to it.  this is also mapped in the config.json file.
     setInterval(function () {
@@ -1322,6 +1330,14 @@ function paradoxPlatform(log, config) {
                             }
                             zones[i].accessory.motionsensorService.getCharacteristic(Characteristic.MotionDetected).setValue(state);
                             break;
+                        case 'Smoke Sensor':
+                            if (zones[i].status == 'off') {
+                                state = false;
+                            } else {
+                                state = true;
+                            }
+                            zones[i].accessory.smokesensorService.getCharacteristic(Characteristic.SmokeDetected).setValue(state);
+                            break;
                         default:
                             alarm[0].accessory.log('Not Supported: %s [%s]', zones[i].name, zones[i].type);
                     }
@@ -1397,7 +1413,7 @@ paradoxPlatform.prototype.accessories = function (callback) {
 
                 var a = new ParadoxAccessory(self.log, accConfig, accessoryName);
 
-                if (accConfig.type == 'Garage Door' || accConfig.type == 'Contact Sensor' || accConfig.type == 'Motion Sensor') {
+                if (accConfig.type == 'Garage Door' || accConfig.type == 'Contact Sensor' || accConfig.type == 'Motion Sensor' || accConfig.type == 'Smoke Sensor') {
                     zones[accConfig.zone].accessory = a;
                     zones[accConfig.zone].type = accConfig.type;
                     zones[accConfig.zone].topic = accConfig.topic;
@@ -1462,6 +1478,9 @@ ParadoxAccessory.prototype.getServices = function () {
             break;
         case 'Motion Sensor':
             return [this.informationService, this.motionsensorService];
+            break;
+        case 'Smoke Sensor':
+            return [this.informationService, this.smokesensorService];
             break;
         case 'Connected':
             return [this.informationService, this.switchService];
@@ -1535,6 +1554,11 @@ ParadoxAccessory.prototype.initService = function () {
             this.motionsensorService = new Service.MotionSensor(this.name);
             this.informationService
                     .setCharacteristic(Characteristic.Model, 'Motion Sensor');
+            break;
+        case 'Smoke Sensor':
+            this.smokesensorService = new Service.SmokeSensor(this.name);
+            this.informationService
+                    .setCharacteristic(Characteristic.Model, 'Smoke Sensor');
             break;
         case 'Connected':
             this.switchService = new Service.Switch(this.name);
