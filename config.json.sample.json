@@ -67,12 +67,21 @@
         			}
         	 	},
         	 	
-        	 	
+        		{
+        		"name": "Kitchen",
+        		"config": {
+        			"type": "Smoke Sensor",
+        			"zone": 3,
+                                "topic": "Paradox/smokesensor1/",                         
+                                "debounceDelay" : 0
+        			}
+        	 	},
+                 
         		{
         		"name": "Back Door",
         		"config": {
         			"type": "Contact Sensor",
-        			"zone": 3,
+        			"zone": 4,
                                 "topic": "Paradox/contactsensor1/",
                                 "debounceDelay" : 0
 
@@ -84,7 +93,7 @@
         		"name": "Gate",
         		"config": {
         			"type": "Garage Door",
-        			"zone": 4,
+        			"zone": 5,
         			"pgm": 1,
                                 "doorOpensInSeconds": 25,
                                 "topic": "Paradox/gate1/",
