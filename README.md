@@ -15,7 +15,7 @@ You simply toggle the switch to control logged in status.
 Parameters are available for the config of the platform to tweak all the delays between commands and plugins.See the wiki for description of this and sample config.json file.
 
 Change log:
-1) I added a software debounce feature. I found on my garage door and gate that I would get a bouncing state at the moment of open or close wit hthe new event driven state change.  So I added a configurable debounce period where once a state change is noticed all changes durign the debounce period will be ignored.
+1) Added a Smoke Sensor accessory
 
 Please note:
 The maximum password length is 16 characters.
