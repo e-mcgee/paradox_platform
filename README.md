@@ -15,7 +15,7 @@ You simply toggle the switch to control logged in status.
 Parameters are available for the config of the platform to tweak all the delays between commands and plugins.See the wiki for description of this and sample config.json file.
 
 Change log:
-1) Added a Smoke Sensor accessory
+1) Fixed race condition on short polldelay settings during login process.
 
 Please note:
 The maximum password length is 16 characters.
