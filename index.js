@@ -913,6 +913,7 @@ function _login(password, cl, acc) {
             acc.log('Error logging in');
             cl.end();
             loggedin = false;
+            busyloggingin = false;
         }
     }, WAIT_AFTER_LOGIN);
 }
