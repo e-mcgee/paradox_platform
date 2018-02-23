@@ -4,6 +4,7 @@ var mqtt = require('mqtt');
 
 // Global variables
 var loggedin = false;                           // indcates if logged in successful
+var busyloggingin = false;
 var client;
 var mqttclient;
 var mqttenabled = false;
@@ -898,6 +899,7 @@ function _login(password, cl, acc) {
                                         cl.write(buf3);
                                         setTimeout(function () {
                                             loggedin = true;
+                                            busyloggingin = false;
                                             acc.log('Done logging in');
                                         }, LOGINDELAY);
                                     }, DELAY_BETWEEN_CMDS);
@@ -1245,7 +1247,8 @@ function paradoxPlatform(log, config) {
     //  Each accsory can also have a pgm mapped to it.  this is also mapped in the config.json file.
     setInterval(function () {
         alarm[0].accessory.log('Mute : [%s]', muteStatus);
-        if (connected && !loggedin) {
+        if (connected && !loggedin && !busyloggingin) {
+            busyloggingin = true;
             client = net.createConnection({port: alarm_port, host: alarm_ip_address}, () => {
                 alarm[0].accessory.log('Getting Status - Connected to alarm!');
             });
