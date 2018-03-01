@@ -503,9 +503,9 @@ function _parsestatus(acc, cl) {
                             break;
                         case 'Smoke Sensor':
                             if (zones[receivebuffer[24]-1].status == 'off') {
-                                state = false;
+                                state = Characteristic.SmokeDetected.SMOKE_NOT_DETECTED;
                             } else {
-                                state = true;
+                                state = Characteristic.SmokeDetected.SMOKE_DETECTED;
                             }
                             zones[receivebuffer[24]-1].accessory.smokesensorService.getCharacteristic(Characteristic.SmokeDetected).setValue(state);
                             break;
@@ -573,7 +573,7 @@ function _parsestatus(acc, cl) {
             case 38:
                 // "Zone alarm restore"
                 zones[receivebuffer[24]-1].accessory.log('Zone:' + zones[receivebuffer[24]-1].accessory.name + ' alarm restored.');
-                alarm[receivebuffer[25]].accessory.securitysystemService.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.DISARMED);
+//                alarm[receivebuffer[25]].accessory.securitysystemService.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.DISARMED);
                 alarm[receivebuffer[25]].accessory.log('Alarmstatus :' + alarm[receivebuffer[25]].status);
                 if (mqttenabled) {
                     mqttclient.publish(alarm[receivebuffer[25]].topic, alarm[receivebuffer[25]].status, acc.publish_options);
@@ -747,46 +747,6 @@ function format37ByteMessage(message) {
     return message;
 }
 
-//function setupClient(cl) {
-//    cl = net.createConnection({port: alarm_port, host: alarm_ip_address}, () => {
-// //       acc.log('Getting Status - Connected to alarm!');
-//    });
-//
-//    cl.on('end', () => {
-////        self.log('Finished Getting Status - Disconnected from  alarm');
-//        loggedin = false;
-////        connected = false;
-//    });
-//
-//    cl.on('timeout', () => {
-////        self.log('No response from alarm - Disconnected from alarm');
-//        loggedin = false;
-//        cl.end();
-//    });
-//
-//    cl.on('error', () => {
-////        self.log('Error communicating with alarm - Disconnected from alarm');
-//        loggedin = false;
-//        cl.end();
-//    });
-//
-//    cl.on('data', (data) => {
-//        if (data.length > 37) {
-////            self.log("Message received");
-////            self.log("message length = ");
-////            self.log(data.length);
-//            receivebuffer = Buffer.from(data);
-////            self.log(receivebuffer[16]);
-////            self.log(receivebuffer[23]);
-////            self.log(receivebuffer[24]);
-////            self.log(receivebuffer[25]);            
-//            _parsestatus(self, cl);
-//            message_count++;
-//        }
-//    });
-//    
-////    return cl;
-//}
 
 //
 // This is the login function to the alarm.  It takes the alarm password, the socket handle, and the accessory in order to be able to log message for the ccessory
@@ -1196,50 +1156,6 @@ function paradoxPlatform(log, config) {
 //        }
 //        });
     }        
-//    this.client.subscribe(this.topicStatusGet);
-//    this.client.publish(this.topicStatusSet, this.statusCmd, this.publish_options);
-
-
-//    client = net.createConnection({port: alarm_port, host: alarm_ip_address}, () => {
-//        this.log('Getting Status - Connected to alarm!');
-//    });
-//
-//    client.on('end', () => {
-////        self.log('Finished Getting Status - Disconnected from  alarm');
-//        loggedin = false;
-//        connected = false;
-//    });
-//
-//    client.on('timeout', () => {
-////        self.log('No response from alarm - Disconnected from alarm');
-//        loggedin = false;
-//        client.end();
-//    });
-//
-//    client.on('error', () => {
-////        self.log('Error communicating with alarm - Disconnected from alarm');
-//        loggedin = false;
-//        client.end();
-//    });
-//
-//    client.on('data', (data) => {
-//        if (data.length > 37) {
-////            self.log("Message received");
-////            self.log("message length = ");
-////            self.log(data.length);
-//            receivebuffer = Buffer.from(data);
-////            self.log(receivebuffer[16]);
-////            self.log(receivebuffer[23]);
-////            self.log(receivebuffer[24]);
-////            self.log(receivebuffer[25]);            
-//            _parsestatus(self, client);
-//            message_count++;
-//        }
-//    });
-
-//     setupClient(client);
-//    _login(alarm_password, client, self);
-//    this.log("Fin logged in")
     // Status poll loop
     //  This loop sends the status request message to the alarm and then retrives the values form the buffer.
     //  It then parses the values corretcly to reflect the correct Homekit status, depending on what tye of accessory the status belongs to.
@@ -1336,9 +1252,9 @@ function paradoxPlatform(log, config) {
                             break;
                         case 'Smoke Sensor':
                             if (zones[i].status == 'off') {
-                                state = false;
+                                state = Characteristic.SmokeDetected.SMOKE_NOT_DETECTED;
                             } else {
-                                state = true;
+                                state = Characteristic.SmokeDetected.SMOKE_DETECTED;
                             }
                             zones[i].accessory.smokesensorService.getCharacteristic(Characteristic.SmokeDetected).setValue(state);
                             break;
@@ -1681,10 +1597,10 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
                 }, DELAY_BETWEEN_CMDS);
             }, DELAY_BETWEEN_CMDS);
         }, wait);
-    }
-    else {
+//    }
+//    else {
       callback();
-    }
+//    }
 };
 
 
@@ -1786,47 +1702,7 @@ ParadoxAccessory.prototype.setConnectedState = function (state, callback) {
     
     this.log("Changing connected state");
     if (!connected) {
-//        this.log("Logging in again");
-//        client = net.createConnection({port: alarm_port, host: alarm_ip_address}, () => {
-//            this.log('Getting Status - Connected to alarm!');
-//        });
-//
-//        client.on('end', () => {
-//    //        self.log('Finished Getting Status - Disconnected from  alarm');
-//            loggedin = false;
-//            connected = false;
-//        });
-//
-//        client.on('timeout', () => {
-//    //        self.log('No response from alarm - Disconnected from alarm');
-//            loggedin = false;
-//            client.end();
-//        });
-//
-//        client.on('error', () => {
-//    //        self.log('Error communicating with alarm - Disconnected from alarm');
-//            loggedin = false;
-//            client.end();
-//        });
-//
-//        client.on('data', (data) => {
-//            if (data.length > 37) {
-//    //            acc.log("Message received");
-//    //            acc.log("message length = ");
-//    //            acc.log(data.length);
-//                receivebuffer = Buffer.from(data);
-//                _parsestatus(self, client);
-//                message_count++;
-//            }
-//        });
-//       
-//        setTimeout ( function() {
-//           _login(alarm_password, client, self);
-//           setTimeout ( function () {
-                connected = true;               
-//           }, LOGINDELAY);
-//        } ,LOGIN_DELAY_AFTER_RECONNECT);
-
+       connected = true;               
     } else {
        this.log("Disconnecting from alarm");
        _logout(client, self);
