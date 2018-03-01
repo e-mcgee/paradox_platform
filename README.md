@@ -16,6 +16,8 @@ Parameters are available for the config of the platform to tweak all the delays 
 
 Change log:
 1) Fixed callback in door state setting to ensure immediate feedback so that multiple actions on doors can happen simultaneously.
+2) Fixed alarm set callback that was missing
+3) Mute status get until login complete
 
 Please note:
 The maximum password length is 16 characters.
