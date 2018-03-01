@@ -1597,7 +1597,7 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
                 }, DELAY_BETWEEN_CMDS);
             }, DELAY_BETWEEN_CMDS);
         }, wait);
-        callback(null,state);
+        callback();
     }
     else {
       callback();
