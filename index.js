@@ -1205,99 +1205,101 @@ function paradoxPlatform(log, config) {
 //             setupClient(client);
             _login(alarm_password, client, self);                
         }
-        if (!muteStatus && getAlarmStatus(self)) {
-            var state;
-            alarm[0].accessory.log('Got status');
-            alarm[0].accessory.log('Results:');
-            for (i = 0; i < 32; i++) {
-                var st;
-                if (zones[i].accessory != null) {
-                    switch (zones[i].type) {
-                        case 'Garage Door':
-                            var isClosed;
-                            if (zones[i].status == 'off') {
-                                isClosed = true;
-                                state = DoorState.CLOSED;
-                            } else {
-                                isClosed = false;
-                                state = DoorState.OPEN;
-                            }                            
-                            if (isClosed != zones[i].accessory.wasClosed) {
-                              if (!zones[i].accessory.operating) {
-                                zones[i].accessory.log('Door state changed');
-                                zones[i].accessory.wasClosed = isClosed;
-                                zones[i].accessory.garagedooropenerService.getCharacteristic(DoorState).updateValue(state);
-                                zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(state);
-                                zones[i].accessory.targetState = state;
-                              }
-                            }
-                            break;
-                        case 'Alarm':
-                            break;
-                        case 'Contact Sensor':
-                            if (zones[i].status == 'off') {
-                                state = Characteristic.ContactSensorState.CONTACT_DETECTED;
-                            } else {
-                                state = Characteristic.ContactSensorState.CONTACT_NOT_DETECTED;
-                            }
-                            zones[i].accessory.contactsensorService.getCharacteristic(Characteristic.ContactSensorState).setValue(state);
-                            break;
-                        case 'Motion Sensor':
-                            if (zones[i].status == 'off') {
-                                state = false;
-                            } else {
-                                state = true;
-                            }
-                            zones[i].accessory.motionsensorService.getCharacteristic(Characteristic.MotionDetected).setValue(state);
-                            break;
-                        case 'Smoke Sensor':
-                            if (zones[i].status == 'off') {
-                                state = Characteristic.SmokeDetected.SMOKE_NOT_DETECTED;
-                            } else {
-                                state = Characteristic.SmokeDetected.SMOKE_DETECTED;
-                            }
-                            zones[i].accessory.smokesensorService.getCharacteristic(Characteristic.SmokeDetected).setValue(state);
-                            break;
-                        default:
-                            alarm[0].accessory.log('Not Supported: %s [%s]', zones[i].name, zones[i].type);
-                    }
-                }
-                if (zones[i].accessory != null) {
-                    zones[i].accessory.log('Zone ' + i.toString() + ' ' + zones[i].status + ' (' + zones[i].accessory.name + ')');
-                    if (mqttenabled) {
-                        mqttclient.publish(zones[i].topic, zones[i].status, this.publish_options);
-                    }
-                }
-            }
-            
-            for (i = 0; i < 2; i++) {
-                if (alarm[i].accessory != null) {
-                    if (alarm[i].status != alarmstatus[i]) {
-                        if (alarmstatus[i] == 'In Alarm' || alarmstatus[i] == 'Armed Perimeter' || alarmstatus[i] == 'Armed Sleep' || alarmstatus[i] == 'Armed Away' || alarmstatus[i] == 'Disarmed') {
-                            alarm[i].status = alarmstatus[i];
-                            var stat = GetHomebridgeStatus(alarmstatus[i]);
-                            if (alarmstatus[i] == 'In Alarm') {
-                                var alarmtype = 'Zone(s) triggered:';                        
-                                for (i = 0; i < 32; i++) {
-                                    if (zones[i].accessory != null) {
-                                        alarmtype += zones[i].name + ' ';
-                                    }
+        if (loggedin) {
+            if (!muteStatus && getAlarmStatus(self)) {
+                var state;
+                alarm[0].accessory.log('Got status');
+                alarm[0].accessory.log('Results:');
+                for (i = 0; i < 32; i++) {
+                    var st;
+                    if (zones[i].accessory != null) {
+                        switch (zones[i].type) {
+                            case 'Garage Door':
+                                var isClosed;
+                                if (zones[i].status == 'off') {
+                                    isClosed = true;
+                                    state = DoorState.CLOSED;
+                                } else {
+                                    isClosed = false;
+                                    state = DoorState.OPEN;
+                                }                            
+                                if (isClosed != zones[i].accessory.wasClosed) {
+                                  if (!zones[i].accessory.operating) {
+                                    zones[i].accessory.log('Door state changed');
+                                    zones[i].accessory.wasClosed = isClosed;
+                                    zones[i].accessory.garagedooropenerService.getCharacteristic(DoorState).updateValue(state);
+                                    zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(state);
+                                    zones[i].accessory.targetState = state;
+                                  }
                                 }
-                            }
-                            alarm[i].accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemAlarmType).updateValue(alarmtype);                    
-                            alarm[i].accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemCurrentState).updateValue(stat);
-                            alarm[i].accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemTargetState).updateValue(stat);
+                                break;
+                            case 'Alarm':
+                                break;
+                            case 'Contact Sensor':
+                                if (zones[i].status == 'off') {
+                                    state = Characteristic.ContactSensorState.CONTACT_DETECTED;
+                                } else {
+                                    state = Characteristic.ContactSensorState.CONTACT_NOT_DETECTED;
+                                }
+                                zones[i].accessory.contactsensorService.getCharacteristic(Characteristic.ContactSensorState).setValue(state);
+                                break;
+                            case 'Motion Sensor':
+                                if (zones[i].status == 'off') {
+                                    state = false;
+                                } else {
+                                    state = true;
+                                }
+                                zones[i].accessory.motionsensorService.getCharacteristic(Characteristic.MotionDetected).setValue(state);
+                                break;
+                            case 'Smoke Sensor':
+                                if (zones[i].status == 'off') {
+                                    state = Characteristic.SmokeDetected.SMOKE_NOT_DETECTED;
+                                } else {
+                                    state = Characteristic.SmokeDetected.SMOKE_DETECTED;
+                                }
+                                zones[i].accessory.smokesensorService.getCharacteristic(Characteristic.SmokeDetected).setValue(state);
+                                break;
+                            default:
+                                alarm[0].accessory.log('Not Supported: %s [%s]', zones[i].name, zones[i].type);
                         }
                     }
-                    alarm[i].accessory.log('Alarmstatus :' + alarm[i].status);
-                    if (mqttenabled) {
-                        mqttclient.publish(alarm[i].topic, alarm[i].status, this.publish_options);
+                    if (zones[i].accessory != null) {
+                        zones[i].accessory.log('Zone ' + i.toString() + ' ' + zones[i].status + ' (' + zones[i].accessory.name + ')');
+                        if (mqttenabled) {
+                            mqttclient.publish(zones[i].topic, zones[i].status, this.publish_options);
+                        }
                     }
                 }
-            }
 
-        } else {
-            alarm[0].accessory.log('Busy with alarm - not getting status now.');
+                for (i = 0; i < 2; i++) {
+                    if (alarm[i].accessory != null) {
+                        if (alarm[i].status != alarmstatus[i]) {
+                            if (alarmstatus[i] == 'In Alarm' || alarmstatus[i] == 'Armed Perimeter' || alarmstatus[i] == 'Armed Sleep' || alarmstatus[i] == 'Armed Away' || alarmstatus[i] == 'Disarmed') {
+                                alarm[i].status = alarmstatus[i];
+                                var stat = GetHomebridgeStatus(alarmstatus[i]);
+                                if (alarmstatus[i] == 'In Alarm') {
+                                    var alarmtype = 'Zone(s) triggered:';                        
+                                    for (i = 0; i < 32; i++) {
+                                        if (zones[i].accessory != null) {
+                                            alarmtype += zones[i].name + ' ';
+                                        }
+                                    }
+                                }
+                                alarm[i].accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemAlarmType).updateValue(alarmtype);                    
+                                alarm[i].accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemCurrentState).updateValue(stat);
+                                alarm[i].accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemTargetState).updateValue(stat);
+                            }
+                        }
+                        alarm[i].accessory.log('Alarmstatus :' + alarm[i].status);
+                        if (mqttenabled) {
+                            mqttclient.publish(alarm[i].topic, alarm[i].status, this.publish_options);
+                        }
+                    }
+                }
+
+            } else {
+                alarm[0].accessory.log('Busy with alarm - not getting status now.');
+            }
         }
     }, POLL_DELAY);
     
@@ -1689,6 +1691,8 @@ ParadoxAccessory.prototype.setAlarmState = function (state, callback) {
         }, wait);    
     } else {
         self.log('Alarm status error - ignoring');
+        err = 'Alarm status error - ignoring';
+        callback(err, state);
     }
 };
 
