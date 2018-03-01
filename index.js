@@ -1510,7 +1510,7 @@ ParadoxAccessory.prototype.getDoorState = function (callback) {
 };
 
 
-ParadoxAccessory.prototype.setFinalDoorState = function(callback, state) {
+ParadoxAccessory.prototype.setFinalDoorState = function(state) {
 
     var acc = this.garagedooropenerService;
 
@@ -1533,7 +1533,7 @@ ParadoxAccessory.prototype.setFinalDoorState = function(callback, state) {
   
     //    }
     this.operating = false;
-    callback(null, state);
+//    callback(null, state);
 };
 
 
@@ -1587,17 +1587,17 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
                 args: [config.pgm]
             };
             controlPGM("ON", config.pgm, self, client);
-            setTimeout(self.setFinalDoorState.bind(self, callback, state), self.config.doorOpensInSeconds * 1000);
+            setTimeout(self.setFinalDoorState.bind(self, state), self.config.doorOpensInSeconds * 1000);
             setTimeout(function () {
                 controlPGM("OFF", config.pgm, self, client);
                 setTimeout(function () {
                     controlPGMstate = false;
                     muteStatus = false;
                     this.reachability = true;
+                    callback();
                 }, DELAY_BETWEEN_CMDS);
             }, DELAY_BETWEEN_CMDS);
         }, wait);
-        callback();
     }
     else {
       callback();
