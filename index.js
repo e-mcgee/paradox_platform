@@ -631,7 +631,7 @@ function _parsestatus(acc, cl) {
         if (receivebuffer[19] == 0x01) {
             // Alarm status
 //            acc.log('Alarm State received');
-//            status_valid = true;
+            status_valid = true;
             if (receivebuffer[33] > 0x10) {
                 alarmstatus[0] = "In Alarm";
             } else {
