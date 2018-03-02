@@ -18,6 +18,7 @@ Change log:
 1) Fixed callback in door state setting to ensure immediate feedback so that multiple actions on doors can happen simultaneously.
 2) Fixed alarm set callback that was missing
 3) Mute status get until login complete
+4) Fixed random crash - caused by log during PGM changes
 
 Please note:
 The maximum password length is 16 characters.
