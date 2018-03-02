@@ -631,7 +631,7 @@ function _parsestatus(acc, cl) {
         if (receivebuffer[19] == 0x01) {
             // Alarm status
 //            acc.log('Alarm State received');
-            status_valid = true;
+//            status_valid = true;
             if (receivebuffer[33] > 0x10) {
                 alarmstatus[0] = "In Alarm";
             } else {
@@ -933,14 +933,14 @@ function getAlarmStatus(acc) {
     self = this;
 
     if (controlPGMstate || controlAlarmstate || !connected) {
-//        acc.log('Busy with alarm now - not getting status');
-        return(false);
+        acc.log('Busy with alarm now - not getting status');
+        status_valid = false;
+    } else {
+        message_count = 0;
+        status_valid = false;
+        _getalarmstatus(client, acc);
+        status_valid = true;
     }
-
-    message_count = 0;
-    status_valid = false;
-    _getalarmstatus(client, acc);
-    status_valid = true;
     return(status_valid);
 }
 
