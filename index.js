@@ -930,18 +930,20 @@ function _getalarmstatus(cl, acc) {
 //  It takes accessory as input in order to be able to log messages for it
 function getAlarmStatus(acc) {
     
-    self = this;
+//    self = this;
+    var returnvalue = false;
 
     if (controlPGMstate || controlAlarmstate || !connected) {
-        acc.log('Busy with alarm now - not getting status');
-        status_valid = false;
+//        acc.log('Busy with alarm now - not getting status');
+//        status_valid = false;
     } else {
         message_count = 0;
         status_valid = false;
         _getalarmstatus(client, acc);
         status_valid = true;
+        returnvalue = true;
     }
-    return(status_valid);
+    return(returnvalue);
 }
 
 
