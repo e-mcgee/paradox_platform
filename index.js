@@ -933,8 +933,8 @@ function getAlarmStatus(acc) {
     self = this;
 
     if (controlPGMstate || controlAlarmstate || !connected) {
-        acc.log('Busy with alarm now - not getting status');
-        return false;
+//        acc.log('Busy with alarm now - not getting status');
+        return(false);
     }
 
     message_count = 0;
@@ -1266,9 +1266,9 @@ function paradoxPlatform(log, config) {
                     if (zones[i].accessory != null) {
                         zones[i].accessory.log('Zone ' + i.toString() + ' ' + zones[i].status + ' (' + zones[i].accessory.name + ')');
                         if (mqttenabled) {
-                            zones[i].accessory.log('About to publish zone to MQTT');                            
+//                            zones[i].accessory.log('About to publish zone to MQTT');                            
                             mqttclient.publish(zones[i].topic, zones[i].status, this.publish_options);
-                            zones[i].accessory.log('Published zone to MQTT');                            
+//                            zones[i].accessory.log('Published zone to MQTT');                            
                         }
                     }
                 }
@@ -1294,9 +1294,9 @@ function paradoxPlatform(log, config) {
                         }
                         alarm[i].accessory.log('Alarmstatus :' + alarm[i].status);
                         if (mqttenabled) {
-                            alarm[i].accessory.log('About to publish alarm to MQTT');
+//                            alarm[i].accessory.log('About to publish alarm to MQTT');
                             mqttclient.publish(alarm[i].topic, alarm[i].status, this.publish_options);
-                            alarm[i].accessory.log('Published alarm to MQTT');                            
+//                            alarm[i].accessory.log('Published alarm to MQTT');                            
                         }
                     }
                 }
