@@ -451,7 +451,7 @@ function _parsestatus(acc, cl) {
                 } 
             case 1:
                 // "Zone open",
-                if (!zones[receivebuffer[24]-1].debounce) {
+                if (zones[receivebuffer[24]-1].accessory != null && !zones[receivebuffer[24]-1].debounce) {
                     if (receivebuffer[23] == 1) zones[receivebuffer[24]-1].status = 'on';
                     setTimeout(function () {
                         zones[receivebuffer[24]-1].debounce = false;
@@ -516,8 +516,8 @@ function _parsestatus(acc, cl) {
                     if (mqttenabled) {
                         mqttclient.publish(zones[receivebuffer[24]-1].topic, zones[receivebuffer[24]-1].status, this.publish_options);
                     }
+                    acc.log('Zone:' + zones[receivebuffer[24]-1].accessory.name);
                 }                
-                acc.log('Zone:' + zones[receivebuffer[24]-1].accessory.name);
                 break;
             case 2:
                 // "Partition status"
@@ -563,20 +563,24 @@ function _parsestatus(acc, cl) {
                 break;
             case 36:
                 // "Zone in alarm"
-                zones[receivebuffer[24]-1].accessory.log('Zone:' + zones[receivebuffer[24]-1].accessory.name + ' in alarm.');
-                alarm[receivebuffer[25]].accessory.securitysystemService.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED);
-                alarm[receivebuffer[25]].accessory.log('Alarmstatus :' + alarm[receivebuffer[25]].status);
-                if (mqttenabled) {
-                    mqttclient.publish(alarm[receivebuffer[25]].topic, alarm[receivebuffer[25]].status, acc.publish_options);
+                if (zones[receivebuffer[24]-1].accessory != null && alarm[receivebuffer[25]].accessory != null) {                
+                    zones[receivebuffer[24]-1].accessory.log('Zone:' + zones[receivebuffer[24]-1].accessory.name + ' in alarm.');
+                    alarm[receivebuffer[25]].accessory.securitysystemService.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED);
+                    alarm[receivebuffer[25]].accessory.log('Alarmstatus :' + alarm[receivebuffer[25]].status);
+                    if (mqttenabled) {
+                        mqttclient.publish(alarm[receivebuffer[25]].topic, alarm[receivebuffer[25]].status, acc.publish_options);
+                    }
                 }
                 break;
             case 38:
                 // "Zone alarm restore"
-                zones[receivebuffer[24]-1].accessory.log('Zone:' + zones[receivebuffer[24]-1].accessory.name + ' alarm restored.');
-//                alarm[receivebuffer[25]].accessory.securitysystemService.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.DISARMED);
-                alarm[receivebuffer[25]].accessory.log('Alarmstatus :' + alarm[receivebuffer[25]].status);
-                if (mqttenabled) {
-                    mqttclient.publish(alarm[receivebuffer[25]].topic, alarm[receivebuffer[25]].status, acc.publish_options);
+                if (zones[receivebuffer[24]-1].accessory != null && alarm[receivebuffer[25]].accessory != null) {                                
+                    zones[receivebuffer[24]-1].accessory.log('Zone:' + zones[receivebuffer[24]-1].accessory.name + ' alarm restored.');
+    //                alarm[receivebuffer[25]].accessory.securitysystemService.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.DISARMED);
+                    alarm[receivebuffer[25]].accessory.log('Alarmstatus :' + alarm[receivebuffer[25]].status);
+                    if (mqttenabled) {
+                        mqttclient.publish(alarm[receivebuffer[25]].topic, alarm[receivebuffer[25]].status, acc.publish_options);
+                    }
                 }
                 break;                
             case 40:
