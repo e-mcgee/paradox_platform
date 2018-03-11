@@ -382,35 +382,40 @@ for (i = 0; i < 2; i++) {
 }
 
 
-//function _byte_xor(chks, byte) {
-//    
-//    var tmp1;
-//    var tmp2;
-//    
-//    for (i = 0; i < 8 ; i++) 
-//    {
-//        tmp1 = byte && 0x01;
-//        tmp2 = chks && 0x01;
-//        tmp2 = tmp1 ^ tmp2;
-//        tmp1 = (chks && 0x08) ^ (tmp2 << 3);
-//        chks = (chks && 0xFE) && tmp1;
-//        tmp1 = (chks && 0x10) ^ (tmp2 << 4);
-//        chks = (chks && 0xF7) && tmp1;
-//        chks = chks << 1;
-//    }
-//    return chks;
-//}
+function _byte_xor(chks, byte) {
+    
+    var tmp1;
+    var tmp2;
+    
+    for (i = 0; i < 8 ; i++) 
+    {
+        tmp1 = byte && (0x01 << i);           // Mask bit i
+        tmp1 = tmp1 >> i;                     // Get it to bit 0
+        tmp2 = chks && 0x01;                  // Get checksum bit 0
+        tmp2 = tmp1 ^ tmp2;                   // XOR bits 0
+        chks = (chks && 0xFE) && tmp2;        // Put the XOR result in checksum bit 0        
+        tmp1 = (chks && 0x08) ^ (tmp2 << 3);  // XOR bits 3
+        chks = (chks && 0xF7) && tmp1;        // Put the XOR result in checksum bit 3
+        tmp1 = (chks && 0x10) ^ (tmp2 << 4);  // XOR Bit 4
+        chks = (chks && 0xEF) && tmp1;        // Put the XOR result in checksum bit 4
+        tmp2 = chks && 0x01;                  // Get checksum bit 0
+        tmp2 = tmp2 << 7;                     // Move it to bit 7
+        chks = chks >> 1;                     // Shift checksum right 1 bit
+        chks = chks && tmp2;                  // Rotate calculated bit 0 into bit 7
+    }
+    return chks;
+}
 
-//function _checksum() {
-//    var checksum = 0;
-//    for (i = 0; i < 36; i++)
-//        checksum = _byte_xor(checksum, receivebuffer[i]);
-////        while (checksum > 255)
-////            checksum = checksum - (checksum / 256) * 256;
-//    if (checksum == receivebuffer[36])
-//        return true;
-//    else return false;
-//}
+function _checksum() {
+    var checksum = 0;
+    for (i = 0; i < 36; i++)
+        checksum = _byte_xor(checksum, receivebuffer[i]);
+//        while (checksum > 255)
+//            checksum = checksum - (checksum / 256) * 256;
+    if (checksum == receivebuffer[36])
+        return true;
+    else return false;
+}
 //
 // Function to retrieve alram status and zone status from buffer data received from alarm.
 //  This is used in periodic status pole as well as in alarm control and pgm control functions
@@ -465,191 +470,193 @@ function _parsestatus(acc, cl) {
         var state;
 //        acc.log(receivebuffer[23]);
         acc.log(eventMap[receivebuffer[23]]);
-        switch (receivebuffer[23]) {
-            case 0:
-                // "Zone OK",
-                if (zones[receivebuffer[24]-1].accessory != null && !zones[receivebuffer[24]-1].debounce)
-                {
-                    zones[receivebuffer[24]-1].status = 'off';
-                } 
-            case 1:
-                // "Zone open",
-                if (zones[receivebuffer[24]-1].accessory != null && !zones[receivebuffer[24]-1].debounce) {
-                    if (receivebuffer[23] == 1) zones[receivebuffer[24]-1].status = 'on';
-                    setTimeout(function () {
-                        zones[receivebuffer[24]-1].debounce = false;
-                        zones[receivebuffer[24]-1].accessory.log('Stopping debounce');
-                    }, zones[receivebuffer[24]-1].debounceDelay);
-                }                    
-                var state;
-                if (zones[receivebuffer[24]-1].accessory != null && !zones[receivebuffer[24]-1].debounce) {
-                    zones[receivebuffer[24]-1].debounce = true;
-                    zones[receivebuffer[24]-1].accessory.log('Starting debounce delay:');
-                    zones[receivebuffer[24]-1].accessory.log(zones[receivebuffer[24]-1].debounceDelay);
-                   switch (zones[receivebuffer[24]-1].type) {
-                        case 'Garage Door':
-                            var isClosed;
-                            if (zones[receivebuffer[24]-1].status == 'off') {
-                                isClosed = true;
-                                state = DoorState.CLOSED;
-                            } else {
-                                isClosed = false;
-                                state = DoorState.OPEN;
-                            }                            
-                            if (isClosed != zones[receivebuffer[24]-1].accessory.wasClosed) {
-                              if (!zones[receivebuffer[24]-1].accessory.operating) {
-                                zones[receivebuffer[24]-1].accessory.log('Door state changed');
-                                zones[receivebuffer[24]-1].accessory.wasClosed = isClosed;
-                                zones[receivebuffer[24]-1].accessory.garagedooropenerService.getCharacteristic(DoorState).updateValue(state);
-                                zones[receivebuffer[24]-1].accessory.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(state);
-                                zones[receivebuffer[24]-1].accessory.targetState = state;
-                              }
-                            }
-                            break;
-                        case 'Alarm':
-                            break;
-                        case 'Contact Sensor':
-                            if (zones[receivebuffer[24]-1].status == 'off') {
-                                state = Characteristic.ContactSensorState.CONTACT_DETECTED;
-                            } else {
-                                state = Characteristic.ContactSensorState.CONTACT_NOT_DETECTED;
-                            }
-                            zones[receivebuffer[24]-1].accessory.contactsensorService.getCharacteristic(Characteristic.ContactSensorState).setValue(state);
-                            break;
-                        case 'Motion Sensor':
-                            if (zones[receivebuffer[24]-1].status == 'off') {
-                                state = false;
-                            } else {
-                                state = true;
-                            }
-                            zones[receivebuffer[24]-1].accessory.motionsensorService.getCharacteristic(Characteristic.MotionDetected).setValue(state);
-                            break;
-                        case 'Smoke Sensor':
-                            if (zones[receivebuffer[24]-1].status == 'off') {
-                                state = Characteristic.SmokeDetected.SMOKE_NOT_DETECTED;
-                            } else {
-                                state = Characteristic.SmokeDetected.SMOKE_DETECTED;
-                            }
-                            zones[receivebuffer[24]-1].accessory.smokesensorService.getCharacteristic(Characteristic.SmokeDetected).setValue(state);
-                            break;
+        if (receivebuffer[24] > 0 && receivebuffer[24] < 33) {
+            switch (receivebuffer[23]) {
+                case 0:
+                    // "Zone OK",
+                    if (zones[receivebuffer[24]-1].accessory != null && !zones[receivebuffer[24]-1].debounce)
+                    {
+                        zones[receivebuffer[24]-1].status = 'off';
+                    } 
+                case 1:
+                    // "Zone open",
+                    if (zones[receivebuffer[24]-1].accessory != null && !zones[receivebuffer[24]-1].debounce) {
+                        if (receivebuffer[23] == 1) zones[receivebuffer[24]-1].status = 'on';
+                        setTimeout(function () {
+                            zones[receivebuffer[24]-1].debounce = false;
+                            zones[receivebuffer[24]-1].accessory.log('Stopping debounce');
+                        }, zones[receivebuffer[24]-1].debounceDelay);
+                    }                    
+                    var state;
+                    if (zones[receivebuffer[24]-1].accessory != null && !zones[receivebuffer[24]-1].debounce) {
+                        zones[receivebuffer[24]-1].debounce = true;
+                        zones[receivebuffer[24]-1].accessory.log('Starting debounce delay:');
+                        zones[receivebuffer[24]-1].accessory.log(zones[receivebuffer[24]-1].debounceDelay);
+                       switch (zones[receivebuffer[24]-1].type) {
+                            case 'Garage Door':
+                                var isClosed;
+                                if (zones[receivebuffer[24]-1].status == 'off') {
+                                    isClosed = true;
+                                    state = DoorState.CLOSED;
+                                } else {
+                                    isClosed = false;
+                                    state = DoorState.OPEN;
+                                }                            
+                                if (isClosed != zones[receivebuffer[24]-1].accessory.wasClosed) {
+                                  if (!zones[receivebuffer[24]-1].accessory.operating) {
+                                    zones[receivebuffer[24]-1].accessory.log('Door state changed');
+                                    zones[receivebuffer[24]-1].accessory.wasClosed = isClosed;
+                                    zones[receivebuffer[24]-1].accessory.garagedooropenerService.getCharacteristic(DoorState).updateValue(state);
+                                    zones[receivebuffer[24]-1].accessory.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(state);
+                                    zones[receivebuffer[24]-1].accessory.targetState = state;
+                                  }
+                                }
+                                break;
+                            case 'Alarm':
+                                break;
+                            case 'Contact Sensor':
+                                if (zones[receivebuffer[24]-1].status == 'off') {
+                                    state = Characteristic.ContactSensorState.CONTACT_DETECTED;
+                                } else {
+                                    state = Characteristic.ContactSensorState.CONTACT_NOT_DETECTED;
+                                }
+                                zones[receivebuffer[24]-1].accessory.contactsensorService.getCharacteristic(Characteristic.ContactSensorState).setValue(state);
+                                break;
+                            case 'Motion Sensor':
+                                if (zones[receivebuffer[24]-1].status == 'off') {
+                                    state = false;
+                                } else {
+                                    state = true;
+                                }
+                                zones[receivebuffer[24]-1].accessory.motionsensorService.getCharacteristic(Characteristic.MotionDetected).setValue(state);
+                                break;
+                            case 'Smoke Sensor':
+                                if (zones[receivebuffer[24]-1].status == 'off') {
+                                    state = Characteristic.SmokeDetected.SMOKE_NOT_DETECTED;
+                                } else {
+                                    state = Characteristic.SmokeDetected.SMOKE_DETECTED;
+                                }
+                                zones[receivebuffer[24]-1].accessory.smokesensorService.getCharacteristic(Characteristic.SmokeDetected).setValue(state);
+                                break;
+                        }
                     }
-                }
-                if (zones[receivebuffer[24]-1].accessory != null) {
-                    zones[receivebuffer[24]-1].accessory.log('Zone ' + (receivebuffer[24]-1).toString() + ' ' + zones[receivebuffer[24]-1].status + ' (' + zones[receivebuffer[24]-1].accessory.name + ')');
-                    if (mqttenabled) {
-                        mqttclient.publish(zones[receivebuffer[24]-1].topic, zones[receivebuffer[24]-1].status, this.publish_options);
+                    if (zones[receivebuffer[24]-1].accessory != null) {
+                        zones[receivebuffer[24]-1].accessory.log('Zone ' + (receivebuffer[24]-1).toString() + ' ' + zones[receivebuffer[24]-1].status + ' (' + zones[receivebuffer[24]-1].accessory.name + ')');
+                        if (mqttenabled) {
+                            mqttclient.publish(zones[receivebuffer[24]-1].topic, zones[receivebuffer[24]-1].status, this.publish_options);
+                        }
+                        acc.log('Zone:' + zones[receivebuffer[24]-1].accessory.name);
+                    }                
+                    break;
+                case 2:
+                    // "Partition status"
+                    //0:"N/A" ,
+                    //1:"N/A" ,
+                    //2:"Silent alarm" ,
+                    //3:"Buzzer alarm" ,
+                    //4:"Steady alarm" ,
+                    //5:"Pulse alarm" ,
+                    //6:"Strobe" ,
+                    //7:"Alarm stopped" ,
+                    //8:"Squawk ON (Partition 1)" ,
+                    //9:"Squawk OFF (Partition 1)" ,
+                    //10:"Ground Start (Partition 1)" ,
+                    //11:"Disarm partition" ,
+                    //12:"Arm partition" ,
+                    //13:"Entry delay started" ,
+                    //14:"Exit delay started" ,
+                    //15:"Pre-alarm delay" ,
+                    //16:"Report confirmation" ,
+                    //99:"Any partition status event"                
+                    acc.log(partitionStatus[receivebuffer[24]]);
+                    break;
+                case 3:
+                    // "Bell status (Partition 1)"
+                    acc.log(bellStatus[receivebuffer[24]]);
+                    break;
+                case 5:
+                case 6:
+                    acc.log(nonReportableEvents[receivebuffer[24]]);
+                    break;
+                case 26:
+                    acc.log(softwareAccess[receivebuffer[24]]);
+                    break;
+                case 27:
+                    acc.log(busModuleEvent[receivebuffer[24]]);
+                    break;
+                case 30:
+                    acc.log(specialArming[receivebuffer[24]]);
+                    break;
+                case 34:
+                    acc.log(specialDisarming[receivebuffer[24]]);
+                    break;
+                case 36:
+                    // "Zone in alarm"
+                    if (zones[receivebuffer[24]-1].accessory != null && alarm[receivebuffer[25]].accessory != null) {                
+                        zones[receivebuffer[24]-1].accessory.log('Zone:' + zones[receivebuffer[24]-1].accessory.name + ' in alarm.');
+                        alarm[receivebuffer[25]].accessory.securitysystemService.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED);
+                        alarm[receivebuffer[25]].accessory.log('Alarmstatus :' + alarm[receivebuffer[25]].status);
+                        if (mqttenabled) {
+                            mqttclient.publish(alarm[receivebuffer[25]].topic, alarm[receivebuffer[25]].status, acc.publish_options);
+                        }
                     }
-                    acc.log('Zone:' + zones[receivebuffer[24]-1].accessory.name);
-                }                
-                break;
-            case 2:
-                // "Partition status"
-                //0:"N/A" ,
-                //1:"N/A" ,
-                //2:"Silent alarm" ,
-                //3:"Buzzer alarm" ,
-                //4:"Steady alarm" ,
-                //5:"Pulse alarm" ,
-                //6:"Strobe" ,
-                //7:"Alarm stopped" ,
-                //8:"Squawk ON (Partition 1)" ,
-                //9:"Squawk OFF (Partition 1)" ,
-                //10:"Ground Start (Partition 1)" ,
-                //11:"Disarm partition" ,
-                //12:"Arm partition" ,
-                //13:"Entry delay started" ,
-                //14:"Exit delay started" ,
-                //15:"Pre-alarm delay" ,
-                //16:"Report confirmation" ,
-                //99:"Any partition status event"                
-                acc.log(partitionStatus[receivebuffer[24]]);
-                break;
-            case 3:
-                // "Bell status (Partition 1)"
-                acc.log(bellStatus[receivebuffer[24]]);
-                break;
-            case 5:
-            case 6:
-                acc.log(nonReportableEvents[receivebuffer[24]]);
-                break;
-            case 26:
-                acc.log(softwareAccess[receivebuffer[24]]);
-                break;
-            case 27:
-                acc.log(busModuleEvent[receivebuffer[24]]);
-                break;
-            case 30:
-                acc.log(specialArming[receivebuffer[24]]);
-                break;
-            case 34:
-                acc.log(specialDisarming[receivebuffer[24]]);
-                break;
-            case 36:
-                // "Zone in alarm"
-                if (zones[receivebuffer[24]-1].accessory != null && alarm[receivebuffer[25]].accessory != null) {                
-                    zones[receivebuffer[24]-1].accessory.log('Zone:' + zones[receivebuffer[24]-1].accessory.name + ' in alarm.');
-                    alarm[receivebuffer[25]].accessory.securitysystemService.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED);
-                    alarm[receivebuffer[25]].accessory.log('Alarmstatus :' + alarm[receivebuffer[25]].status);
-                    if (mqttenabled) {
-                        mqttclient.publish(alarm[receivebuffer[25]].topic, alarm[receivebuffer[25]].status, acc.publish_options);
+                    break;
+                case 38:
+                    // "Zone alarm restore"
+                    if (zones[receivebuffer[24]-1].accessory != null && alarm[receivebuffer[25]].accessory != null) {                                
+                        zones[receivebuffer[24]-1].accessory.log('Zone:' + zones[receivebuffer[24]-1].accessory.name + ' alarm restored.');
+        //                alarm[receivebuffer[25]].accessory.securitysystemService.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.DISARMED);
+                        alarm[receivebuffer[25]].accessory.log('Alarmstatus :' + alarm[receivebuffer[25]].status);
+                        if (mqttenabled) {
+                            mqttclient.publish(alarm[receivebuffer[25]].topic, alarm[receivebuffer[25]].status, acc.publish_options);
+                        }
                     }
-                }
-                break;
-            case 38:
-                // "Zone alarm restore"
-                if (zones[receivebuffer[24]-1].accessory != null && alarm[receivebuffer[25]].accessory != null) {                                
-                    zones[receivebuffer[24]-1].accessory.log('Zone:' + zones[receivebuffer[24]-1].accessory.name + ' alarm restored.');
-    //                alarm[receivebuffer[25]].accessory.securitysystemService.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.DISARMED);
-                    alarm[receivebuffer[25]].accessory.log('Alarmstatus :' + alarm[receivebuffer[25]].status);
-                    if (mqttenabled) {
-                        mqttclient.publish(alarm[receivebuffer[25]].topic, alarm[receivebuffer[25]].status, acc.publish_options);
-                    }
-                }
-                break;                
-            case 40:
-                acc.log(specialAlarm[receivebuffer[24]]);
-                break;
-            case 42:
-                // "Trouble restored "
-                acc.log([receivebuffer[24]]);
-                break;
-            case 44:
-                // "New trouble (Partition 1:both for sub event 7"
-                // SecuritySystem
-                //  // Optional Characteristics
-                //  this.addOptionalCharacteristic(Characteristic.StatusFault);
-                acc.log(newTrouble[receivebuffer[24]]);
-                break;
-            case 45:
-                // "Trouble restored "
-                acc.log(troubleRestored[receivebuffer[24]]);
-                break;
-            case 46:
-                acc.log(moduleTrouble[receivebuffer[24]]);
-                break;
-            case 47:
-                acc.log(moduleTroubleRestore[receivebuffer[24]]);
-                break;
-            case 48:
-                acc.log(special[receivebuffer[24]]);
-                break;
-//    42: "Zone tampered",
-//    43: "Zone tamper restore",
-//    49: "Low battery on zone",
-// ContacSensor
-//  // Optional Characteristics
-//  this.addOptionalCharacteristic(Characteristic.StatusTampered);
-//  this.addOptionalCharacteristic(Characteristic.StatusLowBattery);
-//
-// MotionSensor
-//  // Optional Characteristics
-//  this.addOptionalCharacteristic(Characteristic.StatusTampered);
-//  this.addOptionalCharacteristic(Characteristic.StatusLowBattery);
+                    break;                
+                case 40:
+                    acc.log(specialAlarm[receivebuffer[24]]);
+                    break;
+                case 42:
+                    // "Trouble restored "
+                    acc.log([receivebuffer[24]]);
+                    break;
+                case 44:
+                    // "New trouble (Partition 1:both for sub event 7"
+                    // SecuritySystem
+                    //  // Optional Characteristics
+                    //  this.addOptionalCharacteristic(Characteristic.StatusFault);
+                    acc.log(newTrouble[receivebuffer[24]]);
+                    break;
+                case 45:
+                    // "Trouble restored "
+                    acc.log(troubleRestored[receivebuffer[24]]);
+                    break;
+                case 46:
+                    acc.log(moduleTrouble[receivebuffer[24]]);
+                    break;
+                case 47:
+                    acc.log(moduleTroubleRestore[receivebuffer[24]]);
+                    break;
+                case 48:
+                    acc.log(special[receivebuffer[24]]);
+                    break;
+    //    42: "Zone tampered",
+    //    43: "Zone tamper restore",
+    //    49: "Low battery on zone",
+    // ContacSensor
+    //  // Optional Characteristics
+    //  this.addOptionalCharacteristic(Characteristic.StatusTampered);
+    //  this.addOptionalCharacteristic(Characteristic.StatusLowBattery);
+    //
+    // MotionSensor
+    //  // Optional Characteristics
+    //  this.addOptionalCharacteristic(Characteristic.StatusTampered);
+    //  this.addOptionalCharacteristic(Characteristic.StatusLowBattery);
 
 
-            case 64:
-                acc.log(systemStatus[receivebuffer[24]]);
-                break;
+                case 64:
+                    acc.log(systemStatus[receivebuffer[24]]);
+                    break;
+            }
         }
     }
 
