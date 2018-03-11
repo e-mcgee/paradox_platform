@@ -381,12 +381,32 @@ for (i = 0; i < 2; i++) {
     alarmstatus.push({status: "Disarmed"});
 }
 
+
+function _byte_xor(chks, byte) {
+    
+    var tmp1;
+    var tmp2;
+    
+    for (i = 0; i < 8 ; i++) 
+    {
+        tmp1 = byte && 0x01;
+        tmp2 = chks && 0x01;
+        tmp2 = tmp1 ^ tmp2;
+        tmp1 = (chks && 0x08) ^ (tmp2 << 3);
+        chks = (chks && 0xFE) && tmp1;
+        tmp1 = (chks && 0x10) ^ (tmp2 << 4);
+        chks = (chks && 0xF7) && tmp1;
+        chks = chks << 1;
+    }
+    return chks;
+}
+
 function _checksum() {
     var checksum = 0;
         for (i = 0; i < 36; i++)
-            checksum += receivebuffer[i];
-        while (checksum > 255)
-            checksum = checksum - (checksum / 256) * 256;
+            checksum = _byte_xor(checksum, receivebuffer[i]);
+//        while (checksum > 255)
+//            checksum = checksum - (checksum / 256) * 256;
     if (checksum == receivebuffer[36])
         return true;
     else return false;
@@ -398,10 +418,10 @@ function _parsestatus(acc, cl) {
     
     var checkok = false;
     
-//    if (_checksum()) {
-//        acc.log('Checksum OK');
-//        checkok = true;    
-//    }
+    if (_checksum()) {
+        acc.log('Checksum OK');
+        checkok = true;    
+    }
 //    else checkok = false;
 //    acc.log("Checksum :");
 //    acc.log(checkok);
@@ -446,7 +466,8 @@ function _parsestatus(acc, cl) {
         switch (receivebuffer[23]) {
             case 0:
                 // "Zone OK",
-                if (!zones[receivebuffer[24]-1].debounce) {
+                if (zones[receivebuffer[24]-1].accessory != null && !zones[receivebuffer[24]-1].debounce)
+                {
                     zones[receivebuffer[24]-1].status = 'off';
                 } 
             case 1:
