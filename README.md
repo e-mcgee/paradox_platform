@@ -21,6 +21,7 @@ Change log:
 4) Fixed random crash - caused by log during PGM changes
 5) Fixed random crash - caused by incorrect zone or alarm value received from alarm that points to an invalid zone not caught by code.  Now checking validity of zone first.
 6) Calculating Checksum
+7) Checks that zone info received from alarm is between 1 and 32 to avoid crashes if not
 
 Please note:
 The maximum password length is 16 characters.
