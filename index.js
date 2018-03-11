@@ -382,24 +382,24 @@ for (i = 0; i < 2; i++) {
 }
 
 
-function _byte_xor(chks, byte) {
-    
-    var tmp1;
-    var tmp2;
-    
-    for (i = 0; i < 8 ; i++) 
-    {
-        tmp1 = byte && 0x01;
-        tmp2 = chks && 0x01;
-        tmp2 = tmp1 ^ tmp2;
-        tmp1 = (chks && 0x08) ^ (tmp2 << 3);
-        chks = (chks && 0xFE) && tmp1;
-        tmp1 = (chks && 0x10) ^ (tmp2 << 4);
-        chks = (chks && 0xF7) && tmp1;
-        chks = chks << 1;
-    }
-    return chks;
-}
+//function _byte_xor(chks, byte) {
+//    
+//    var tmp1;
+//    var tmp2;
+//    
+//    for (i = 0; i < 8 ; i++) 
+//    {
+//        tmp1 = byte && 0x01;
+//        tmp2 = chks && 0x01;
+//        tmp2 = tmp1 ^ tmp2;
+//        tmp1 = (chks && 0x08) ^ (tmp2 << 3);
+//        chks = (chks && 0xFE) && tmp1;
+//        tmp1 = (chks && 0x10) ^ (tmp2 << 4);
+//        chks = (chks && 0xF7) && tmp1;
+//        chks = chks << 1;
+//    }
+//    return chks;
+//}
 
 function _checksum() {
     var checksum = 0;
@@ -416,14 +416,14 @@ function _checksum() {
 //  This is used in periodic status pole as well as in alarm control and pgm control functions
 function _parsestatus(acc, cl) {
     
-    var checkok = false;
+//    var checkok = false;
     
-    if (_checksum()) {
+//    if (_checksum()) {
 //        acc.log('Checksum OK');
 //        checkok = true;    
-    } else {
+//    } else {
 //        acc.log('Checksum not OK');
-    }
+//    }
 //    else checkok = false;
 //    acc.log("Checksum :");
 //    acc.log(checkok);
