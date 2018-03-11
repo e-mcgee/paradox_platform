@@ -420,7 +420,9 @@ function _parsestatus(acc, cl) {
     
     if (_checksum()) {
         acc.log('Checksum OK');
-        checkok = true;    
+//        checkok = true;    
+    } else {
+        acc.log('Checksum not OK');
     }
 //    else checkok = false;
 //    acc.log("Checksum :");
