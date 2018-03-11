@@ -403,8 +403,8 @@ function _byte_xor(chks, byte) {
 
 function _checksum() {
     var checksum = 0;
-        for (i = 0; i < 36; i++)
-            checksum = _byte_xor(checksum, receivebuffer[i]);
+    for (i = 0; i < 36; i++)
+        checksum = _byte_xor(checksum, receivebuffer[i]);
 //        while (checksum > 255)
 //            checksum = checksum - (checksum / 256) * 256;
     if (checksum == receivebuffer[36])
@@ -419,10 +419,10 @@ function _parsestatus(acc, cl) {
     var checkok = false;
     
     if (_checksum()) {
-        acc.log('Checksum OK');
+//        acc.log('Checksum OK');
 //        checkok = true;    
     } else {
-        acc.log('Checksum not OK');
+//        acc.log('Checksum not OK');
     }
 //    else checkok = false;
 //    acc.log("Checksum :");
