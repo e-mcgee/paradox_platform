@@ -1229,10 +1229,10 @@ function paradoxPlatform(log, config) {
             });
 
             client.on('data', (data) => {
+                self.log("Message received");
+                self.log("message length = ");
+                self.log(data.length);
                 if (data.length > 37) {
-        //            self.log("Message received");
-        //            self.log("message length = ");
-        //            self.log(data.length);
                     receivebuffer = Buffer.from(data);
         //            self.log(receivebuffer[16]);
         //            self.log(receivebuffer[23]);
