@@ -382,36 +382,40 @@ for (i = 0; i < 2; i++) {
 }
 
 
-function _byte_xor(chks, byte) {
-    
-    var tmp1;
-    var tmp2;
-    
-    for (i = 0; i < 8 ; i++) 
-    {
-        tmp1 = byte && (0x01 << i);           // Mask bit i
-        tmp1 = tmp1 >> i;                     // Get it to bit 0
-        tmp2 = chks && 0x01;                  // Get checksum bit 0
-        tmp2 = tmp1 ^ tmp2;                   // XOR bits 0
-        chks = (chks && 0xFE) && tmp2;        // Put the XOR result in checksum bit 0        
-        tmp1 = (chks && 0x08) ^ (tmp2 << 3);  // XOR bits 3
-        chks = (chks && 0xF7) && tmp1;        // Put the XOR result in checksum bit 3
-        tmp1 = (chks && 0x10) ^ (tmp2 << 4);  // XOR Bit 4
-        chks = (chks && 0xEF) && tmp1;        // Put the XOR result in checksum bit 4
-        tmp2 = chks && 0x01;                  // Get checksum bit 0
-        tmp2 = tmp2 << 7;                     // Move it to bit 7
-        chks = chks >> 1;                     // Shift checksum right 1 bit
-        chks = chks && tmp2;                  // Rotate calculated bit 0 into bit 7
-    }
-    return chks;
-}
+//function _byte_xor(chks, byte) {
+//    
+//    var tmp1;
+//    var tmp2;
+//    
+//    for (i = 0; i < 8 ; i++) 
+//    {
+//        tmp1 = byte && (0x01 << i);           // Mask bit i
+//        tmp1 = tmp1 >> i;                     // Get it to bit 0
+//        tmp2 = chks && 0x01;                  // Get checksum bit 0
+//        tmp2 = tmp1 ^ tmp2;                   // XOR bits 0
+//        chks = (chks && 0xFE) && tmp2;        // Put the XOR result in checksum bit 0        
+//        tmp1 = (chks && 0x08) ^ (tmp2 << 3);  // XOR bits 3
+//        chks = (chks && 0xF7) && tmp1;        // Put the XOR result in checksum bit 3
+//        tmp1 = (chks && 0x10) ^ (tmp2 << 4);  // XOR Bit 4
+//        chks = (chks && 0xEF) && tmp1;        // Put the XOR result in checksum bit 4
+//        tmp2 = chks && 0x01;                  // Get checksum bit 0
+//        tmp2 = tmp2 << 7;                     // Move it to bit 7
+//        chks = chks >> 1;                     // Shift checksum right 1 bit
+//        chks = chks && tmp2;                  // Rotate calculated bit 0 into bit 7
+//    }
+//    return chks;
+//}
 
 function _checksum() {
     var checksum = 0;
     for (i = 0; i < 36; i++)
-        checksum = _byte_xor(checksum, receivebuffer[i]);
+        checksum += receivebuffer[i];
+//        checksum = _byte_xor(checksum, receivebuffer[i]);
 //        while (checksum > 255)
 //            checksum = checksum - (checksum / 256) * 256;
+    while (checksum > 255)
+        checksum = checksum - (checksum / 256) * 256;
+    
     if (checksum == receivebuffer[36])
         return true;
     else return false;
@@ -423,12 +427,12 @@ function _parsestatus(acc, cl) {
     
 //    var checkok = false;
     
-//    if (_checksum()) {
-//        acc.log('Checksum OK');
-//        checkok = true;    
-//    } else {
-//        acc.log('Checksum not OK');
-//    }
+    if (_checksum()) {
+        acc.log('Checksum OK');
+  //      checkok = true;    
+    } else {
+        acc.log('Checksum not OK');
+    }
 //    else checkok = false;
 //    acc.log("Checksum :");
 //    acc.log(checkok);
