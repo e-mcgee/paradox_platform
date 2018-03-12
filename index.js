@@ -409,14 +409,14 @@ for (i = 0; i < 2; i++) {
 function _checksum() {
     var checksum = 0;
     for (i = 0; i < 36; i++)
-        checksum += receivebuffer[i];
+        checksum += receivebuffer[i+16];
 //        checksum = _byte_xor(checksum, receivebuffer[i]);
 //        while (checksum > 255)
 //            checksum = checksum - (checksum / 256) * 256;
     while (checksum > 255)
         checksum = checksum - (checksum / 256) * 256;
     
-    if (checksum == receivebuffer[36])
+    if (checksum == receivebuffer[52])
         return true;
     else return false;
 }
