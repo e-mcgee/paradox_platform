@@ -413,8 +413,10 @@ function _checksum() {
 //        checksum = _byte_xor(checksum, receivebuffer[i]);
 //        while (checksum > 255)
 //            checksum = checksum - (checksum / 256) * 256;
-    while (checksum > 255)
-        checksum = checksum - (checksum / 256) * 256;
+//    while (checksum > 255)
+//        checksum = checksum - (checksum / 256) * 256;
+
+    checksum = checksum % 256;
     
     if (checksum == receivebuffer[52])
         return true;
