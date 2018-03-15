@@ -1325,9 +1325,9 @@ function paradoxPlatform(log, config) {
 //                                        if (zones[i].accessory != null) {
 //                                            alarmtype += zones[i].name + ' ';
 //                                        }
-                                    }
+//                                    }
                                 }
-                                alarm[i].accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemAlarmType).updateValue(alarmtype);                    
+//                                alarm[i].accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemAlarmType).updateValue(alarmtype);                    
                                 alarm[i].accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemCurrentState).updateValue(stat);
                                 alarm[i].accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemTargetState).updateValue(stat);
                             }
