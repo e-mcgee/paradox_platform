@@ -1316,14 +1316,15 @@ function paradoxPlatform(log, config) {
                     if (alarm[i].accessory != null) {
                         if (alarm[i].status != alarmstatus[i]) {
                             if (alarmstatus[i] == 'In Alarm' || alarmstatus[i] == 'Armed Perimeter' || alarmstatus[i] == 'Armed Sleep' || alarmstatus[i] == 'Armed Away' || alarmstatus[i] == 'Disarmed') {
+                                var alarmtype = 'None';
                                 alarm[i].status = alarmstatus[i];
                                 var stat = GetHomebridgeStatus(alarmstatus[i]);
                                 if (alarmstatus[i] == 'In Alarm') {
-                                    var alarmtype = 'Zone(s) triggered:';                        
-                                    for (i = 0; i < 32; i++) {
-                                        if (zones[i].accessory != null) {
-                                            alarmtype += zones[i].name + ' ';
-                                        }
+                                    var alarmtype = 'Zone(s) triggered';                        
+//                                    for (i = 0; i < 32; i++) {
+//                                        if (zones[i].accessory != null) {
+//                                            alarmtype += zones[i].name + ' ';
+//                                        }
                                     }
                                 }
                                 alarm[i].accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemAlarmType).updateValue(alarmtype);                    
