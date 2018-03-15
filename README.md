@@ -22,6 +22,7 @@ Change log:
 5) Fixed random crash - caused by incorrect zone or alarm value received from alarm that points to an invalid zone not caught by code.  Now checking validity of zone first.
 6) Calculating Checksum correctly - only parse message received if checksum is OK
 7) Checks that zone info received from alarm is between 1 and 32 to avoid crashes if not
+8) Fixed variable that is not initialised and may cause random crashes
 
 Please note:
 The maximum password length is 16 characters.
