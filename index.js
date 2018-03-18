@@ -491,7 +491,7 @@ function _parsestatus(acc, cl) {
                             {
                                 zones[receivebuffer[24]-1].status = 'on';
                             }
-                            setTimeout(_debounce(receivebuffer[24]-1), zones[receivebuffer[24]-1].debounceDelay);
+                            setTimeout(_debounce, zones[receivebuffer[24]-1].debounceDelay, receivebuffer[24]-1);
                         }                    
                         var state;
                         if (zones[receivebuffer[24]-1].accessory != null && !zones[receivebuffer[24]-1].debounce) {
