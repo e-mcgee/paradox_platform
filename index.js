@@ -487,6 +487,7 @@ function _parsestatus(acc, cl) {
                             var z = receivebuffer[24]-1;
                             acc.log("zone :");
                             acc.log(receivebuffer[24]-1);
+                            acc.log(z);
                             setTimeout(function (z) {
                                 zones[z].debounce = false;
                                 zones[z].accessory.log('Stopping debounce');
