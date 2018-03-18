@@ -489,6 +489,7 @@ function _parsestatus(acc, cl) {
                             acc.log(receivebuffer[24]-1);
                             acc.log(z);
                             setTimeout(function (z) {
+                                acc.log(z);
                                 zones[z].debounce = false;
                                 zones[z].accessory.log('Stopping debounce');
                             }, zones[z].debounceDelay);
@@ -498,7 +499,7 @@ function _parsestatus(acc, cl) {
                             zones[receivebuffer[24]-1].debounce = true;
                             zones[receivebuffer[24]-1].accessory.log('Starting debounce delay:');
                             zones[receivebuffer[24]-1].accessory.log(zones[receivebuffer[24]-1].debounceDelay);
-                           switch (zones[receivebuffer[24]-1].type) {
+                            switch (zones[receivebuffer[24]-1].type) {
                                 case 'Garage Door':
                                     var isClosed;
                                     if (zones[receivebuffer[24]-1].status == 'off') {
