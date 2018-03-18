@@ -480,11 +480,15 @@ function _parsestatus(acc, cl) {
                     case 1:
                         // "Zone open",
                         if (zones[receivebuffer[24]-1].accessory != null && !zones[receivebuffer[24]-1].debounce) {
-                            if (receivebuffer[23] == 1) zones[receivebuffer[24]-1].status = 'on';
-                            setTimeout(function () {
-                                zones[receivebuffer[24]-1].debounce = false;
-                                zones[receivebuffer[24]-1].accessory.log('Stopping debounce');
-                            }, zones[receivebuffer[24]-1].debounceDelay);
+                            if (receivebuffer[23] == 1)
+                            {
+                                zones[receivebuffer[24]-1].status = 'on';
+                            }
+                            var z = receivebuffer[24]-1;
+                            setTimeout(function (z) {
+                                zones[z].debounce = false;
+                                zones[z].accessory.log('Stopping debounce');
+                            }, zones[z].debounceDelay);
                         }                    
                         var state;
                         if (zones[receivebuffer[24]-1].accessory != null && !zones[receivebuffer[24]-1].debounce) {
