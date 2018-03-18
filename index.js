@@ -422,6 +422,13 @@ function _checksum() {
         return true;
     else return false;
 }
+
+function _debounce(_zone) {
+    zones[_zone].accessory.log("zone :");
+    zones[_zone].accessory.log(_zone);    
+    zones[_zone].debounce = false;
+    zones[_zone].accessory.log('Stopping debounce');
+}
 //
 // Function to retrieve alram status and zone status from buffer data received from alarm.
 //  This is used in periodic status pole as well as in alarm control and pgm control functions
@@ -484,15 +491,7 @@ function _parsestatus(acc, cl) {
                             {
                                 zones[receivebuffer[24]-1].status = 'on';
                             }
-                            var z = receivebuffer[24]-1;
-                            acc.log("zone :");
-                            acc.log(receivebuffer[24]-1);
-                            acc.log(z);
-                            setTimeout(function (z) {
-                                acc.log(z);
-                                zones[z].debounce = false;
-                                zones[z].accessory.log('Stopping debounce');
-                            }, zones[z].debounceDelay);
+                            setTimeout(_debounce(receivebuffer[24]-1), zones[receivebuffer[24]-1].debounceDelay);
                         }                    
                         var state;
                         if (zones[receivebuffer[24]-1].accessory != null && !zones[receivebuffer[24]-1].debounce) {
