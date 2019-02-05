@@ -410,15 +410,8 @@ function _checksum() {
     var checksum = 0;
     for (i = 0; i < 36; i++)
         checksum += receivebuffer[i+16];
-//        checksum = _byte_xor(checksum, receivebuffer[i]);
-//        while (checksum > 255)
-//            checksum = checksum - (checksum / 256) * 256;
-//    while (checksum > 255)
-//        checksum = checksum - (checksum / 256) * 256;
-
-    checksum = checksum % 256;
-    
-    if (checksum == receivebuffer[52])
+    checksum = checksum % 256;    
+    if (checksum === receivebuffer[52])
         return true;
     else return false;
 }
@@ -433,16 +426,14 @@ function _debounce(_zone) {
 // Function to retrieve alram status and zone status from buffer data received from alarm.
 //  This is used in periodic status pole as well as in alarm control and pgm control functions
 function _parsestatus(acc, cl) {
-    
-//    var checkok = false;
-    
+        
     if (_checksum()) {
         acc.log('Checksum OK');
 
 //    for (i = 0; i < 36; i++)
 //        acc.log(receivebuffer[i]);
 
-        if (receivebuffer[16] == 0x02) {
+        if (receivebuffer[16] === 0x02) {
             switch (receivebuffer[20]) {
                 case 0x15:
                     PanelProduct = 'SP5500';
@@ -472,7 +463,7 @@ function _parsestatus(acc, cl) {
 
         }
 
-        if (receivebuffer[16] == 0xE2) {
+        if (receivebuffer[16] === 0xE2) {
             var state;
     //        acc.log(receivebuffer[23]);
             acc.log(eventMap[receivebuffer[23]]);
@@ -480,35 +471,35 @@ function _parsestatus(acc, cl) {
                 switch (receivebuffer[23]) {
                     case 0:
                         // "Zone OK",
-                        if (zones[receivebuffer[24]-1].accessory != null && !zones[receivebuffer[24]-1].debounce)
+                        if (zones[receivebuffer[24]-1].accessory !== null && !zones[receivebuffer[24]-1].debounce)
                         {
                             zones[receivebuffer[24]-1].status = 'off';
                         } 
                     case 1:
                         // "Zone open",
-                        if (zones[receivebuffer[24]-1].accessory != null && !zones[receivebuffer[24]-1].debounce) {
-                            if (receivebuffer[23] == 1)
+                        if (zones[receivebuffer[24]-1].accessory !== null && !zones[receivebuffer[24]-1].debounce) {
+                            if (receivebuffer[23] === 1)
                             {
                                 zones[receivebuffer[24]-1].status = 'on';
                             }
                             setTimeout(_debounce, zones[receivebuffer[24]-1].debounceDelay, receivebuffer[24]-1);
                         }                    
                         var state;
-                        if (zones[receivebuffer[24]-1].accessory != null && !zones[receivebuffer[24]-1].debounce) {
+                        if (zones[receivebuffer[24]-1].accessory !== null && !zones[receivebuffer[24]-1].debounce) {
                             zones[receivebuffer[24]-1].debounce = true;
                             zones[receivebuffer[24]-1].accessory.log('Starting debounce delay:');
                             zones[receivebuffer[24]-1].accessory.log(zones[receivebuffer[24]-1].debounceDelay);
                             switch (zones[receivebuffer[24]-1].type) {
                                 case 'Garage Door':
                                     var isClosed;
-                                    if (zones[receivebuffer[24]-1].status == 'off') {
+                                    if (zones[receivebuffer[24]-1].status === 'off') {
                                         isClosed = true;
                                         state = DoorState.CLOSED;
                                     } else {
                                         isClosed = false;
                                         state = DoorState.OPEN;
                                     }                            
-                                    if (isClosed != zones[receivebuffer[24]-1].accessory.wasClosed) {
+                                    if (isClosed !== zones[receivebuffer[24]-1].accessory.wasClosed) {
                                       if (!zones[receivebuffer[24]-1].accessory.operating) {
                                         zones[receivebuffer[24]-1].accessory.log('Door state changed');
                                         zones[receivebuffer[24]-1].accessory.wasClosed = isClosed;
@@ -521,7 +512,7 @@ function _parsestatus(acc, cl) {
                                 case 'Alarm':
                                     break;
                                 case 'Contact Sensor':
-                                    if (zones[receivebuffer[24]-1].status == 'off') {
+                                    if (zones[receivebuffer[24]-1].status === 'off') {
                                         state = Characteristic.ContactSensorState.CONTACT_DETECTED;
                                     } else {
                                         state = Characteristic.ContactSensorState.CONTACT_NOT_DETECTED;
@@ -529,7 +520,7 @@ function _parsestatus(acc, cl) {
                                     zones[receivebuffer[24]-1].accessory.contactsensorService.getCharacteristic(Characteristic.ContactSensorState).setValue(state);
                                     break;
                                 case 'Motion Sensor':
-                                    if (zones[receivebuffer[24]-1].status == 'off') {
+                                    if (zones[receivebuffer[24]-1].status === 'off') {
                                         state = false;
                                     } else {
                                         state = true;
@@ -537,7 +528,7 @@ function _parsestatus(acc, cl) {
                                     zones[receivebuffer[24]-1].accessory.motionsensorService.getCharacteristic(Characteristic.MotionDetected).setValue(state);
                                     break;
                                 case 'Smoke Sensor':
-                                    if (zones[receivebuffer[24]-1].status == 'off') {
+                                    if (zones[receivebuffer[24]-1].status === 'off') {
                                         state = Characteristic.SmokeDetected.SMOKE_NOT_DETECTED;
                                     } else {
                                         state = Characteristic.SmokeDetected.SMOKE_DETECTED;
@@ -546,7 +537,7 @@ function _parsestatus(acc, cl) {
                                     break;
                             }
                         }
-                        if (zones[receivebuffer[24]-1].accessory != null) {
+                        if (zones[receivebuffer[24]-1].accessory !== null) {
                             zones[receivebuffer[24]-1].accessory.log('Zone ' + (receivebuffer[24]-1).toString() + ' ' + zones[receivebuffer[24]-1].status + ' (' + zones[receivebuffer[24]-1].accessory.name + ')');
                             if (mqttenabled) {
                                 mqttclient.publish(zones[receivebuffer[24]-1].topic, zones[receivebuffer[24]-1].status, this.publish_options);
@@ -598,9 +589,9 @@ function _parsestatus(acc, cl) {
                         break;
                     case 36:
                         // "Zone in alarm"
-                        if (zones[receivebuffer[24]-1].accessory != null && alarm[receivebuffer[25]].accessory != null) {                
+                        if (zones[receivebuffer[24]-1].accessory !== null && alarm[receivebuffer[25]].accessory !== null) {                
                             zones[receivebuffer[24]-1].accessory.log('Zone:' + zones[receivebuffer[24]-1].accessory.name + ' in alarm.');
-                            alarm[receivebuffer[25]].accessory.securitysystemService.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED);
+                            alarm[receivebuffer[25]].accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemCurrentState).setValue(Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED);
                             alarm[receivebuffer[25]].accessory.log('Alarmstatus :' + alarm[receivebuffer[25]].status);
                             if (mqttenabled) {
                                 mqttclient.publish(alarm[receivebuffer[25]].topic, alarm[receivebuffer[25]].status, acc.publish_options);
@@ -609,7 +600,7 @@ function _parsestatus(acc, cl) {
                         break;
                     case 38:
                         // "Zone alarm restore"
-                        if (zones[receivebuffer[24]-1].accessory != null && alarm[receivebuffer[25]].accessory != null) {                                
+                        if (zones[receivebuffer[24]-1].accessory !== null && alarm[receivebuffer[25]].accessory !== null) {                                
                             zones[receivebuffer[24]-1].accessory.log('Zone:' + zones[receivebuffer[24]-1].accessory.name + ' alarm restored.');
             //                alarm[receivebuffer[25]].accessory.securitysystemService.setCharacteristic(Characteristic.SecuritySystemCurrentState, Characteristic.SecuritySystemCurrentState.DISARMED);
                             alarm[receivebuffer[25]].accessory.log('Alarmstatus :' + alarm[receivebuffer[25]].status);
@@ -667,8 +658,8 @@ function _parsestatus(acc, cl) {
         }
 
     
-        if (receivebuffer[16] == 0x52) {
-            if (receivebuffer[19] == 0x01) {
+        if (receivebuffer[16] === 0x52) {
+            if (receivebuffer[19] === 0x01) {
                 // Alarm status
     //            acc.log('Alarm State received');
                 status_valid = true;
@@ -745,14 +736,14 @@ function _parsestatus(acc, cl) {
 
                 }
             }
-            if (receivebuffer[19] == 0x00) {
+            if (receivebuffer[19] === 0x00) {
                 // Zone status
-                if (loginresult == 0) {             // only get zone status if this message is not as a result of a login message sent to alarm          
+                if (loginresult === 0) {             // only get zone status if this message is not as a result of a login message sent to alarm          
     //                acc.log('Zone State received');
                     for (i = 0; i < 4; i++) {
                         for (j = 0; j < 8; j++) {
-                            if (zones[j + i * 8].accessory != null) {
-                                if (zones[j + i * 8].accessory.operating != true) {
+                            if (zones[j + i * 8].accessory !== null) {
+                                if (zones[j + i * 8].accessory.operating !== true) {
                                     if (receivebuffer[i + 35] & 0x01 << j) {
                                         zones[j + i * 8].status = "on";
                                     } else {
@@ -776,7 +767,7 @@ function _parsestatus(acc, cl) {
 function format37ByteMessage(message) {
 
     var checksum = 0;
-    if (message.length % 37 != 0) {
+    if (message.length % 37 !== 0) {
         for (i = 0; i < message.length; i++)
             checksum += message.charCodeAt(i);
         while (checksum > 255)
@@ -809,7 +800,7 @@ function _login(password, cl, acc) {
 
     cl.write(buf);
     setTimeout(function () {
-        if (receivebuffer[4] == 0x38) {
+        if (receivebuffer[4] === 0x38) {
             acc.log('Log in successfull');
             buf = Buffer.from(LOGIN_MSG2);
             buf[1] = 0x00;
@@ -1001,7 +992,7 @@ function controlAlarm(state, partition, acc, cl) {
 
         acc.log('Controlling Alarm State...');
         buf = Buffer.from(CONTROLALARM_MSG1);
-        if (partition == 0) {
+        if (partition === 0) {
             switch (state) {
                 case "ARM" :
                     message1 = CONTROLALARM_ARM_P0_MSG;
@@ -1017,7 +1008,7 @@ function controlAlarm(state, partition, acc, cl) {
                     break;
             }
         }
-        if (partition == 1) {
+        if (partition === 1) {
             switch (state) {
                 case "ARM" :
                     message1 = CONTROLALARM_ARM_P1_MSG;
@@ -1074,7 +1065,7 @@ function controlPGM(state, pgm, acc, cl) {
         buf = Buffer.from(CONTROLPGM_MSG1);
         if (state == "ON") {
             message1 = '\x40\x00\x30';
-        } else if (state == "OFF") {
+        } else if (state === "OFF") {
             message1 = '\x40\x00\x31';
         } else {
             acc.log('Invalid PGM state - ignoring.');
@@ -1219,7 +1210,7 @@ function paradoxPlatform(log, config) {
             client.on('end', () => {
         //        self.log('Finished Getting Status - Disconnected from  alarm');
                 loggedin = false;
-                connected = false;
+ //               connected = false;
             });
 
             client.on('timeout', () => {
