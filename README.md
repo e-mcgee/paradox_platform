@@ -23,7 +23,9 @@ Change log:
 6) Calculating Checksum correctly - only parse message received if checksum is OK
 7) Checks that zone info received from alarm is between 1 and 32 to avoid crashes if not
 8) Fixed variable that is not initialised and may cause random crashes
-9) Fixed race condition during debounce period on index variable.
+9) Fixed race condition during debounce period on index variable
+10) Changed alarm trigger state
+11) Fixed Connected flag that gets reset on connection end.  Connected flag should stop login but failed connections should not stop login through flag
 
 Please note:
 The maximum password length is 16 characters.
