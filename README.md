@@ -14,14 +14,6 @@ You simply toggle the switch to control logged in status.
 
 Parameters are available for the config of the platform to tweak all the delays between commands and plugins.See the wiki for description of this and sample config.json file.
 
-Please assist me by donating:
-<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-<input type="hidden" name="cmd" value="_s-xclick" />
-<input type="hidden" name="hosted_button_id" value="8HG2NEW2PWWZN" />
-<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
-<img alt="" border="0" src="https://www.paypal.com/en_ZA/i/scr/pixel.gif" width="1" height="1" />
-</form>
-
 Change log:
 1) Fixed callback in door state setting to ensure immediate feedback so that multiple actions on doors can happen simultaneously.
 2) Fixed alarm set callback that was missing
