@@ -1,3 +1,4 @@
+
 // Requires
 var net = require('net');
 var mqtt = require('mqtt');
@@ -8,6 +9,7 @@ var busyloggingin = false;
 var client;
 var mqttclient;
 var mqttenabled = false;
+var mqttconnected = false;
 
 //var alarmstatus = 'Disarmed';                   // Current Alarm state
 //var alarmstatus_p2 = 'Disarmed';                   // Current Alarm state
@@ -1063,7 +1065,7 @@ function controlPGM(state, pgm, acc, cl) {
         acc.log('Controlling PGM State...');
 
         buf = Buffer.from(CONTROLPGM_MSG1);
-        if (state == "ON") {
+        if (state === "ON") {
             message1 = '\x40\x00\x30';
         } else if (state === "OFF") {
             message1 = '\x40\x00\x31';
@@ -1182,16 +1184,81 @@ function paradoxPlatform(log, config) {
 	};
         this.log("Connecting to MQTT Broker");
         mqttclient = mqtt.connect(this.url, this.options);
+        
+        
+        mqttclient.on('connect', () => {
+//            self.subscribe_options = {
+//                qos: 0
+//            };
+//            mqttconnected = true;
+//            self.log('MQTT Broker connected');
+            for (i = 0; i < 2; i++) {
+                if (alarm[i].accessory !== null ) {
+                    alarm[i].accessory.log('MQTT subscribing to :');
+                    alarm[i].accessory.log(alarm[i].cmdtopic);
+//                    mqttclient.subcribe(alarm[i].cmdtopic, function (err) {
+//                       self.log('MQTT subscribe error:');
+//                       self.log(err);
+//                    });    
+                }
+            }
+            for (i = 0; i < 32; i++) {
+                if (zones[i].accessory !== null) {
+                    if (zones[i].accessory.cmdtopic !== null)  {
+                        zones[i].accessory.log('MQTT subscribing to :');
+                        zones[i].accessory.log(zones[i].accessory.cmdtopic);
+//                    mqttclient.subcribe(zones[i].accessory.cmdtopic, this.subscribe_options, function (err) {
+//                       this.log('MQTT subscribe error:');
+//                       this.log(err);
+//                    });
+                    }
+                }
+            }                
+        });
 
-//        this.mqttclient.on('message', function (topic, message) {
-//        if (topic == that.topicStatusGet) {
-//            var status = message.toString();
-//            if (status == that.onValue || status == that.offValue) {
-//                    that.switchStatus = (status == that.onValue) ? true : false;
-//                    that.service.getCharacteristic(Characteristic.On).setValue(that.switchStatus, undefined, 'fromSetValue');
-//            }
-//        }
-//        });
+        mqttclient.on('message', (topic, message) => {
+    //            Alarm accessories command topic message contains the desired state of the alarm:
+    //            "Armed Perimeter"
+    //            "Armed Sleep"
+    //            "Armed Away"
+    //            "Disarmed"
+    //            
+            for (i = 0; i < 2; i++) {
+                if (alarm[i].cmdtopic === topic) {
+    //                   set alarm to message
+                      alarm[i].accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemCurrentState).updateValue(GetHomebridgeStatus(message));
+                      alarm[i].accessory.securitysystemService.getCharacteristic(Characteristic.SecuritySystemTargetState).updateValue(GetHomebridgeStatus(message));
+                }
+            }
+
+    //            Garagedoor accessories command topic contains either an:
+    //            'open' or 'close' message
+    //            and if this commands different than the current state of the door it will command the door to open or close
+            for (i = 0; i < 32; i++) {
+                if (zones[i].accessory.cmdtopic === topic) {
+    //                   trigger garagedoor action
+                    var change = false;
+                    if (zones[i].status === 'off' && message === 'open') {
+                        isClosed = true;
+                        state = DoorState.OPEN;
+                        change = true;
+                    } 
+                    else if (zones[i].status === 'on' && message === 'close') {
+                        isClosed = false;
+                        state = DoorState.CLOSE;
+                        change = true;
+                    }                            
+                    if (!zones[i].accessory.operating && change) {
+                        zones[i].accessory.log('Door state changed');
+                        zones[i].accessory.wasClosed = isClosed;
+                        zones[i].accessory.garagedooropenerService.getCharacteristic(DoorState).updateValue(state);
+                        zones[i].accessory.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(state);
+                        zones[i].accessory.targetState = state;
+                    }
+                }
+            }                
+        });
+        
     }        
     // Status poll loop
     //  This loop sends the status request message to the alarm and then retrives the values form the buffer.
@@ -1243,24 +1310,27 @@ function paradoxPlatform(log, config) {
             _login(alarm_password, client, self);                
         }
         if (loggedin) {
+//            if (mqttconnected) {
+//                
+//            }
             if (!muteStatus && getAlarmStatus(self)) {
                 var state;
                 alarm[0].accessory.log('Got status');
                 alarm[0].accessory.log('Results:');
                 for (i = 0; i < 32; i++) {
                     var st;
-                    if (zones[i].accessory != null) {
+                    if (zones[i].accessory !== null) {
                         switch (zones[i].type) {
                             case 'Garage Door':
                                 var isClosed;
-                                if (zones[i].status == 'off') {
+                                if (zones[i].status === 'off') {
                                     isClosed = true;
                                     state = DoorState.CLOSED;
                                 } else {
                                     isClosed = false;
                                     state = DoorState.OPEN;
                                 }                            
-                                if (isClosed != zones[i].accessory.wasClosed) {
+                                if (isClosed !== zones[i].accessory.wasClosed) {
                                   if (!zones[i].accessory.operating) {
                                     zones[i].accessory.log('Door state changed');
                                     zones[i].accessory.wasClosed = isClosed;
@@ -1273,7 +1343,7 @@ function paradoxPlatform(log, config) {
                             case 'Alarm':
                                 break;
                             case 'Contact Sensor':
-                                if (zones[i].status == 'off') {
+                                if (zones[i].status === 'off') {
                                     state = Characteristic.ContactSensorState.CONTACT_DETECTED;
                                 } else {
                                     state = Characteristic.ContactSensorState.CONTACT_NOT_DETECTED;
@@ -1281,7 +1351,7 @@ function paradoxPlatform(log, config) {
                                 zones[i].accessory.contactsensorService.getCharacteristic(Characteristic.ContactSensorState).setValue(state);
                                 break;
                             case 'Motion Sensor':
-                                if (zones[i].status == 'off') {
+                                if (zones[i].status === 'off') {
                                     state = false;
                                 } else {
                                     state = true;
@@ -1289,7 +1359,7 @@ function paradoxPlatform(log, config) {
                                 zones[i].accessory.motionsensorService.getCharacteristic(Characteristic.MotionDetected).setValue(state);
                                 break;
                             case 'Smoke Sensor':
-                                if (zones[i].status == 'off') {
+                                if (zones[i].status === 'off') {
                                     state = Characteristic.SmokeDetected.SMOKE_NOT_DETECTED;
                                 } else {
                                     state = Characteristic.SmokeDetected.SMOKE_DETECTED;
@@ -1300,7 +1370,7 @@ function paradoxPlatform(log, config) {
                                 alarm[0].accessory.log('Not Supported: %s [%s]', zones[i].name, zones[i].type);
                         }
                     }
-                    if (zones[i].accessory != null) {
+                    if (zones[i].accessory !== null) {
                         zones[i].accessory.log('Zone ' + i.toString() + ' ' + zones[i].status + ' (' + zones[i].accessory.name + ')');
                         if (mqttenabled) {
 //                            zones[i].accessory.log('About to publish zone to MQTT');                            
@@ -1311,13 +1381,13 @@ function paradoxPlatform(log, config) {
                 }
 
                 for (i = 0; i < 2; i++) {
-                    if (alarm[i].accessory != null) {
-                        if (alarm[i].status != alarmstatus[i]) {
-                            if (alarmstatus[i] == 'In Alarm' || alarmstatus[i] == 'Armed Perimeter' || alarmstatus[i] == 'Armed Sleep' || alarmstatus[i] == 'Armed Away' || alarmstatus[i] == 'Disarmed') {
+                    if (alarm[i].accessory !== null) {
+                        if (alarm[i].status !== alarmstatus[i]) {
+                            if (alarmstatus[i] === 'In Alarm' || alarmstatus[i] === 'Armed Perimeter' || alarmstatus[i] === 'Armed Sleep' || alarmstatus[i] === 'Armed Away' || alarmstatus[i] === 'Disarmed') {
                                 var alarmtype = 'None';
                                 alarm[i].status = alarmstatus[i];
                                 var stat = GetHomebridgeStatus(alarmstatus[i]);
-                                if (alarmstatus[i] == 'In Alarm') {
+                                if (alarmstatus[i] === 'In Alarm') {
                                     var alarmtype = 'Zone(s) triggered';                        
 //                                    for (i = 0; i < 32; i++) {
 //                                        if (zones[i].accessory != null) {
@@ -1341,7 +1411,7 @@ function paradoxPlatform(log, config) {
 
             } else {
                 alarm[0].accessory.log('Busy with alarm - not getting status now.');
-            }
+            }            
         }
     }, POLL_DELAY);
     
@@ -1373,27 +1443,41 @@ paradoxPlatform.prototype.accessories = function (callback) {
 
             self.log('Found: %s [%s]', accessoryName, accConfig.type);
             
-            if (accessoryName != "inactive") {
+            if (accessoryName !== "inactive") {
 
                 var a = new ParadoxAccessory(self.log, accConfig, accessoryName);
 
-                if (accConfig.type == 'Garage Door' || accConfig.type == 'Contact Sensor' || accConfig.type == 'Motion Sensor' || accConfig.type == 'Smoke Sensor') {
+                if (accConfig.type === 'Garage Door' || accConfig.type === 'Contact Sensor' || accConfig.type === 'Motion Sensor' || accConfig.type === 'Smoke Sensor') {
                     zones[accConfig.zone].accessory = a;
                     zones[accConfig.zone].type = accConfig.type;
                     zones[accConfig.zone].topic = accConfig.topic;
+                    zones[accConfig.zone].cmdtopic = null;                    
                     zones[accConfig.zone].debounceDelay = accConfig.debounceDelay;
                     self.log('Debounce delay:');
                     self.log(zones[accConfig.zone].debounceDelay);
                 }
-                if (accConfig.type == 'Garage Door') {
+                if (accConfig.type === 'Garage Door') {
                     zones[accConfig.zone].doorOpensInSeconds = accConfig.doorOpensInSeconds;
                     self.log('Door open in seconds:');
                     self.log(accConfig.doorOpensInSeconds);
+                    zones[accConfig.zone].cmdtopic = accConfig.cmdtopic;
+//                    self.log('Subscribing to Garage Door command topic');
+//                    self.log(zones[accConfig.zone].cmdtopic);
+//                    mqttclient.subcribe(zones[accConfig.zone].cmdtopic, function (err) {
+//                       self.log('MQTT Subscribe Error:');
+//                       self.log(err);
+//                    });
                 }
 
-                if (accConfig.type == 'Alarm') {
+                if (accConfig.type === 'Alarm') {
                     alarm[accConfig.partition].accessory = a;
                     alarm[accConfig.partition].topic = accConfig.topic;
+                    alarm[accConfig.partition].cmdtopic = accConfig.cmdtopic;
+//                    self.log('Subscribing to Alarm command topic');                    
+//                    mqttclient.subcribe(alarm[accConfig.partition].cmdtopic, function (err) {
+//                       self.log('MQTT subscribe error:');
+//                       self.log(err);
+//                    });    
                 }
                 acc.push(a);
             }
@@ -1460,15 +1544,16 @@ ParadoxAccessory.prototype.initService = function () {
 
     this.informationService
             .setCharacteristic(Characteristic.Manufacturer, 'Paradox')
-            .setCharacteristic(Characteristic.SerialNumber, 'Platform')
+//            .setCharacteristic(Characteristic.SerialNumber, 'Platform')
             .setCharacteristic(Characteristic.FirmwareRevision, 'v1.0');
 
     switch (this.config.type) {
         case 'Alarm':
             this.securitysystemService = new Service.SecuritySystem(this.name);
             this.informationService
-                    .setCharacteristic(Characteristic.Model, 'Alarm');
-            this.securitysystemService
+                    .setCharacteristic(Characteristic.Model, 'Alarm')
+ 		    .setCharacteristic(Characteristic.SerialNumber, 'Platform'); 
+          this.securitysystemService
                     .getCharacteristic(Characteristic.SecuritySystemCurrentState)
                     .on('get', this.getAlarmState.bind(this));
             this.securitysystemService
@@ -1479,11 +1564,14 @@ ParadoxAccessory.prototype.initService = function () {
             this.log(alarmstatus[this.config.partition]);
             this.securitysystemService.getCharacteristic(AlarmS).setValue(GetHomebridgeStatus(alarmstatus[this.config.partition]));
             this.securitysystemService.getCharacteristic(Characteristic.SecuritySystemTargetState).setValue(GetHomebridgeStatus(alarmstatus[this.config.partition]));
+//            this.log('Subscribing to Alarm command topic');                    
+//            mqttclient.subcribe(alarm[this.config.partition].this.config.cmdtopic);                        
             break;
         case 'Garage Door':
             this.garagedooropenerService = new Service.GarageDoorOpener(this.name);
             this.informationService
-                    .setCharacteristic(Characteristic.Model, 'Garage Door');
+                    .setCharacteristic(Characteristic.Model, 'Garage Door')
+		    .setCharacteristic(Characteristic.SerialNumber, 'Platform');
             this.garagedooropenerService
                     .getCharacteristic(DoorState)
                     .on('get', this.getDoorState.bind(this));
@@ -1497,7 +1585,7 @@ ParadoxAccessory.prototype.initService = function () {
             this.garagedooropenerService.operating = false;
                         
             this.log("Initial Door State: ");
-            if (zones[this.config.zone].status == 'off') {
+            if (zones[this.config.zone].status === 'off') {
                 this.wasClosed = true;
                 this.log('Closed');
                 this.garagedooropenerService.getCharacteristic(DoorState).setValue(Characteristic.CurrentDoorState.CLOSED);  /// Was TargetDoorState
@@ -1512,12 +1600,14 @@ ParadoxAccessory.prototype.initService = function () {
         case 'Contact Sensor':
             this.contactsensorService = new Service.ContactSensor(this.name);
             this.informationService
-                    .setCharacteristic(Characteristic.Model, 'Contact Sensor');
+                    .setCharacteristic(Characteristic.Model, 'Contact Sensor')
+		    .setCharacteristic(Characteristic.SerialNumber, this.name);
             break;
         case 'Motion Sensor':
             this.motionsensorService = new Service.MotionSensor(this.name);
             this.informationService
-                    .setCharacteristic(Characteristic.Model, 'Motion Sensor');
+                    .setCharacteristic(Characteristic.Model, 'Motion Sensor')
+		    .setCharacteristic(Characteristic.SerialNumber, this.name);
             break;
         case 'Smoke Sensor':
             this.smokesensorService = new Service.SmokeSensor(this.name);
@@ -1569,8 +1659,8 @@ ParadoxAccessory.prototype.setFinalDoorState = function(state) {
 //      this.log("Was trying to " + (this.targetState == DoorState.CLOSED ? "CLOSE" : "OPEN") + " the door, but it is still " + (isClosed ? "CLOSED":"OPEN"));
 //      this.currentDoorState.setValue(DoorState.STOPPED);
 //    } else {
-      this.log("Set current state to " + (this.targetState == DoorState.CLOSED ? "CLOSED" : "OPEN"));
-      this.wasClosed = this.targetState == DoorState.CLOSED;
+      this.log("Set current state to " + (this.targetState === DoorState.CLOSED ? "CLOSED" : "OPEN"));
+      this.wasClosed = this.targetState === DoorState.CLOSED;
       this.log("Setting final state...");
       this.garagedooropenerService.setCharacteristic(DoorState, this.targetState);
 //      this.garagedooropenerService.getCharacteristic(Characteristic.TargetDoorState).setValue(this.targetState);
@@ -1593,7 +1683,7 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
     self.log('Setting state to ' + state);
     this.targetState = state;
 
-    if (zones[config.zone].status == 'off') {
+    if (zones[config.zone].status === 'off') {
         isClosed = true;
         self.log('Curently closed');
     } else {
@@ -1601,10 +1691,10 @@ ParadoxAccessory.prototype.setDoorState = function (state, callback) {
         self.log('Curently open');
     }
 
-    if ((state == DoorState.OPEN && isClosed) || (state == DoorState.CLOSED && !isClosed)) {
+    if ((state === DoorState.OPEN && isClosed) || (state === DoorState.CLOSED && !isClosed)) {
         self.log("Triggering GarageDoor Relay");
         this.operating = true;
-        if (state == DoorState.OPEN) {
+        if (state === DoorState.OPEN) {
             acc.getCharacteristic(DoorState).setValue(DoorState.OPENING);
         } else {
             acc.getCharacteristic(DoorState).setValue(DoorState.CLOSING);
@@ -1668,7 +1758,7 @@ ParadoxAccessory.prototype.getAlarmState = function (callback) {
     var config = this.config;
 
     state = GetHomebridgeStatus(alarm[config.partition].status);
-    if (state == 10) {
+    if (state === 10) {
         self.log('Alarmstate unknown');
         err = 'Error';
     }
@@ -1689,7 +1779,7 @@ ParadoxAccessory.prototype.setAlarmState = function (state, callback) {
     var wait = 1;
     var config = this.config;
 
-    if (targetstate == Characteristic.SecuritySystemTargetState.STAY_ARM || targetstate == Characteristic.SecuritySystemTargetState.NIGHT_ARM || targetstate == Characteristic.SecuritySystemTargetState.AWAY_ARM || targetstate == Characteristic.SecuritySystemTargetState.DISARM) {
+    if (targetstate === Characteristic.SecuritySystemTargetState.STAY_ARM || targetstate === Characteristic.SecuritySystemTargetState.NIGHT_ARM || targetstate === Characteristic.SecuritySystemTargetState.AWAY_ARM || targetstate === Characteristic.SecuritySystemTargetState.DISARM) {
 
         self.log('Setting alarm state to %s', targetstate);
 
@@ -1706,7 +1796,7 @@ ParadoxAccessory.prototype.setAlarmState = function (state, callback) {
             controlAlarmstate = true;
             _getalarmstatus(client, self);
             setTimeout(function () {
-                if (GetHomebridgeStatus(alarmstatus[config.partition]) != targetstate) {
+                if (GetHomebridgeStatus(alarmstatus[config.partition]) !== targetstate) {
                     switch (targetstate) {
                         case Characteristic.SecuritySystemTargetState.STAY_ARM:
                             controlAlarm("STAY", config.partition, self, client);
