@@ -1485,7 +1485,7 @@ ParadoxAccessory.prototype.initService = function () {
             this.garagedooropenerService = new Service.GarageDoorOpener(this.name);
             this.informationService
                     .setCharacteristic(Characteristic.Model, 'Garage Door')
-                    .setCharacteristic(Characteristic.SerialNumber, 'Platform'); 
+                    .setCharacteristic(Characteristic.SerialNumber, this.name); 
             this.garagedooropenerService
                     .getCharacteristic(DoorState)
                     .on('get', this.getDoorState.bind(this));
