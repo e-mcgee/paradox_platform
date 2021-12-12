@@ -1460,14 +1460,15 @@ ParadoxAccessory.prototype.initService = function () {
 
     this.informationService
             .setCharacteristic(Characteristic.Manufacturer, 'Paradox')
-            .setCharacteristic(Characteristic.SerialNumber, 'Platform')
+            // .setCharacteristic(Characteristic.SerialNumber, 'Platform')
             .setCharacteristic(Characteristic.FirmwareRevision, 'v1.0');
 
     switch (this.config.type) {
         case 'Alarm':
             this.securitysystemService = new Service.SecuritySystem(this.name);
             this.informationService
-                    .setCharacteristic(Characteristic.Model, 'Alarm');
+                    .setCharacteristic(Characteristic.Model, 'Alarm')
+                    .setCharacteristic(Characteristic.SerialNumber, 'Platform'); 
             this.securitysystemService
                     .getCharacteristic(Characteristic.SecuritySystemCurrentState)
                     .on('get', this.getAlarmState.bind(this));
@@ -1483,7 +1484,8 @@ ParadoxAccessory.prototype.initService = function () {
         case 'Garage Door':
             this.garagedooropenerService = new Service.GarageDoorOpener(this.name);
             this.informationService
-                    .setCharacteristic(Characteristic.Model, 'Garage Door');
+                    .setCharacteristic(Characteristic.Model, 'Garage Door')
+                    .setCharacteristic(Characteristic.SerialNumber, this.name); 
             this.garagedooropenerService
                     .getCharacteristic(DoorState)
                     .on('get', this.getDoorState.bind(this));
@@ -1512,12 +1514,14 @@ ParadoxAccessory.prototype.initService = function () {
         case 'Contact Sensor':
             this.contactsensorService = new Service.ContactSensor(this.name);
             this.informationService
-                    .setCharacteristic(Characteristic.Model, 'Contact Sensor');
+                    .setCharacteristic(Characteristic.Model, 'Contact Sensor')
+                    .setCharacteristic(Characteristic.SerialNumber, this.name);
             break;
         case 'Motion Sensor':
             this.motionsensorService = new Service.MotionSensor(this.name);
             this.informationService
-                    .setCharacteristic(Characteristic.Model, 'Motion Sensor');
+                    .setCharacteristic(Characteristic.Model, 'Motion Sensor')
+                    .setCharacteristic(Characteristic.SerialNumber, this.name);
             break;
         case 'Smoke Sensor':
             this.smokesensorService = new Service.SmokeSensor(this.name);
